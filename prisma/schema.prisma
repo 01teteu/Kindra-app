@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------------
+// USER — Etapa 1.1
+// --------------------------------------------
+
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String? // hash da senha (opcional para usuários do Google)
+  provider String  @default("LOCAL") // "LOCAL" ou "GOOGLE" (SQLite não suporta Enum nativo no Prisma)
+
+  role          String  @default("USER")
+  emailVerified Boolean @default(false)
+  resendAttempts Int       @default(0)
+  lastResendAt   DateTime?
+
+  resetResendAttempts Int       @default(0)
+  lastResetResendAt   DateTime?
+
+  profile Profile?
+  passwordResetTokens PasswordResetToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  used      Boolean  @default(false)
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
+}
+
+// --------------------------------------------
+// PROFILE — Etapa 1.2
+// --------------------------------------------
+
+model Profile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  firstName String
+  lastName  String
+  birthDate DateTime
+
+  weightKg      Float
+  heightCm      Float
+  activityLevel String
+  goal          String
+  isPCD         Boolean @default(false)
+
+  // SQLite doesn't support arrays (String[]), so we use a JSON-stringified String 
+  allergies           ProfileAllergy[]
+  physicalLimitations ProfilePhysicalLimitation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+model Allergy {
+  id       String           @id @default(uuid())
+  name     String           @unique
+  profiles ProfileAllergy[]
+
+  @@map("allergies")
+}
+
+model ProfileAllergy {
+  profileId String
+  allergyId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  allergy   Allergy @relation(fields: [allergyId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, allergyId])
+  @@map("profile_allergies")
+}
+
+model PhysicalLimitation {
+  id       String                      @id @default(uuid())
+  name     String                      @unique
+  profiles ProfilePhysicalLimitation[]
+
+  @@map("physical_limitations")
+}
+
+model ProfilePhysicalLimitation {
+  profileId            String
+  physicalLimitationId String
+  profile              Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  physicalLimitation   PhysicalLimitation @relation(fields: [physicalLimitationId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, physicalLimitationId])
+  @@map("profile_physical_limitations")
+}
