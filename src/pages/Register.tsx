@@ -61,7 +61,11 @@ export function Register() {
       // Go to verify email prompt view
       navigate('/verify-email', { state: { email: data.email } });
     } catch (err: any) {
-      setServerError(err.message || 'Erro ao criar conta.');
+      if (err.status) {
+        setServerError(err.message);
+      } else {
+        setServerError('Erro de rede: não foi possível conectar ao servidor.');
+      }
     }
   };
 

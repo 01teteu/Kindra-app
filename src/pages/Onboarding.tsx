@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { clsx } from 'clsx';
+import { ACTIVITY_LEVEL_OPTIONS, GOAL_OPTIONS } from '../shared/onboardingOptions';
 
 interface CatalogOption {
   id: string;
@@ -22,22 +23,33 @@ export function Onboarding() {
   // Catalog Options
   const [allergiesOptions, setAllergiesOptions] = useState<CatalogOption[]>([]);
   const [limitationsOptions, setLimitationsOptions] = useState<CatalogOption[]>([]);
+  
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [fetchError, setFetchError] = useState('');
 
   // Form State
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     birthDate: '',
+    biologicalSex: '',
     weightKg: '',
     heightCm: '',
     activityLevel: '',
     goal: '',
     isPCD: false,
     allergies: [] as string[],
-    limitations: [] as string[]
+    hasOtherAllergy: false,
+    otherAllergyText: '',
+    limitations: [] as string[],
+    hasOtherLimitation: false,
+    otherLimitationText: ''
   });
 
-  useEffect(() => {
+  const loadData = () => {
+    setIsInitializing(true);
+    setFetchError('');
+    
     // 1. Verifica estado real no backend (ignora cache/localStorage)
     apiFetch('/auth/me')
       .then(user => {
@@ -53,25 +65,59 @@ export function Onboarding() {
           setAllergiesOptions(res.allergies || []);
           setLimitationsOptions(res.limitations || []);
         }
+        setIsInitializing(false);
       })
       .catch((err) => {
-        // Se der erro no /me (ex: não autenticado), joga pro login
-        navigate('/login');
+        // Se for erro de auth, joga pro login
+        if (err.status === 401 || err.status === 403) {
+          navigate('/login');
+        } else {
+          // Outro erro (rede, timeout, 500)
+          setFetchError(err.message || 'Falha ao conectar com o servidor.');
+          setIsInitializing(false);
+        }
       });
+  };
+
+  useEffect(() => {
+    loadData();
   }, [navigate]);
 
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const toggleArrayItem = (field: 'allergies' | 'limitations', id: string) => {
+  const handleToggle = (
+    field: 'allergies' | 'limitations', 
+    id: string, 
+    otherField: 'hasOtherAllergy' | 'hasOtherLimitation'
+  ) => {
+    const options = field === 'allergies' ? allergiesOptions : limitationsOptions;
+    const nenhumaId = options.find(opt => opt.name.toLowerCase() === 'nenhuma')?.id;
+
     setFormData(prev => {
-      const current = prev[field];
-      if (current.includes(id)) {
-        return { ...prev, [field]: current.filter(itemId => itemId !== id) };
+      let newArr = [...prev[field]];
+      let newHasOther = prev[otherField];
+
+      if (id === nenhumaId) {
+        newArr = [nenhumaId];
+        newHasOther = false;
+      } else if (id === 'Outras') {
+        newHasOther = !newHasOther;
+        if (newHasOther && nenhumaId) {
+          newArr = newArr.filter(a => a !== nenhumaId);
+        }
       } else {
-        return { ...prev, [field]: [...current, id] };
+        if (nenhumaId) {
+          newArr = newArr.filter(a => a !== nenhumaId);
+        }
+        if (newArr.includes(id)) {
+          newArr = newArr.filter(a => a !== id);
+        } else {
+          newArr.push(id);
+        }
       }
+      return { ...prev, [field]: newArr, [otherField]: newHasOther };
     });
   };
 
@@ -80,12 +126,19 @@ export function Onboarding() {
       return formData.firstName.length >= 2 && formData.lastName.length >= 2;
     }
     if (step === 2) {
-      return formData.birthDate && Number(formData.weightKg) > 0 && Number(formData.heightCm) > 0;
+      return formData.birthDate && formData.biologicalSex && Number(formData.weightKg) > 0 && Number(formData.heightCm) > 0;
     }
     if (step === 3) {
       return formData.activityLevel && formData.goal;
     }
-    return true; // Step 4 is optional selections
+    if (step === 4) {
+      const isAllergiesValid = (formData.allergies.length > 0 || formData.hasOtherAllergy) && 
+                               (!formData.hasOtherAllergy || formData.otherAllergyText.trim().length > 0);
+      const isLimitationsValid = (formData.limitations.length > 0 || formData.hasOtherLimitation) && 
+                                 (!formData.hasOtherLimitation || formData.otherLimitationText.trim().length > 0);
+      return Boolean(isAllergiesValid && isLimitationsValid);
+    }
+    return true;
   };
 
   const handleNext = () => {
@@ -102,11 +155,26 @@ export function Onboarding() {
     try {
       setIsSubmitting(true);
       setServerError('');
+      
+      const {
+        hasOtherAllergy, otherAllergyText,
+        hasOtherLimitation, otherLimitationText,
+        ...restFormData
+      } = formData;
+
       await apiFetch('/profile', {
         data: {
-          ...formData,
-          weightKg: Number(formData.weightKg),
-          heightCm: Number(formData.heightCm),
+          ...restFormData,
+          allergies: [
+            ...restFormData.allergies,
+            ...(hasOtherAllergy && otherAllergyText.trim() ? [otherAllergyText.trim()] : [])
+          ],
+          limitations: [
+            ...restFormData.limitations,
+            ...(hasOtherLimitation && otherLimitationText.trim() ? [otherLimitationText.trim()] : [])
+          ],
+          weightKg: Number(restFormData.weightKg),
+          heightCm: Number(restFormData.heightCm),
         }
       });
       navigate('/home');
@@ -114,24 +182,32 @@ export function Onboarding() {
       if (err.message === 'O perfil deste usuário já foi criado.') {
         navigate('/home');
       } else {
-        setServerError(err.message || 'Erro ao criar o perfil.');
+        if (err.status) {
+          setServerError(err.message);
+        } else {
+          setServerError('Erro de rede: não foi possível conectar ao servidor.');
+        }
         setIsSubmitting(false);
       }
     }
   };
 
-  const goals = [
-    { id: 'Emagrecimento', label: 'Emagrecimento', desc: 'Perder peso e reduzir medidas' },
-    { id: 'Hipertrofia', label: 'Hipertrofia', desc: 'Ganhar massa muscular' },
-    { id: 'Manutencao', label: 'Manutenção', desc: 'Manter o peso e melhorar a saúde' },
-  ];
+  const goals = GOAL_OPTIONS.map(id => ({
+    id,
+    label: id === 'Manutencao' ? 'Manutenção' : id,
+    desc: id === 'Emagrecimento' ? 'Perder peso e reduzir medidas' : 
+          id === 'Hipertrofia' ? 'Ganhar massa muscular' : 
+          'Manter o peso e melhorar a saúde'
+  }));
 
-  const activityLevels = [
-    { id: 'Sedentario', label: 'Sedentário', desc: 'Pouco ou nenhum exercício' },
-    { id: 'Leve', label: 'Leve', desc: 'Exercício 1 a 3 dias na semana' },
-    { id: 'Moderado', label: 'Moderado', desc: 'Exercício 3 a 5 dias na semana' },
-    { id: 'Intenso', label: 'Intenso', desc: 'Exercício diário ou treinos pesados' },
-  ];
+  const activityLevels = ACTIVITY_LEVEL_OPTIONS.map(id => ({
+    id,
+    label: id === 'Sedentario' ? 'Sedentário' : id,
+    desc: id === 'Sedentario' ? 'Pouco ou nenhum exercício' :
+          id === 'Leve' ? 'Exercício 1 a 3 dias na semana' :
+          id === 'Moderado' ? 'Exercício 3 a 5 dias na semana' :
+          'Exercício diário ou treinos pesados'
+  }));
 
   // Animation variants
   const pageVariants = {
@@ -139,6 +215,33 @@ export function Onboarding() {
     in: { opacity: 1, x: 0 },
     out: { opacity: 0, x: -20 },
   };
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-kindra-50 flex items-center justify-center p-4">
+        <div className="text-kindra-500 font-medium animate-pulse">Carregando dados...</div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="min-h-screen bg-kindra-50 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-8 text-center space-y-4">
+          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900">Erro de Conexão</h2>
+          <p className="text-gray-600 pb-4">{fetchError}</p>
+          <Button onClick={loadData} className="w-full">
+            Tentar Novamente
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-kindra-50 flex flex-col items-center pt-10 px-4 relative overflow-hidden">
@@ -233,6 +336,31 @@ export function Onboarding() {
                     value={formData.birthDate}
                     onChange={(e) => handleChange('birthDate', e.target.value)}
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-kindra-700 uppercase tracking-wider mb-2">Sexo Biológico</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleChange('biologicalSex', 'MALE')}
+                      className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all duration-200 ${
+                        formData.biologicalSex === 'MALE'
+                          ? 'bg-kindra-950 border-kindra-950 text-kindra-base shadow-lg scale-[1.02]'
+                          : 'bg-kindra-50 border-kindra-200 text-kindra-700 hover:border-kindra-300'
+                      }`}
+                    >
+                      Masculino
+                    </button>
+                    <button
+                      onClick={() => handleChange('biologicalSex', 'FEMALE')}
+                      className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all duration-200 ${
+                        formData.biologicalSex === 'FEMALE'
+                          ? 'bg-kindra-950 border-kindra-950 text-kindra-base shadow-lg scale-[1.02]'
+                          : 'bg-kindra-50 border-kindra-200 text-kindra-700 hover:border-kindra-300'
+                      }`}
+                    >
+                      Feminino
+                    </button>
+                  </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="w-1/2">
@@ -347,7 +475,7 @@ export function Onboarding() {
                     return (
                       <button
                         key={opt.id}
-                        onClick={() => toggleArrayItem('allergies', opt.id)}
+                        onClick={() => handleToggle('allergies', opt.id, 'hasOtherAllergy')}
                         className={clsx(
                           "px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 border-2",
                           isSelected 
@@ -360,7 +488,36 @@ export function Onboarding() {
                     );
                   })}
                   {allergiesOptions.length === 0 && <span className="text-sm text-kindra-400">Carregando...</span>}
+                  
+                  {allergiesOptions.length > 0 && (
+                    <button
+                      onClick={() => handleToggle('allergies', 'Outras', 'hasOtherAllergy')}
+                      className={clsx(
+                        "px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 border-2",
+                        formData.hasOtherAllergy
+                          ? "bg-kindra-950 border-kindra-950 text-kindra-base scale-105" 
+                          : "bg-kindra-50 border-kindra-200 text-kindra-700 hover:border-kindra-400"
+                      )}
+                    >
+                      Outras
+                    </button>
+                  )}
                 </div>
+                {formData.hasOtherAllergy && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-3"
+                  >
+                    <Input 
+                      placeholder="Qual outra alergia?" 
+                      value={formData.otherAllergyText}
+                      onChange={e => handleChange('otherAllergyText', e.target.value)}
+                      maxLength={50}
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
               </div>
 
               <div>
@@ -371,7 +528,7 @@ export function Onboarding() {
                     return (
                       <button
                         key={opt.id}
-                        onClick={() => toggleArrayItem('limitations', opt.id)}
+                        onClick={() => handleToggle('limitations', opt.id, 'hasOtherLimitation')}
                         className={clsx(
                           "px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 border-2",
                           isSelected 
@@ -384,7 +541,36 @@ export function Onboarding() {
                     );
                   })}
                   {limitationsOptions.length === 0 && <span className="text-sm text-kindra-400">Carregando...</span>}
+                  
+                  {limitationsOptions.length > 0 && (
+                    <button
+                      onClick={() => handleToggle('limitations', 'Outras', 'hasOtherLimitation')}
+                      className={clsx(
+                        "px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 border-2",
+                        formData.hasOtherLimitation
+                          ? "bg-kindra-950 border-kindra-950 text-kindra-base scale-105" 
+                          : "bg-kindra-50 border-kindra-200 text-kindra-700 hover:border-kindra-400"
+                      )}
+                    >
+                      Outras
+                    </button>
+                  )}
                 </div>
+                {formData.hasOtherLimitation && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-3"
+                  >
+                    <Input 
+                      placeholder="Qual outra limitação?" 
+                      value={formData.otherLimitationText}
+                      onChange={e => handleChange('otherLimitationText', e.target.value)}
+                      maxLength={50}
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-kindra-200">
@@ -422,6 +608,7 @@ export function Onboarding() {
             <Button 
               onClick={handleSubmit} 
               isLoading={isSubmitting}
+              disabled={!validateStep()}
               className="w-full sm:w-auto"
             >
               FINALIZAR PERFIL

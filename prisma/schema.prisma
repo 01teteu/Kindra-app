@@ -25,8 +25,28 @@ model User {
   resetResendAttempts Int       @default(0)
   lastResetResendAt   DateTime?
 
+  lastEmailDeliveryFailedAt DateTime?
+
+  // Gamificação (Streaks)
+  currentStreak Int       @default(0)
+  longestStreak Int       @default(0)
+  lastActiveDay DateTime? // Data do último check-in de metas
+
   profile Profile?
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+
+  routines        Routine[]
+  workoutSessions WorkoutSession[]
+  customExercises Exercise[]
+  
+  weightLogs      WeightLog[]
+  nutritionGoals  NutritionGoal[]
+  waterIntakeLogs WaterIntakeLog[]
+  nutritionHistory HistoryUserNutri[] // Relação com a nova tabela
+  
+  customFoods     Food[]
+  meals           Meal[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -38,6 +58,7 @@ model EmailVerificationToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
 
@@ -64,11 +85,12 @@ model PasswordResetToken {
 model Profile {
   id     String @id @default(uuid())
   userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   firstName String
   lastName  String
   birthDate DateTime
+  biologicalSex String?
 
   weightKg      Float
   heightCm      Float
@@ -89,6 +111,7 @@ model Profile {
 model Allergy {
   id       String           @id @default(uuid())
   name     String           @unique
+  isCustom Boolean          @default(false)
   profiles ProfileAllergy[]
 
   @@map("allergies")
@@ -107,6 +130,7 @@ model ProfileAllergy {
 model PhysicalLimitation {
   id       String                      @id @default(uuid())
   name     String                      @unique
+  isCustom Boolean                     @default(false)
   profiles ProfilePhysicalLimitation[]
 
   @@map("physical_limitations")
@@ -120,4 +144,243 @@ model ProfilePhysicalLimitation {
 
   @@id([profileId, physicalLimitationId])
   @@map("profile_physical_limitations")
+}
+
+// --------------------------------------------
+// WORKOUT / TRAINING — Etapa 2.1
+// --------------------------------------------
+
+model Exercise {
+  id           String   @id @default(uuid())
+  name         String
+  targetMuscle String
+  equipment    String
+  isCustom     Boolean  @default(false)
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  routineExercises RoutineExercise[]
+  workoutExercises WorkoutExercise[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("exercises")
+}
+
+model Routine {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  exercises RoutineExercise[]
+  sessions  WorkoutSession[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("routines")
+}
+
+model RoutineExercise {
+  id         String   @id @default(uuid())
+  routineId  String
+  exerciseId String
+  routine    Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  
+  order      Int      @default(0)
+  notes      String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("routine_exercises")
+}
+
+model WorkoutSession {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routineId  String?
+  routine    Routine? @relation(fields: [routineId], references: [id], onDelete: SetNull)
+  
+  name       String   // "Treino de Peito" (herdado da rotina) ou "Treino Livre"
+  startedAt  DateTime @default(now())
+  endedAt    DateTime? 
+  volumeTotal Float   @default(0) // Cache do (peso * reps) para cálculos rápidos
+  
+  exercises  WorkoutExercise[]
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("workout_sessions")
+}
+
+model WorkoutExercise {
+  id        String   @id @default(uuid())
+  sessionId String
+  sessionIdRel WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  
+  order      Int      @default(0)
+  notes      String?
+  
+  sets       WorkoutSet[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("workout_exercises")
+}
+
+model WorkoutSet {
+  id                String   @id @default(uuid())
+  workoutExerciseId String
+  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  
+  setNumber   Int      // 1, 2, 3...
+  reps        Int      @default(0)
+  weight      Float    @default(0)
+  isCompleted Boolean  @default(false)
+  restTime    Int      @default(0) // Descanso em segundos (timer do hevy)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("workout_sets")
+}
+
+// --------------------------------------------
+// NUTRITION & TRACKING — Etapa 3
+// --------------------------------------------
+
+model WeightLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weightKg  Float
+  loggedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("weight_logs")
+}
+
+model NutritionGoal {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetKcal     Float
+  targetProteinG Float
+  targetCarbsG   Float
+  targetFatG     Float
+  targetWaterMl  Float
+  activeFrom     DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("nutrition_goals")
+}
+
+model WaterIntakeLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amountMl  Int
+  loggedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("water_intake_logs")
+}
+
+model HistoryUserNutri {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime // A data a qual o histórico se refere
+  
+  // Consumo Realizado no Dia
+  waterIngestedMl Int      @default(0)
+  consumedKcal    Float    @default(0)
+  mealsLogged     Int      @default(0)
+  
+  // Metas do Dia (Para referência)
+  targetWaterMl   Float
+  targetKcal      Float
+
+  // Gamificação
+  waterGoalAchieved Boolean @default(false)
+
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, date]) 
+  @@map("history_user_nutri")
+}
+
+// --------------------------------------------
+// NUTRITION & TRACKING — Alimentos e Refeições
+// --------------------------------------------
+
+model Food {
+  id          String   @id @default(uuid())
+  name        String   @unique // Normalizado (lowercase/trim) para evitar duplicatas
+  
+  // Padronização de Moderação
+  isCustom    Boolean  @default(false)
+  userId      String?  
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Valores Nutricionais baseados na porção padrão de 100g (Padrão TACO)
+  kcal        Float    @default(0)
+  proteinG    Float    @default(0)
+  carbsG      Float    @default(0)
+  fatG        Float    @default(0)
+
+  entries     MealEntry[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("foods")
+}
+
+model Meal {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Tipo da refeição: validação controlada por Zod Enum (ex: BREAKFAST, LUNCH, DINNER, SNACK)
+  name      String
+  
+  loggedAt  DateTime @default(now())
+  
+  entries   MealEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("meals")
+}
+
+model MealEntry {
+  id          String   @id @default(uuid())
+  
+  mealId      String
+  meal        Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  
+  foodId      String
+  food        Food     @relation(fields: [foodId], references: [id], onDelete: Restrict)
+  
+  amountGrams Float    // Quantidade real consumida
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("meal_entries")
 }

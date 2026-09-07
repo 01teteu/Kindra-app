@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { profileSchema } from '../schemas/profile.schema.js';
 import * as profileService from '../services/profile.service.js';
+import { calculateAndSaveNutritionGoal } from '../services/nutrition.service.js';
 
 export async function getOptionsController(req: FastifyRequest, reply: FastifyReply) {
   try {
@@ -30,6 +31,14 @@ export async function createProfileController(req: FastifyRequest, reply: Fastif
     }
 
     const profile = await profileService.createProfile(userId, parsed.data);
+    
+    // Dispara o cálculo automático da meta nutricional (efeito colateral, não deve bloquear)
+    try {
+      await calculateAndSaveNutritionGoal(userId);
+    } catch (nutritionError) {
+      console.error('[Onboarding] Falha não-crítica ao calcular metas nutricionais:', nutritionError);
+      // Silencioso. O usuário poderá recalcular manualmente na aba Nutri.
+    }
     
     return reply.status(201).send({
       message: 'Perfil criado com sucesso',

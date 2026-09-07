@@ -8,18 +8,23 @@ import path from 'path';
 import { userRoutes } from './routes/user.routes.js';
 import { authRoutes } from './routes/auth.routes.js';
 import { profileRoutes } from './routes/profile.routes.js';
+import { workoutRoutes } from './routes/workout.routes.js';
+import { nutritionRoutes } from './routes/nutrition.routes.js';
+import { foodRoutes } from './routes/food.routes.js';
+import { mealRoutes } from './routes/meal.routes.js';
 
 const projectRoot = process.cwd();
 
 async function startServer() {
   const fastify = Fastify({ 
     logger: true,
-    trustProxy: true // CRÍTICO: Permite que o Fastify leia o IP real do cliente repassado pelo proxy do Cloud Run/Nginx
+    trustProxy: true
   });
+
   const PORT = 3000;
 
   await fastify.register(fastifyCookie, {
-    secret: process.env.COOKIE_SECRET || 'super_secret_cookie_fallback', // for signed cookies
+    secret: process.env.COOKIE_SECRET || 'super_secret_cookie_fallback',
   });
 
   // 0. Autenticação JWT
@@ -31,16 +36,20 @@ async function startServer() {
     }
   });
 
-  // 1. Rate limiting global (100 reqs / min)
+  // 1. Rate limiting global
   await fastify.register(fastifyRateLimit, {
     max: 100,
     timeWindow: '1 minute',
   });
 
   // 2. Registro das rotas da API
-  await fastify.register(userRoutes, { prefix: '/api/users' }); // renomeei apenas por contexto
+  await fastify.register(userRoutes, { prefix: '/api/users' });
   await fastify.register(authRoutes, { prefix: '/api/auth' });
   await fastify.register(profileRoutes, { prefix: '/api/profile' });
+  await fastify.register(workoutRoutes, { prefix: '/api/workouts' });
+  await fastify.register(nutritionRoutes, { prefix: '/api/nutrition' });
+  await fastify.register(foodRoutes, { prefix: '/api/foods' });
+  await fastify.register(mealRoutes, { prefix: '/api/meals' });
 
 
   // 3. Configuração para servir o Frontend (React/Vite) na mesma porta

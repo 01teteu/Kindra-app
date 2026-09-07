@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 export const resendVerificationSchema = z.object({});
 
 export const confirmVerificationSchema = z.object({
-  token: z.string().min(1, "O token de verificação é obrigatório."),
+  token: z.string().min(1, "O token de verificação é obrigatório.").max(255, "Token muito longo."),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -17,7 +17,7 @@ export const forgotPasswordSchema = z.object({
 
 export const verifyResetCodeSchema = z.object({
   email: z.string().trim().toLowerCase().email("E-mail inválido.").max(255, "E-mail muito longo."),
-  token: z.string().min(6, "O código deve ter 6 dígitos."),
+  token: z.string().min(6, "O código deve ter 6 dígitos.").max(6, "O código deve ter 6 dígitos."),
 });
 
 export const resetPasswordSchema = z.object({
@@ -53,7 +53,7 @@ export type ChangeEmailInput = z.infer<typeof changeEmailSchema>;
 export type CheckEmailInput = z.infer<typeof checkEmailSchema>;
 
 export const googleAuthSchema = z.object({
-  credential: z.string().min(1, "Token do Google é obrigatório.")
+  credential: z.string().min(1, "Token do Google é obrigatório.").max(5000, "Token muito longo.")
 });
 
 export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;

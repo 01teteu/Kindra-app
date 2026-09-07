@@ -33,6 +33,7 @@ export async function apiFetch(endpoint: string, options: FetchOptions = {}) {
     const errorMessage = responseData?.error || responseData?.message || `Erro inesperado (Status ${response.status}). Resposta: ${rawText.substring(0, 80)}`;
     const err = new Error(errorMessage);
     (err as any).data = responseData;
+    (err as any).status = response.status;
     throw err;
   }
 

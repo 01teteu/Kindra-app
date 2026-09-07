@@ -46,8 +46,10 @@ export async function createUser(data: RegisterInput) {
 
       try {
         await sendRegistrationAttemptEmail(existingUser.email);
+        await prisma.user.update({ where: { id: existingUser.id }, data: { lastEmailDeliveryFailedAt: null } });
       } catch (error: any) {
-        throw new Error(`Falha ao enviar e-mail: ${error.message}`);
+        console.error(`[EMAIL_DELIVERY_FAILED] Falha ao enviar email (attempt) para ${existingUser.email}. Motivo:`, error.message);
+        await prisma.user.update({ where: { id: existingUser.id }, data: { lastEmailDeliveryFailedAt: new Date() } });
       }
 
       // Retorna usuário Dummy com ID aleatório
@@ -71,8 +73,10 @@ export async function createUser(data: RegisterInput) {
 
     try {
       await sendVerificationEmail(user.id, user.email);
+      await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: null } });
     } catch (error: any) {
-      throw new Error(`A conta foi atualizada, mas falhou ao enviar o e-mail: ${error.message}`);
+      console.error(`[EMAIL_DELIVERY_FAILED] Falha ao enviar email de verificacao para ${user.email}. Motivo:`, error.message);
+      await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: new Date() } });
     }
 
     return {
@@ -95,8 +99,10 @@ export async function createUser(data: RegisterInput) {
 
   try {
     await sendVerificationEmail(user.id, user.email);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: null } });
   } catch (error: any) {
-    throw new Error(`A conta foi criada, mas falhou ao enviar o e-mail: ${error.message}`);
+    console.error(`[EMAIL_DELIVERY_FAILED] Falha ao enviar email de verificacao para ${user.email}. Motivo:`, error.message);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: new Date() } });
   }
 
   return {

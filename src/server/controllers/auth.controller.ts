@@ -88,7 +88,8 @@ export async function meController(req: FastifyRequest, reply: FastifyReply) {
       id: user.id,
       email: user.email,
       role: user.role,
-      hasProfile: !!user.profile
+      hasProfile: !!user.profile,
+      profile: user.profile || null
     });
   } catch (error) {
     return reply.status(401).send({ error: 'Não autorizado' });

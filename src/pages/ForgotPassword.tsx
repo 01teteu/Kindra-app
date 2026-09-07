@@ -56,7 +56,11 @@ export function ForgotPassword() {
       setEmail(data.email);
       setStep(2);
     } catch (err: any) {
-      setServerError(err.message || 'Erro ao processar solicitação.');
+      if (err.status) {
+        setServerError(err.message);
+      } else {
+        setServerError('Erro de rede: falha na conexão.');
+      }
     }
   };
 
@@ -67,7 +71,11 @@ export function ForgotPassword() {
       setJwtToken(response.resetToken);
       setStep(3);
     } catch (err: any) {
-      setServerError(err.message || 'Código inválido.');
+      if (err.status) {
+        setServerError(err.message);
+      } else {
+        setServerError('Erro de rede: falha na conexão.');
+      }
     }
   };
 
@@ -85,7 +93,11 @@ export function ForgotPassword() {
       });
       setStep(4);
     } catch (err: any) {
-      setServerError(err.message || 'Erro ao redefinir senha.');
+      if (err.status) {
+        setServerError(err.message);
+      } else {
+        setServerError('Erro de rede: falha na conexão.');
+      }
     }
   };
 

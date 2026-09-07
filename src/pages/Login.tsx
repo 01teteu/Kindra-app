@@ -51,7 +51,11 @@ export function Login() {
         sessionStorage.setItem('pendingToken', err.data.pendingToken);
         navigate('/verify-email', { state: { email: data.email } });
       } else {
-        setServerError(err.message || 'Credenciais inválidas.');
+        if (err.status) {
+          setServerError(err.message);
+        } else {
+          setServerError('Erro de rede: não foi possível conectar ao servidor.');
+        }
       }
     }
   };

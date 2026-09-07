@@ -11,6 +11,11 @@ import { VerifyEmailPrompt } from './pages/VerifyEmailPrompt';
 import { VerifyEmailConfirm } from './pages/VerifyEmailConfirm';
 import { Onboarding } from './pages/Onboarding';
 import { Home } from './pages/Home';
+import { WorkoutLive } from './pages/WorkoutLive';
+import { ExerciseCatalog } from './pages/ExerciseCatalog';
+import { AppLayout } from './components/layout/AppLayout';
+import { Nutri } from './pages/Nutri';
+import { Workout } from './pages/Workout';
 
 export default function App() {
   const googleClientId = (import.meta as any).env.VITE_GOOGLE_CLIENT_ID || '';
@@ -25,7 +30,16 @@ export default function App() {
           <Route path="/verify-email" element={<VerifyEmailPrompt />} />
           <Route path="/verificar-email" element={<VerifyEmailConfirm />} />
           <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/home" element={<Home />} />
+          
+          {/* Rotas com Bottom Navigation */}
+          <Route element={<AppLayout />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/nutri" element={<Nutri />} />
+            <Route path="/workout" element={<Workout />} />
+          </Route>
+
+          <Route path="/workout/live" element={<WorkoutLive />} />
+          <Route path="/workout/exercises" element={<ExerciseCatalog />} />
           
           {/* Fallback temporário, redireciona para login */}
           <Route path="*" element={<Navigate to="/login" replace />} />

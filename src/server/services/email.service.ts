@@ -28,11 +28,11 @@ export async function sendVerificationEmail(userId: string, email: string) {
     }
   });
 
-  // 4. Envia via Brevo
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) {
-    throw new Error('A chave de API do Brevo não está configurada no servidor.');
-  }
+  // 4. Envia via Brevo (Comentado temporariamente para ambiente de dev)
+  // const apiKey = process.env.BREVO_API_KEY;
+  // if (!apiKey) {
+  //   throw new Error('A chave de API do Brevo não está configurada no servidor.');
+  // }
 
   const htmlTemplate = `
   <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f7f9; padding: 40px 20px; text-align: center;">
@@ -57,6 +57,12 @@ export async function sendVerificationEmail(userId: string, email: string) {
   </div>
   `;
 
+  // MOCK TEMPORÁRIO PARA DESENVOLVIMENTO
+  console.log('\n=============================================');
+  console.log(`[MOCK EMAIL] Código de Verificação para ${email}: ${token}`);
+  console.log('=============================================\n');
+
+  /*
   const response = await globalThis.fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -77,6 +83,7 @@ export async function sendVerificationEmail(userId: string, email: string) {
     console.error('Falha ao enviar e-mail via Brevo', errorText);
     throw new Error(`Erro do provedor de e-mail: ${errorText}`);
   }
+  */
 }
 
 export async function sendPasswordResetEmail(userId: string, email: string) {
@@ -102,11 +109,11 @@ export async function sendPasswordResetEmail(userId: string, email: string) {
     }
   });
 
-  // 4. Envia via Brevo
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) {
-    throw new Error('A chave de API do Brevo não está configurada no servidor.');
-  }
+  // 4. Envia via Brevo (Comentado temporariamente para ambiente de dev)
+  // const apiKey = process.env.BREVO_API_KEY;
+  // if (!apiKey) {
+  //   throw new Error('A chave de API do Brevo não está configurada no servidor.');
+  // }
 
   const htmlTemplate = `
   <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f7f9; padding: 40px 20px; text-align: center;">
@@ -131,6 +138,12 @@ export async function sendPasswordResetEmail(userId: string, email: string) {
   </div>
   `;
 
+  // MOCK TEMPORÁRIO PARA DESENVOLVIMENTO
+  console.log('\n=============================================');
+  console.log(`[MOCK EMAIL] Código de Redefinição para ${email}: ${token}`);
+  console.log('=============================================\n');
+
+  /*
   const response = await globalThis.fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -151,6 +164,7 @@ export async function sendPasswordResetEmail(userId: string, email: string) {
     console.error('Falha ao enviar e-mail de redefinição via Brevo', errorText);
     throw new Error(`Erro do provedor de e-mail: ${errorText}`);
   }
+  */
 }
 
 export async function sendRegistrationAttemptEmail(email: string) {

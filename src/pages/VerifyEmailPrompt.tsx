@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { Mail, ArrowRight, X, Edit2, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowRight, X, Edit2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -21,6 +21,7 @@ export function VerifyEmailPrompt() {
   const [currentEmail, setCurrentEmail] = useState<string>(originalEmail);
   const [otp, setOtp] = useState<string>('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [cooldown, setCooldown] = useState(0);
@@ -58,7 +59,9 @@ export function VerifyEmailPrompt() {
 
     try {
       const res = await apiFetch('/auth/verify-email/confirm', { data: { token: otp } });
-      setFeedback({ type: 'success', text: 'E-mail verificado com sucesso! Redirecionando...' });
+      
+      // Se sucesso, muda o estado de sucesso para disparar a animação (não seta mensagem de feedback)
+      setIsSuccess(true);
       
       sessionStorage.removeItem('pendingToken');
       
@@ -157,66 +160,96 @@ export function VerifyEmailPrompt() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md text-center">
-        <div className="mx-auto w-16 h-16 bg-kindra-200 rounded-full flex items-center justify-center mb-6">
-          <Mail className="w-8 h-8 text-kindra-950" />
-        </div>
-        
-        <h1 className="text-xl sm:text-3xl font-display font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-4 text-kindra-950">
-          Verifique seu E-mail
-        </h1>
-        
-        <p className="text-kindra-400 mb-6 text-sm">
-          Enviamos um código de 6 dígitos. Digite-o abaixo para ativar sua conta.
-        </p>
+      <Card className="w-full max-w-md text-center overflow-hidden">
+        <AnimatePresence mode="wait">
+          {!isSuccess ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="mx-auto w-16 h-16 bg-kindra-200 rounded-full flex items-center justify-center mb-6">
+                <Mail className="w-8 h-8 text-kindra-950" />
+              </div>
+              
+              <h1 className="text-xl sm:text-3xl font-display font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-4 text-kindra-950">
+                Verifique seu E-mail
+              </h1>
+              
+              <p className="text-kindra-400 mb-6 text-sm">
+                Enviamos um código de 6 dígitos. Digite-o abaixo para ativar sua conta.
+              </p>
 
-        <div className="mb-6 flex items-center justify-between bg-kindra-50 p-3 rounded-xl border border-kindra-100">
-          <div className="flex flex-col overflow-hidden text-left">
-            <span className="text-xs font-bold text-kindra-950 uppercase tracking-widest mb-1">E-mail Cadastrado</span>
-            <span className="text-sm text-kindra-500 truncate">{currentEmail}</span>
-          </div>
-          <button
-            onClick={handleOpenEditModal}
-            disabled={isVerifying || isResending}
-            className="p-2 text-kindra-400 hover:text-kindra-950 hover:bg-kindra-200 rounded-lg transition-colors disabled:opacity-50"
-            title="Editar e-mail"
-          >
-            <Edit2 className="w-4 h-4" />
-          </button>
-        </div>
+              <div className="mb-6 flex items-center justify-between bg-kindra-50 p-3 rounded-xl border border-kindra-100">
+                <div className="flex flex-col overflow-hidden text-left">
+                  <span className="text-xs font-bold text-kindra-950 uppercase tracking-widest mb-1">E-mail Cadastrado</span>
+                  <span className="text-sm text-kindra-500 truncate">{currentEmail}</span>
+                </div>
+                <button
+                  onClick={handleOpenEditModal}
+                  disabled={isVerifying || isResending}
+                  className="p-2 text-kindra-400 hover:text-kindra-950 hover:bg-kindra-200 rounded-lg transition-colors disabled:opacity-50"
+                  title="Editar e-mail"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+              </div>
 
-        <div className="mb-8">
-          <OtpInput value={otp} onChange={setOtp} />
-        </div>
+              <div className="mb-8">
+                <OtpInput value={otp} onChange={setOtp} />
+              </div>
 
-        {feedback && (
-          <div className={`mb-6 p-3 text-sm rounded-xl font-medium ${feedback.type === 'success' ? 'bg-kindra-950 text-kindra-base' : 'bg-red-500/10 text-red-500'}`}>
-            {feedback.text}
-          </div>
-        )}
+              {feedback && feedback.type === 'error' && (
+                <div className="mb-6 p-3 text-sm rounded-xl font-medium bg-red-500/10 text-red-500">
+                  {feedback.text}
+                </div>
+              )}
 
-        <div className="space-y-4">
-          <Button 
-            className="w-full" 
-            onClick={handleVerify}
-            isLoading={isVerifying}
-            disabled={isResending}
-          >
-            VALIDAR CÓDIGO
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full" 
-            onClick={executeNormalResend}
-            isLoading={isResending}
-            disabled={cooldown > 0 || isVerifying}
-          >
-            {cooldown > 0 ? `AGUARDE ${cooldown}s...` : 'REENVIAR CÓDIGO'}
-          </Button>
-          <Link to="/login" className="inline-flex items-center text-sm font-semibold text-kindra-500 hover:text-kindra-950 transition-colors">
-            Ir para o Login <ArrowRight className="ml-2 w-4 h-4" />
-          </Link>
-        </div>
+              <div className="space-y-4">
+                <Button 
+                  className="w-full" 
+                  onClick={handleVerify}
+                  isLoading={isVerifying}
+                  disabled={isResending}
+                >
+                  VALIDAR CÓDIGO
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={executeNormalResend}
+                  isLoading={isResending}
+                  disabled={cooldown > 0 || isVerifying}
+                >
+                  {cooldown > 0 ? `AGUARDE ${cooldown}s...` : 'REENVIAR CÓDIGO'}
+                </Button>
+                <Link to="/login" className="inline-flex items-center text-sm font-semibold text-kindra-500 hover:text-kindra-950 transition-colors">
+                  Ir para o Login <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
+              className="py-12 flex flex-col items-center justify-center"
+            >
+              <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6">
+                <CheckCircle className="w-10 h-10 text-green-500" />
+              </div>
+              <h2 className="text-2xl font-display font-bold uppercase tracking-[0.1em] text-kindra-950 mb-2">
+                Verificado!
+              </h2>
+              <p className="text-kindra-500 text-sm">
+                Redirecionando você...
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Card>
 
       {/* MODAL DE CONFIRMAÇÃO */}

@@ -21,6 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               'flex h-12 w-full rounded-full bg-kindra-200/50 pl-6 pr-12 py-2 text-sm text-kindra-950 placeholder:text-kindra-500 font-medium',
               'border border-kindra-300 focus:bg-kindra-100 focus:border-kindra-500 focus:ring-4 focus:ring-kindra-500/10 focus:outline-none transition-all duration-300',
+              '[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
               error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
               className
             )}

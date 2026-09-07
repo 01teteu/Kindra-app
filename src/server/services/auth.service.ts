@@ -202,7 +202,13 @@ export async function resendVerificationEmailService(email: string) {
     }
   });
 
-  await sendVerificationEmail(user.id, user.email);
+  try {
+    await sendVerificationEmail(user.id, user.email);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: null } });
+  } catch (error: any) {
+    console.error(`[EMAIL_DELIVERY_FAILED] Falha ao reenviar email de verificacao para ${user.email}. Motivo:`, error.message);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: new Date() } });
+  }
 }
 
 export async function forgotPasswordService(email: string) {
@@ -252,7 +258,13 @@ export async function forgotPasswordService(email: string) {
     }
   });
 
-  await sendPasswordResetEmail(user.id, user.email);
+  try {
+    await sendPasswordResetEmail(user.id, user.email);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: null } });
+  } catch (error: any) {
+    console.error(`[EMAIL_DELIVERY_FAILED] Falha ao enviar reset de senha para ${user.email}. Motivo:`, error.message);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: new Date() } });
+  }
 }
 
 export async function verifyResetCodeService(data: VerifyResetCodeInput) {
@@ -325,7 +337,13 @@ export async function resetPasswordService(userId: string, newPassword: string) 
     data: { password: hashedPassword }
   });
 
-  await sendPasswordChangedNotification(user.email);
+  try {
+    await sendPasswordChangedNotification(user.email);
+    await prisma.user.update({ where: { id: userId }, data: { lastEmailDeliveryFailedAt: null } });
+  } catch (error: any) {
+    console.error(`[EMAIL_DELIVERY_FAILED] Falha ao enviar notificacao de alteracao de senha para ${user.email}. Motivo:`, error.message);
+    await prisma.user.update({ where: { id: userId }, data: { lastEmailDeliveryFailedAt: new Date() } });
+  }
 }
 
 export async function changeUnverifiedEmailService(oldEmail: string, newEmail: string) {
@@ -350,7 +368,13 @@ export async function changeUnverifiedEmailService(oldEmail: string, newEmail: s
 
   if (newEmailExists) {
     // Alerta o dono real e retorna sucesso silencioso para quem tentou usar
-    await sendRegistrationAttemptEmail(newEmailExists.email);
+    try {
+      await sendRegistrationAttemptEmail(newEmailExists.email);
+      await prisma.user.update({ where: { id: newEmailExists.id }, data: { lastEmailDeliveryFailedAt: null } });
+    } catch (error: any) {
+      console.error(`[EMAIL_DELIVERY_FAILED] Falha ao notificar (attempt) troca de email para ${newEmailExists.email}. Motivo:`, error.message);
+      await prisma.user.update({ where: { id: newEmailExists.id }, data: { lastEmailDeliveryFailedAt: new Date() } });
+    }
     return;
   }
 
@@ -366,5 +390,11 @@ export async function changeUnverifiedEmailService(oldEmail: string, newEmail: s
 
   // 5. Envia o novo token de verificação. 
   // (A função sendVerificationEmail internamente deleta tokens antigos automaticamente)
-  await sendVerificationEmail(user.id, newEmail);
+  try {
+    await sendVerificationEmail(user.id, newEmail);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: null } });
+  } catch (error: any) {
+    console.error(`[EMAIL_DELIVERY_FAILED] Falha ao enviar verificacao de novo email para ${newEmail}. Motivo:`, error.message);
+    await prisma.user.update({ where: { id: user.id }, data: { lastEmailDeliveryFailedAt: new Date() } });
+  }
 }
