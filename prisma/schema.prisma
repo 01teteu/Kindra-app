@@ -7,49 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --------------------------------------------
-// USER — Etapa 1.1
-// --------------------------------------------
-
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  password String? // hash da senha (opcional para usuários do Google)
-  provider String  @default("LOCAL") // "LOCAL" ou "GOOGLE" (SQLite não suporta Enum nativo no Prisma)
-
-  role          String  @default("USER")
-  emailVerified Boolean @default(false)
-  resendAttempts Int       @default(0)
-  lastResendAt   DateTime?
-
-  resetResendAttempts Int       @default(0)
-  lastResetResendAt   DateTime?
-
+  id                        String                   @id @default(uuid())
+  email                     String                   @unique
+  password                  String?
+  provider                  String                   @default("LOCAL")
+  role                      String                   @default("USER")
+  emailVerified             Boolean                  @default(false)
+  resendAttempts            Int                      @default(0)
+  lastResendAt              DateTime?
+  resetResendAttempts       Int                      @default(0)
+  lastResetResendAt         DateTime?
   lastEmailDeliveryFailedAt DateTime?
-
-  // Gamificação (Streaks)
-  currentStreak Int       @default(0)
-  longestStreak Int       @default(0)
-  lastActiveDay DateTime? // Data do último check-in de metas
-
-  profile Profile?
-  passwordResetTokens PasswordResetToken[]
-  emailVerificationTokens EmailVerificationToken[]
-
-  routines        Routine[]
-  workoutSessions WorkoutSession[]
-  customExercises Exercise[]
-  
-  weightLogs      WeightLog[]
-  nutritionGoals  NutritionGoal[]
-  waterIntakeLogs WaterIntakeLog[]
-  nutritionHistory HistoryUserNutri[] // Relação com a nova tabela
-  
-  customFoods     Food[]
-  meals           Meal[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  currentStreak             Int                      @default(0)
+  longestStreak             Int                      @default(0)
+  lastActiveDay             DateTime?
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+  emailVerificationTokens   EmailVerificationToken[]
+  customExercises           Exercise[]
+  customFoods               Food[]
+  nutritionHistory          HistoryUserNutri[]
+  meals                     Meal[]
+  nutritionGoals            NutritionGoal[]
+  passwordResetTokens       PasswordResetToken[]
+  profile                   Profile?
+  routines                  Routine[]
+  waterIntakeLogs           WaterIntakeLog[]
+  weightLogs                WeightLog[]
+  workoutSessions           WorkoutSession[]
 
   @@map("users")
 }
@@ -58,9 +44,9 @@ model EmailVerificationToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("email_verification_tokens")
 }
@@ -69,41 +55,32 @@ model PasswordResetToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   used      Boolean  @default(false)
   attempts  Int      @default(0)
   expiresAt DateTime
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_reset_tokens")
 }
 
-// --------------------------------------------
-// PROFILE — Etapa 1.2
-// --------------------------------------------
-
 model Profile {
-  id     String @id @default(uuid())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  firstName String
-  lastName  String
-  birthDate DateTime
-  biologicalSex String?
-
-  weightKg      Float
-  heightCm      Float
-  activityLevel String
-  goal          String
-  isPCD         Boolean @default(false)
-
-  // SQLite doesn't support arrays (String[]), so we use a JSON-stringified String 
+  id                  String                      @id @default(uuid())
+  userId              String                      @unique
+  firstName           String
+  lastName            String
+  birthDate           DateTime
+  weightKg            Float
+  heightCm            Float
+  activityLevel       String
+  goal                String
+  isPCD               Boolean                     @default(false)
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+  biologicalSex       String?
   allergies           ProfileAllergy[]
   physicalLimitations ProfilePhysicalLimitation[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user                User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
 }
@@ -120,8 +97,8 @@ model Allergy {
 model ProfileAllergy {
   profileId String
   allergyId String
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   allergy   Allergy @relation(fields: [allergyId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([profileId, allergyId])
   @@map("profile_allergies")
@@ -139,46 +116,38 @@ model PhysicalLimitation {
 model ProfilePhysicalLimitation {
   profileId            String
   physicalLimitationId String
-  profile              Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
   physicalLimitation   PhysicalLimitation @relation(fields: [physicalLimitationId], references: [id], onDelete: Cascade)
+  profile              Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([profileId, physicalLimitationId])
   @@map("profile_physical_limitations")
 }
 
-// --------------------------------------------
-// WORKOUT / TRAINING — Etapa 2.1
-// --------------------------------------------
-
 model Exercise {
-  id           String   @id @default(uuid())
-  name         String
-  targetMuscle String
-  equipment    String
-  isCustom     Boolean  @default(false)
-  userId       String?
-  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id               String            @id @default(uuid())
+  name             String
+  targetMuscle     String
+  equipment        String
+  isCustom         Boolean           @default(false)
+  userId           String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   routineExercises RoutineExercise[]
   workoutExercises WorkoutExercise[]
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 
   @@map("exercises")
 }
 
 model Routine {
-  id        String   @id @default(uuid())
+  id        String            @id @default(uuid())
   name      String
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
   exercises RoutineExercise[]
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   sessions  WorkoutSession[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("routines")
 }
@@ -187,86 +156,71 @@ model RoutineExercise {
   id         String   @id @default(uuid())
   routineId  String
   exerciseId String
-  routine    Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
-  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  
   order      Int      @default(0)
   notes      String?
-
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  routine    Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
 
   @@map("routine_exercises")
 }
 
 model WorkoutSession {
-  id         String   @id @default(uuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  routineId  String?
-  routine    Routine? @relation(fields: [routineId], references: [id], onDelete: SetNull)
-  
-  name       String   // "Treino de Peito" (herdado da rotina) ou "Treino Livre"
-  startedAt  DateTime @default(now())
-  endedAt    DateTime? 
-  volumeTotal Float   @default(0) // Cache do (peso * reps) para cálculos rápidos
-  
-  exercises  WorkoutExercise[]
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String            @id @default(uuid())
+  userId      String
+  routineId   String?
+  name        String
+  startedAt   DateTime          @default(now())
+  endedAt     DateTime?
+  volumeTotal Float             @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  exercises   WorkoutExercise[]
+  routine     Routine?          @relation(fields: [routineId], references: [id])
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("workout_sessions")
 }
 
 model WorkoutExercise {
-  id        String   @id @default(uuid())
-  sessionId String
+  id           String         @id @default(uuid())
+  sessionId    String
+  exerciseId   String
+  order        Int            @default(0)
+  notes        String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  exercise     Exercise       @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   sessionIdRel WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  
-  exerciseId String
-  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  
-  order      Int      @default(0)
-  notes      String?
-  
-  sets       WorkoutSet[]
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  sets         WorkoutSet[]
 
   @@map("workout_exercises")
 }
 
 model WorkoutSet {
-  id                String   @id @default(uuid())
+  id                String          @id @default(uuid())
   workoutExerciseId String
+  setNumber         Int
+  reps              Int             @default(0)
+  weight            Float           @default(0)
+  isCompleted       Boolean         @default(false)
+  restTime          Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
   workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
-  
-  setNumber   Int      // 1, 2, 3...
-  reps        Int      @default(0)
-  weight      Float    @default(0)
-  isCompleted Boolean  @default(false)
-  restTime    Int      @default(0) // Descanso em segundos (timer do hevy)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
   @@map("workout_sets")
 }
 
-// --------------------------------------------
-// NUTRITION & TRACKING — Etapa 3
-// --------------------------------------------
-
 model WeightLog {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   weightKg  Float
   loggedAt  DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("weight_logs")
 }
@@ -274,7 +228,6 @@ model WeightLog {
 model NutritionGoal {
   id             String   @id @default(uuid())
   userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   targetKcal     Float
   targetProteinG Float
   targetCarbsG   Float
@@ -283,6 +236,7 @@ model NutritionGoal {
   activeFrom     DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("nutrition_goals")
 }
@@ -290,97 +244,78 @@ model NutritionGoal {
 model WaterIntakeLog {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   amountMl  Int
   loggedAt  DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("water_intake_logs")
 }
 
 model HistoryUserNutri {
-  id              String   @id @default(uuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date            DateTime // A data a qual o histórico se refere
-  
-  // Consumo Realizado no Dia
-  waterIngestedMl Int      @default(0)
-  consumedKcal    Float    @default(0)
-  mealsLogged     Int      @default(0)
-  
-  // Metas do Dia (Para referência)
-  targetWaterMl   Float
-  targetKcal      Float
+  id                  String   @id @default(uuid())
+  userId              String
+  date                DateTime
+  waterIngestedMl     Int      @default(0)
+  consumedKcal        Float    @default(0)
+  consumedProteinG    Float    @default(0)
+  consumedCarbsG      Float    @default(0)
+  consumedFatG        Float    @default(0)
+  mealsLogged         Int      @default(0)
+  targetWaterMl       Float
+  targetKcal          Float
+  waterGoalAchieved   Boolean  @default(false)
+  kcalGoalAchieved    Boolean  @default(false)
+  proteinGoalAchieved Boolean  @default(false)
+  carbsGoalAchieved   Boolean  @default(false)
+  fatGoalAchieved     Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Gamificação
-  waterGoalAchieved Boolean @default(false)
-
-  createdAt       DateTime @default(now())
-
-  @@unique([userId, date]) 
+  @@unique([userId, date])
   @@map("history_user_nutri")
 }
 
-// --------------------------------------------
-// NUTRITION & TRACKING — Alimentos e Refeições
-// --------------------------------------------
-
 model Food {
-  id          String   @id @default(uuid())
-  name        String   @unique // Normalizado (lowercase/trim) para evitar duplicatas
-  
-  // Padronização de Moderação
-  isCustom    Boolean  @default(false)
-  userId      String?  
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  // Valores Nutricionais baseados na porção padrão de 100g (Padrão TACO)
-  kcal        Float    @default(0)
-  proteinG    Float    @default(0)
-  carbsG      Float    @default(0)
-  fatG        Float    @default(0)
-
-  entries     MealEntry[]
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String      @id @default(uuid())
+  name      String      @unique
+  isCustom  Boolean     @default(false)
+  userId    String?
+  kcal      Float       @default(0)
+  proteinG  Float       @default(0)
+  carbsG    Float       @default(0)
+  fatG      Float       @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User?       @relation(fields: [userId], references: [id])
+  entries   MealEntry[]
 
   @@map("foods")
 }
 
 model Meal {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Tipo da refeição: validação controlada por Zod Enum (ex: BREAKFAST, LUNCH, DINNER, SNACK)
   name      String
-  
-  loggedAt  DateTime @default(now())
-  
+  loggedAt  DateTime    @default(now())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   entries   MealEntry[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("meals")
 }
 
 model MealEntry {
   id          String   @id @default(uuid())
-  
   mealId      String
-  meal        Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
-  
   foodId      String
-  food        Food     @relation(fields: [foodId], references: [id], onDelete: Restrict)
-  
-  amountGrams Float    // Quantidade real consumida
-
+  amountGrams Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  food        Food     @relation(fields: [foodId], references: [id])
+  meal        Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
 
   @@map("meal_entries")
 }

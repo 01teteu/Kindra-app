@@ -72,7 +72,7 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
         <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-kindra-200/50 flex items-center justify-center text-kindra-900 border border-kindra-300/30">
+              <div className="h-12 w-12 rounded-2xl bg-kindra-200/50 flex items-center justify-center text-teal-400 border border-kindra-300/30">
                 <Utensils className="h-6 w-6" />
               </div>
               <div>
@@ -90,13 +90,13 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="p-4 text-sm font-medium text-rose-600 bg-rose-50/80 rounded-2xl border border-rose-200/50">
+              <div className="p-4 text-sm font-bold text-rose-400 bg-rose-500/10 rounded-2xl border border-rose-500/20">
                 {error}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-kindra-900 ml-1">Nome do Alimento</label>
+              <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Nome do Alimento</label>
               <input
                 type="text"
                 name="name"
@@ -104,13 +104,13 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                 onChange={handleChange}
                 placeholder="Ex: Arroz Branco Cozido"
                 required
-                className="w-full px-5 py-4 bg-white border border-kindra-200/60 rounded-2xl text-kindra-950 placeholder:text-kindra-400 focus:outline-none focus:ring-2 focus:ring-kindra-900/20 focus:border-kindra-900 transition-all shadow-sm"
+                className="w-full px-5 py-4 bg-kindra-200/50 border border-kindra-300/30 rounded-2xl text-kindra-950 placeholder:text-kindra-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-kindra-900 ml-1">Calorias (kcal)</label>
+                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Calorias (kcal)</label>
                 <input
                   type="number"
                   name="kcal"
@@ -121,11 +121,11 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                   max="900"
                   step="0.1"
                   required
-                  className="w-full px-5 py-4 bg-white border border-kindra-200/60 rounded-2xl text-kindra-950 placeholder:text-kindra-400 focus:outline-none focus:ring-2 focus:ring-kindra-900/20 focus:border-kindra-900 transition-all shadow-sm"
+                  className="w-full px-5 py-4 bg-kindra-200/50 border border-kindra-300/30 rounded-2xl text-kindra-950 placeholder:text-kindra-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-kindra-900 ml-1">Proteína (g)</label>
+                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Proteína (g)</label>
                 <input
                   type="number"
                   name="proteinG"
@@ -136,11 +136,11 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                   max="100"
                   step="0.1"
                   required
-                  className="w-full px-5 py-4 bg-white border border-kindra-200/60 rounded-2xl text-kindra-950 placeholder:text-kindra-400 focus:outline-none focus:ring-2 focus:ring-kindra-900/20 focus:border-kindra-900 transition-all shadow-sm"
+                  className="w-full px-5 py-4 bg-kindra-200/50 border border-kindra-300/30 rounded-2xl text-kindra-950 placeholder:text-kindra-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-kindra-900 ml-1">Carboidratos (g)</label>
+                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Carboidratos (g)</label>
                 <input
                   type="number"
                   name="carbsG"
@@ -151,11 +151,11 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                   max="100"
                   step="0.1"
                   required
-                  className="w-full px-5 py-4 bg-white border border-kindra-200/60 rounded-2xl text-kindra-950 placeholder:text-kindra-400 focus:outline-none focus:ring-2 focus:ring-kindra-900/20 focus:border-kindra-900 transition-all shadow-sm"
+                  className="w-full px-5 py-4 bg-kindra-200/50 border border-kindra-300/30 rounded-2xl text-kindra-950 placeholder:text-kindra-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-kindra-900 ml-1">Gorduras (g)</label>
+                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Gorduras (g)</label>
                 <input
                   type="number"
                   name="fatG"
@@ -166,7 +166,7 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                   max="100"
                   step="0.1"
                   required
-                  className="w-full px-5 py-4 bg-white border border-kindra-200/60 rounded-2xl text-kindra-950 placeholder:text-kindra-400 focus:outline-none focus:ring-2 focus:ring-kindra-900/20 focus:border-kindra-900 transition-all shadow-sm"
+                  className="w-full px-5 py-4 bg-kindra-200/50 border border-kindra-300/30 rounded-2xl text-kindra-950 placeholder:text-kindra-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -174,7 +174,7 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full mt-8 flex items-center justify-center py-4 px-4 bg-kindra-900 text-white rounded-2xl font-medium text-lg hover:bg-kindra-800 focus:outline-none focus:ring-2 focus:ring-kindra-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-8 flex items-center justify-center py-4 px-4 bg-teal-500 text-white rounded-2xl font-bold font-display text-lg tracking-wide hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-kindra-100 transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <Loader2 className="h-5 w-5 animate-spin" />

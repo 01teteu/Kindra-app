@@ -5,7 +5,7 @@ interface FetchOptions extends RequestInit {
 export async function apiFetch(endpoint: string, options: FetchOptions = {}) {
   const { data, headers: customHeaders, ...customConfig } = options;
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(data ? { 'Content-Type': 'application/json' } : {}),
     ...customHeaders,
   };
 

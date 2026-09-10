@@ -24,7 +24,7 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
     return;
   }
 
-  const lastActiveAbstractDate = new Date(user.lastActiveDay);
+  let lastActiveAbstractDate = new Date(user.lastActiveDay);
 
   // Se já está no dia de hoje, não tem o que consolidar. Retorna.
   if (currentAbstractDate.getTime() === lastActiveAbstractDate.getTime()) {
@@ -36,9 +36,16 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
   }
 
   // Descobrir quantos dias se passaram absolutos (ignorando fuso)
-  const daysDiff = Math.round((currentAbstractDate.getTime() - lastActiveAbstractDate.getTime()) / (1000 * 60 * 60 * 24));
+  let daysDiff = Math.round((currentAbstractDate.getTime() - lastActiveAbstractDate.getTime()) / (1000 * 60 * 60 * 24));
   let newCurrentStreak = user.currentStreak;
   let newLongestStreak = user.longestStreak;
+
+  // Limite de segurança: se o gap for maior que 30 dias, ignoramos os dias muito antigos
+  if (daysDiff > 30) {
+    newCurrentStreak = 0; // Abandono claro, perde a ofensiva
+    lastActiveAbstractDate = new Date(currentAbstractDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+    daysDiff = 30;
+  }
 
   // Busca a Meta Atual do usuário (usaremos como retrato da meta dos dias que passaram)
   const currentGoal = await prisma.nutritionGoal.findFirst({
@@ -48,72 +55,121 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
 
   const targetWater = currentGoal?.targetWaterMl || 0;
   const targetKcal = currentGoal?.targetKcal || 0;
+  const targetProteinG = currentGoal?.targetProteinG || 0;
+  const targetCarbsG = currentGoal?.targetCarbsG || 0;
+  const targetFatG = currentGoal?.targetFatG || 0;
 
-  // --- Processar o(s) dia(s) que ficaram para trás ---
-  // Vamos processar especificamente o último dia que ele abriu (lastActive)
-  
-  // Calcula as bordas reais do lastActive baseado no fuso horário do usuário
-  const lastActiveRefStr = lastActiveAbstractDate.toISOString().split('T')[0];
-  const { startOfDayUTC: lastActiveStart, endOfDayUTC: lastActiveEnd } = getDayBounds(lastActiveRefStr, timezoneOffset);
+  const isWithinTolerance = (consumed: number, target: number, margin: number) => {
+    if (target <= 0) return false;
+    return consumed >= target * (1 - margin) && consumed <= target * (1 + margin);
+  };
 
-  // 1. Somar toda a água registrada no dia 'lastActive'
-  const waterLogs = await prisma.waterIntakeLog.aggregate({
-    where: {
-      userId,
-      loggedAt: {
-        gte: lastActiveStart,
-        lte: lastActiveEnd
+  const isAboveFloor = (consumed: number, target: number, floorMargin: number) => {
+    if (target <= 0) return false;
+    return consumed >= target * (1 - floorMargin);
+  };
+
+  let processingDate = new Date(lastActiveAbstractDate);
+
+  // Loop iterando por todos os dias pendentes (do lastActiveDay até o dia anterior ao currentAbstractDate)
+  while (processingDate.getTime() < currentAbstractDate.getTime()) {
+    const processingRefStr = processingDate.toISOString().split('T')[0];
+    const { startOfDayUTC: processingStart, endOfDayUTC: processingEnd } = getDayBounds(processingRefStr, timezoneOffset);
+
+    // 1. Somar toda a água registrada no dia
+    const waterLogs = await prisma.waterIntakeLog.aggregate({
+      where: {
+        userId,
+        loggedAt: {
+          gte: processingStart,
+          lte: processingEnd
+        }
+      },
+      _sum: { amountMl: true }
+    });
+
+    const waterIngested = waterLogs._sum.amountMl || 0;
+    const waterGoalAchieved = waterIngested >= targetWater && targetWater > 0;
+
+    // 1b. Buscar Refeições e Calcular Macros
+    const meals = await prisma.meal.findMany({
+      where: {
+        userId,
+        loggedAt: {
+          gte: processingStart,
+          lte: processingEnd
+        }
+      },
+      include: {
+        entries: {
+          include: { food: true }
+        }
       }
-    },
-    _sum: { amountMl: true }
-  });
+    });
 
-  const waterIngested = waterLogs._sum.amountMl || 0;
-  const waterGoalAchieved = waterIngested >= targetWater && targetWater > 0;
+    let consumedKcal = 0;
+    let consumedProteinG = 0;
+    let consumedCarbsG = 0;
+    let consumedFatG = 0;
 
-  // 2. Gravar o Histórico do dia 'lastActive'
-  await prisma.historyUserNutri.upsert({
-    where: {
-      userId_date: { userId, date: lastActiveAbstractDate }
-    },
-    update: {}, // se já existe, não mexe (medida de segurança)
-    create: {
-      userId,
-      date: lastActiveAbstractDate,
-      waterIngestedMl: waterIngested,
-      targetWaterMl: targetWater,
-      consumedKcal: 0, // Mock: Será implementado no diário alimentar
-      targetKcal: targetKcal,
-      mealsLogged: 0,  // Mock: Será implementado no diário alimentar
-      waterGoalAchieved
-    }
-  });
+    meals.forEach(meal => {
+      meal.entries.forEach(entry => {
+        const multiplier = entry.amountGrams / 100;
+        consumedKcal += entry.food.kcal * multiplier;
+        consumedProteinG += entry.food.proteinG * multiplier;
+        consumedCarbsG += entry.food.carbsG * multiplier;
+        consumedFatG += entry.food.fatG * multiplier;
+      });
+    });
 
-  // 3. Lógica de Streak
-  if (daysDiff === 1) {
-    // Abriu no dia seguinte exato. Se bateu a meta, aumenta o combo.
-    if (waterGoalAchieved) {
+    const kcalGoalAchieved = isWithinTolerance(consumedKcal, targetKcal, 0.10);
+    const carbsGoalAchieved = isWithinTolerance(consumedCarbsG, targetCarbsG, 0.10);
+    const fatGoalAchieved = isWithinTolerance(consumedFatG, targetFatG, 0.10);
+    
+    const proteinGoalAchieved = isAboveFloor(consumedProteinG, targetProteinG, 0.15);
+
+    // 2. Gravar o Histórico do dia processado
+    await prisma.historyUserNutri.upsert({
+      where: {
+        userId_date: { userId, date: processingDate }
+      },
+      update: {}, // se já existe, não mexe (medida de segurança)
+      create: {
+        userId,
+        date: processingDate,
+        waterIngestedMl: waterIngested,
+        targetWaterMl: targetWater,
+        consumedKcal,
+        consumedProteinG,
+        consumedCarbsG,
+        consumedFatG,
+        targetKcal,
+        mealsLogged: meals.length,
+        waterGoalAchieved,
+        kcalGoalAchieved,
+        proteinGoalAchieved,
+        carbsGoalAchieved,
+        fatGoalAchieved
+      }
+    });
+
+    // 3. Lógica de Streak
+    const allGoalsAchieved = waterGoalAchieved && kcalGoalAchieved && proteinGoalAchieved && carbsGoalAchieved && fatGoalAchieved;
+
+    if (allGoalsAchieved) {
       newCurrentStreak += 1;
       if (newCurrentStreak > newLongestStreak) newLongestStreak = newCurrentStreak;
     } else {
       newCurrentStreak = 0; // Quebrou o combo
     }
-  } else if (daysDiff > 1) {
-    // O usuário sumiu por 1 dia ou mais (gap). O combo reseta obrigatoriamente.
-    newCurrentStreak = 0;
+
+    // Avança 1 dia para a próxima iteração
+    processingDate = new Date(processingDate.getTime() + 24 * 60 * 60 * 1000);
   }
 
-  // 4. Limpeza (Zerar a água antiga) e Salvar Novo Status
+  // 4. Salvar Novo Status
   
-  // Limpar a água antiga exige limpar os dados usando a borda de hoje 
-  // do fuso do usuário, não de UTC!
-  const { startOfDayUTC: currentStart } = getDayBounds(referenceDate, timezoneOffset);
-
   await prisma.$transaction([
-    // Apaga os logs de água antigos (tudo antes de hoje local do cliente)
-    prisma.waterIntakeLog.deleteMany({
-      where: { userId, loggedAt: { lt: currentStart } }
-    }),
     // Atualiza o perfil do usuário
     prisma.user.update({
       where: { id: userId },

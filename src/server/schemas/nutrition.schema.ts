@@ -3,11 +3,16 @@ import { z } from 'zod';
 export const timeContextSchema = z.object({
   referenceDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de data inválido. Use YYYY-MM-DD'),
   timezoneOffset: z.number({ message: 'O timezoneOffset (em minutos) é obrigatório.' })
+    .int('O timezoneOffset deve ser um número inteiro.')
+    .min(-720, 'Fuso horário irreal. Mínimo permitido é UTC-12 (-720).')
+    .max(840, 'Fuso horário irreal. Máximo permitido é UTC+14 (+840).')
 });
 
 export const timeContextQuerySchema = z.object({
   referenceDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de data inválido. Use YYYY-MM-DD'),
   timezoneOffset: z.coerce.number({ message: 'O timezoneOffset (em minutos) é obrigatório.' })
+    .refine((val) => !isNaN(val), 'Fuso horário inválido (NaN).')
+    .pipe(z.number().int().min(-720, 'Fuso horário irreal. Mínimo permitido é UTC-12 (-720).').max(840, 'Fuso horário irreal. Máximo permitido é UTC+14 (+840).'))
 });
 
 export const weightLogSchema = z.object({

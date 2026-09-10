@@ -56,6 +56,15 @@ export const mealRoutes: FastifyPluginAsync = async (fastify) => {
             loggedAt: startOfDayUTC
           }
         });
+      } else {
+        // Trava Anti-DoS (Data Growth Abuse): Limite máximo de 50 itens por refeição
+        const currentEntriesCount = await prisma.mealEntry.count({
+          where: { mealId: meal.id }
+        });
+        
+        if (currentEntriesCount >= 50) {
+          return reply.status(400).send({ error: 'Limite de 50 alimentos excedido para esta refeição. Remova alguns itens para continuar.' });
+        }
       }
 
       // 4. Adicionar o Alimento à Refeição
@@ -77,6 +86,52 @@ export const mealRoutes: FastifyPluginAsync = async (fastify) => {
       }
       console.error('[POST /meals/entries error]', error);
       return reply.status(500).send({ error: 'Erro ao registrar refeição.' });
+    }
+  });
+
+  // DELETE /api/meals/entries/:id -> Remove um Alimento da Refeição
+  fastify.delete('/entries/:id', async (request, reply) => {
+    try {
+      const entryId = (request.params as any).id;
+      const userId = (request as any).user.id;
+
+      // 1. Check if entry exists and belongs to the user
+      const entry = await prisma.mealEntry.findFirst({
+        where: {
+          id: entryId,
+          meal: {
+            userId: userId // Secure validation: ensure the parent meal belongs to this user
+          }
+        },
+        include: {
+          meal: true // Need meal data to check the date
+        }
+      });
+
+      if (!entry) {
+        return reply.status(404).send({ error: 'Alimento não encontrado ou sem permissão de acesso.' });
+      }
+
+      // 1.5. Proteção de Ofensiva (Business Logic Firewall): Impedir deleção de dias que já foram consolidados
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { lastActiveDay: true } });
+      if (user?.lastActiveDay) {
+        const lastActiveAbstractDate = new Date(user.lastActiveDay);
+        // We compare the UTC time of the meal with the abstract midnight time of the user's last active day
+        // This is safe because meal.loggedAt is always forced to startOfDayUTC in the POST route
+        if (entry.meal.loggedAt.getTime() < lastActiveAbstractDate.getTime()) {
+           return reply.status(403).send({ error: 'Não é possível remover alimentos de dias passados cujo histórico (ofensiva) já foi consolidado.' });
+        }
+      }
+
+      // 2. Delete the entry
+      await prisma.mealEntry.delete({
+        where: { id: entry.id }
+      });
+
+      return reply.send({ message: 'Alimento removido com sucesso.' });
+    } catch (error) {
+      console.error('[DELETE /meals/entries/:id error]', error);
+      return reply.status(500).send({ error: 'Erro ao remover alimento da refeição.' });
     }
   });
 

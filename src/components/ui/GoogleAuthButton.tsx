@@ -48,7 +48,7 @@ export function GoogleAuthButton() {
             setError('O login com Google falhou ou foi bloqueado.');
           }}
           useOneTap={false}
-          theme="outline"
+          theme="filled_black"
           size="large"
           text="continue_with"
           shape="pill"

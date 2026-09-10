@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus, Coffee, Sun, Moon, Apple } from 'lucide-react';
+import { Plus, Coffee, Sun, Moon, Apple, Trash2 } from 'lucide-react';
 import type { Meal } from '../../lib/nutrition';
 import { AddFoodModal } from './AddFoodModal';
 import { Card } from '../ui/Card';
+import { removeMealEntry } from '../../lib/nutrition';
 
 const CATEGORY_CONFIG = {
   BREAKFAST: { label: 'Café da Manhã', icon: Coffee, color: 'bg-orange-50 text-orange-600 border-orange-100' },
@@ -21,6 +22,30 @@ interface MealTrackerProps {
 
 export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerProps) {
   const [activeCategory, setActiveCategory] = useState<Meal['name'] | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const handleDeleteEntry = async (entryId: string) => {
+    if (confirmDeleteId !== entryId) {
+      setConfirmDeleteId(entryId);
+      // Auto-reset confirmation after 3 seconds
+      setTimeout(() => {
+        setConfirmDeleteId((current) => (current === entryId ? null : current));
+      }, 3000);
+      return;
+    }
+
+    try {
+      setIsDeleting(entryId);
+      await removeMealEntry(entryId);
+      onUpdate();
+    } catch (error) {
+      console.error("Erro ao remover alimento:", error);
+    } finally {
+      setIsDeleting(null);
+      setConfirmDeleteId(null);
+    }
+  };
 
   const getMealData = (category: CategoryKeys) => {
     return meals.find(m => m.name === category);
@@ -103,8 +128,28 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
                                 <p className="text-base font-semibold text-kindra-900 line-clamp-1">{entry.food.name}</p>
                                 <p className="text-sm text-kindra-500">{entry.amountGrams}g</p>
                               </div>
-                              <div className="text-right shrink-0">
-                                <p className="text-base font-bold text-kindra-950">{(entry.food.kcal * multiplier).toFixed(0)} <span className="text-sm font-medium text-kindra-500">kcal</span></p>
+                              <div className="flex items-center gap-3 shrink-0">
+                                <div className="text-right">
+                                  <p className="text-base font-bold text-kindra-950">{(entry.food.kcal * multiplier).toFixed(0)} <span className="text-sm font-medium text-kindra-500">kcal</span></p>
+                                </div>
+                                <button
+                                  onClick={() => handleDeleteEntry(entry.id)}
+                                  disabled={isDeleting === entry.id}
+                                  className={`h-9 min-w-9 rounded-lg flex items-center justify-center transition-colors px-2 disabled:opacity-50 ${
+                                    confirmDeleteId === entry.id
+                                      ? 'bg-red-500 text-white shadow-sm'
+                                      : 'bg-transparent text-red-500 hover:bg-red-50 hover:text-red-600'
+                                  }`}
+                                  title="Remover alimento"
+                                >
+                                  {isDeleting === entry.id ? (
+                                    <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                  ) : confirmDeleteId === entry.id ? (
+                                    <span className="text-xs font-bold uppercase tracking-wider">Apagar?</span>
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </button>
                               </div>
                             </div>
                           );

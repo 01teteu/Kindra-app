@@ -33,10 +33,17 @@ export interface NutritionHistory {
   date: string;
   waterIngestedMl: number;
   consumedKcal: number;
+  consumedProteinG: number;
+  consumedCarbsG: number;
+  consumedFatG: number;
   mealsLogged: number;
   targetWaterMl: number;
   targetKcal: number;
   waterGoalAchieved: boolean;
+  kcalGoalAchieved: boolean;
+  proteinGoalAchieved: boolean;
+  carbsGoalAchieved: boolean;
+  fatGoalAchieved: boolean;
   createdAt: string;
 }
 
@@ -156,3 +163,8 @@ export async function addMealEntry(category: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 
     data: { category, foodId, amountGrams, ...ctx }
   });
 }
+
+export async function removeMealEntry(entryId: string): Promise<void> {
+  return apiFetch(`/meals/entries/${entryId}`, { method: 'DELETE' });
+}
+

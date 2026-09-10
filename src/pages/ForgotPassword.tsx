@@ -56,7 +56,9 @@ export function ForgotPassword() {
       setEmail(data.email);
       setStep(2);
     } catch (err: any) {
-      if (err.status) {
+      if (err.message === 'GOOGLE_USER_NO_PASSWORD') {
+        setServerError('Esta conta utiliza o login do Google. Por favor, volte e clique em "Continuar com o Google".');
+      } else if (err.status) {
         setServerError(err.message);
       } else {
         setServerError('Erro de rede: falha na conexão.');

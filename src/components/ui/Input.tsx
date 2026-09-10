@@ -7,20 +7,23 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, error, type, ...props }, ref) => {
+  ({ className, error, type, title, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPasswordField = type === 'password';
     const inputType = isPasswordField ? (showPassword ? 'text' : 'password') : type;
 
     return (
-      <div className="flex flex-col gap-1 w-full">
+      <div className="flex flex-col gap-1.5 w-full">
+        {title && (
+          <label className="text-[13px] font-bold text-kindra-400 pl-1">{title}</label>
+        )}
         <div className="relative flex items-center w-full group">
           <input
             ref={ref}
             type={inputType}
             className={cn(
-              'flex h-12 w-full rounded-full bg-kindra-200/50 pl-6 pr-12 py-2 text-sm text-kindra-950 placeholder:text-kindra-500 font-medium',
-              'border border-kindra-300 focus:bg-kindra-100 focus:border-kindra-500 focus:ring-4 focus:ring-kindra-500/10 focus:outline-none transition-all duration-300',
+              'flex h-12 w-full rounded-[14px] bg-kindra-50 pl-5 pr-12 py-2 text-sm text-kindra-950 placeholder:text-kindra-500 font-medium',
+              'border border-kindra-300 focus:bg-kindra-100 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 focus:outline-none transition-all duration-300',
               '[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
               error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
               className
