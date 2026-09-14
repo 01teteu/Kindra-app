@@ -42385,5 +42385,691 @@
     "glycine_g": "",
     "proline_g": "",
     "serine_g": ""
+  },
+  {
+    "description": "Whey Protein Concentrado",
+    "energy_kcal": 400,
+    "protein_g": 80,
+    "carbohydrate_g": 10,
+    "lipid_g": 5
+  },
+  {
+    "description": "Whey Protein Isolado",
+    "energy_kcal": 370,
+    "protein_g": 90,
+    "carbohydrate_g": 2,
+    "lipid_g": 1
+  },
+  {
+    "description": "Creatina",
+    "energy_kcal": 0,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "BCAA em Pó",
+    "energy_kcal": 400,
+    "protein_g": 100,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Hipercalórico",
+    "energy_kcal": 380,
+    "protein_g": 15,
+    "carbohydrate_g": 75,
+    "lipid_g": 2
+  },
+  {
+    "description": "Barra de Proteína",
+    "energy_kcal": 350,
+    "protein_g": 30,
+    "carbohydrate_g": 35,
+    "lipid_g": 12
+  },
+  {
+    "description": "Pasta de Amendoim Integral",
+    "energy_kcal": 588,
+    "protein_g": 25,
+    "carbohydrate_g": 20,
+    "lipid_g": 50
+  },
+  {
+    "description": "Maltodextrina",
+    "energy_kcal": 380,
+    "protein_g": 0,
+    "carbohydrate_g": 95,
+    "lipid_g": 0
+  },
+  {
+    "description": "Waxy Maize",
+    "energy_kcal": 350,
+    "protein_g": 0,
+    "carbohydrate_g": 87,
+    "lipid_g": 0
+  },
+  {
+    "description": "Palatinose",
+    "energy_kcal": 375,
+    "protein_g": 0,
+    "carbohydrate_g": 95,
+    "lipid_g": 0
+  },
+  {
+    "description": "Albumina em Pó",
+    "energy_kcal": 380,
+    "protein_g": 80,
+    "carbohydrate_g": 5,
+    "lipid_g": 0
+  },
+  {
+    "description": "Caseína Micelar",
+    "energy_kcal": 360,
+    "protein_g": 80,
+    "carbohydrate_g": 5,
+    "lipid_g": 1.5
+  },
+  {
+    "description": "Glutamina",
+    "energy_kcal": 400,
+    "protein_g": 100,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Pré-treino",
+    "energy_kcal": 0,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Colágeno Hidrolisado",
+    "energy_kcal": 360,
+    "protein_g": 90,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Bebida Láctea Proteica (Yopro/Piracanjuba)",
+    "energy_kcal": 60,
+    "protein_g": 6,
+    "carbohydrate_g": 6,
+    "lipid_g": 1
+  },
+  {
+    "description": "Iogurte Natural Whey",
+    "energy_kcal": 70,
+    "protein_g": 7,
+    "carbohydrate_g": 5,
+    "lipid_g": 2
+  },
+  {
+    "description": "Proteína Isolada de Soja",
+    "energy_kcal": 380,
+    "protein_g": 88,
+    "carbohydrate_g": 2,
+    "lipid_g": 1
+  },
+  {
+    "description": "Proteína de Ervilha",
+    "energy_kcal": 400,
+    "protein_g": 80,
+    "carbohydrate_g": 5,
+    "lipid_g": 8
+  },
+  {
+    "description": "Proteína de Arroz",
+    "energy_kcal": 390,
+    "protein_g": 80,
+    "carbohydrate_g": 5,
+    "lipid_g": 5
+  },
+  {
+    "description": "Hambúrguer Fast Food (Big Mac)",
+    "energy_kcal": 250,
+    "protein_g": 13,
+    "carbohydrate_g": 21,
+    "lipid_g": 13
+  },
+  {
+    "description": "Batata Frita Fast Food (McDonald's)",
+    "energy_kcal": 310,
+    "protein_g": 4,
+    "carbohydrate_g": 40,
+    "lipid_g": 15
+  },
+  {
+    "description": "Nuggets de Frango (McDonald's)",
+    "energy_kcal": 270,
+    "protein_g": 14,
+    "carbohydrate_g": 17,
+    "lipid_g": 16
+  },
+  {
+    "description": "Hambúrguer Fast Food (Whopper)",
+    "energy_kcal": 240,
+    "protein_g": 10,
+    "carbohydrate_g": 18,
+    "lipid_g": 14
+  },
+  {
+    "description": "Sanduíche Subway Frango Teriyaki",
+    "energy_kcal": 150,
+    "protein_g": 11,
+    "carbohydrate_g": 22,
+    "lipid_g": 3
+  },
+  {
+    "description": "Pizza Mussarela (Delivery)",
+    "energy_kcal": 280,
+    "protein_g": 12,
+    "carbohydrate_g": 30,
+    "lipid_g": 12
+  },
+  {
+    "description": "Pizza Calabresa (Delivery)",
+    "energy_kcal": 300,
+    "protein_g": 12,
+    "carbohydrate_g": 28,
+    "lipid_g": 15
+  },
+  {
+    "description": "Pizza Frango com Catupiry",
+    "energy_kcal": 290,
+    "protein_g": 14,
+    "carbohydrate_g": 27,
+    "lipid_g": 14
+  },
+  {
+    "description": "Esfiha de Carne (Habib's)",
+    "energy_kcal": 220,
+    "protein_g": 9,
+    "carbohydrate_g": 28,
+    "lipid_g": 8
+  },
+  {
+    "description": "Esfiha de Queijo (Habib's)",
+    "energy_kcal": 270,
+    "protein_g": 10,
+    "carbohydrate_g": 25,
+    "lipid_g": 14
+  },
+  {
+    "description": "Ketchup Tradicional",
+    "energy_kcal": 100,
+    "protein_g": 1,
+    "carbohydrate_g": 24,
+    "lipid_g": 0
+  },
+  {
+    "description": "Mostarda Tradicional",
+    "energy_kcal": 65,
+    "protein_g": 4,
+    "carbohydrate_g": 5,
+    "lipid_g": 3
+  },
+  {
+    "description": "Maionese Light",
+    "energy_kcal": 300,
+    "protein_g": 1,
+    "carbohydrate_g": 8,
+    "lipid_g": 30
+  },
+  {
+    "description": "Biscoito Recheado (Oreo/Negresco)",
+    "energy_kcal": 480,
+    "protein_g": 5,
+    "carbohydrate_g": 68,
+    "lipid_g": 20
+  },
+  {
+    "description": "Biscoito de Polvilho (Doce ou Salgado)",
+    "energy_kcal": 420,
+    "protein_g": 1,
+    "carbohydrate_g": 80,
+    "lipid_g": 10
+  },
+  {
+    "description": "Salgadinho de Milho (Cheetos/Fandangos)",
+    "energy_kcal": 480,
+    "protein_g": 6,
+    "carbohydrate_g": 58,
+    "lipid_g": 25
+  },
+  {
+    "description": "Salgadinho de Batata (Ruffles)",
+    "energy_kcal": 530,
+    "protein_g": 6,
+    "carbohydrate_g": 50,
+    "lipid_g": 35
+  },
+  {
+    "description": "Salgadinho de Tortilha (Doritos)",
+    "energy_kcal": 500,
+    "protein_g": 7,
+    "carbohydrate_g": 60,
+    "lipid_g": 25
+  },
+  {
+    "description": "Batata Pringles",
+    "energy_kcal": 520,
+    "protein_g": 4,
+    "carbohydrate_g": 55,
+    "lipid_g": 32
+  },
+  {
+    "description": "Chocolate Branco",
+    "energy_kcal": 540,
+    "protein_g": 6,
+    "carbohydrate_g": 58,
+    "lipid_g": 32
+  },
+  {
+    "description": "Bombom Sonho de Valsa",
+    "energy_kcal": 510,
+    "protein_g": 6,
+    "carbohydrate_g": 60,
+    "lipid_g": 27
+  },
+  {
+    "description": "Chocolate KitKat",
+    "energy_kcal": 510,
+    "protein_g": 6,
+    "carbohydrate_g": 62,
+    "lipid_g": 26
+  },
+  {
+    "description": "Chocolate Bis",
+    "energy_kcal": 500,
+    "protein_g": 5,
+    "carbohydrate_g": 68,
+    "lipid_g": 23
+  },
+  {
+    "description": "M&M's Chocolate",
+    "energy_kcal": 480,
+    "protein_g": 5,
+    "carbohydrate_g": 70,
+    "lipid_g": 20
+  },
+  {
+    "description": "Bala de Goma / Fini",
+    "energy_kcal": 350,
+    "protein_g": 5,
+    "carbohydrate_g": 82,
+    "lipid_g": 0
+  },
+  {
+    "description": "Creme de Avelã (Nutella)",
+    "energy_kcal": 540,
+    "protein_g": 6,
+    "carbohydrate_g": 58,
+    "lipid_g": 31
+  },
+  {
+    "description": "Sorvete de Creme / Baunilha",
+    "energy_kcal": 200,
+    "protein_g": 3,
+    "carbohydrate_g": 24,
+    "lipid_g": 10
+  },
+  {
+    "description": "Sorvete de Chocolate",
+    "energy_kcal": 215,
+    "protein_g": 4,
+    "carbohydrate_g": 26,
+    "lipid_g": 11
+  },
+  {
+    "description": "Picolé de Fruta (Base de Água)",
+    "energy_kcal": 80,
+    "protein_g": 0,
+    "carbohydrate_g": 20,
+    "lipid_g": 0
+  },
+  {
+    "description": "Coca-Cola Original",
+    "energy_kcal": 42,
+    "protein_g": 0,
+    "carbohydrate_g": 10.6,
+    "lipid_g": 0
+  },
+  {
+    "description": "Coca-Cola Zero",
+    "energy_kcal": 0,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Guaraná Antarctica",
+    "energy_kcal": 40,
+    "protein_g": 0,
+    "carbohydrate_g": 10,
+    "lipid_g": 0
+  },
+  {
+    "description": "Guaraná Antarctica Zero",
+    "energy_kcal": 0,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Sprite / Soda Limonada",
+    "energy_kcal": 40,
+    "protein_g": 0,
+    "carbohydrate_g": 10,
+    "lipid_g": 0
+  },
+  {
+    "description": "Fanta Laranja",
+    "energy_kcal": 45,
+    "protein_g": 0,
+    "carbohydrate_g": 11,
+    "lipid_g": 0
+  },
+  {
+    "description": "H2OH! / Aquarius Fresh",
+    "energy_kcal": 0,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Red Bull Tradicional",
+    "energy_kcal": 45,
+    "protein_g": 0,
+    "carbohydrate_g": 11,
+    "lipid_g": 0
+  },
+  {
+    "description": "Red Bull Sugar Free / Zero",
+    "energy_kcal": 1,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Monster Energy",
+    "energy_kcal": 47,
+    "protein_g": 0,
+    "carbohydrate_g": 12,
+    "lipid_g": 0
+  },
+  {
+    "description": "Monster Energy Ultra (Zero)",
+    "energy_kcal": 1,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Gatorade / Isotônico",
+    "energy_kcal": 24,
+    "protein_g": 0,
+    "carbohydrate_g": 6,
+    "lipid_g": 0
+  },
+  {
+    "description": "Água de Coco (Caixinha)",
+    "energy_kcal": 20,
+    "protein_g": 0,
+    "carbohydrate_g": 5,
+    "lipid_g": 0
+  },
+  {
+    "description": "Cerveja Puro Malte (Heineken)",
+    "energy_kcal": 42,
+    "protein_g": 0.5,
+    "carbohydrate_g": 3.2,
+    "lipid_g": 0
+  },
+  {
+    "description": "Vinho Tinto Seco",
+    "energy_kcal": 85,
+    "protein_g": 0.2,
+    "carbohydrate_g": 2.5,
+    "lipid_g": 0
+  },
+  {
+    "description": "Vinho Tinto Suave",
+    "energy_kcal": 105,
+    "protein_g": 0.2,
+    "carbohydrate_g": 7.5,
+    "lipid_g": 0
+  },
+  {
+    "description": "Vodka",
+    "energy_kcal": 230,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Whisky",
+    "energy_kcal": 250,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Gin",
+    "energy_kcal": 260,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 0
+  },
+  {
+    "description": "Leite de Amêndoas (Sem açúcar)",
+    "energy_kcal": 15,
+    "protein_g": 0.5,
+    "carbohydrate_g": 0.5,
+    "lipid_g": 1.2
+  },
+  {
+    "description": "Leite de Aveia",
+    "energy_kcal": 45,
+    "protein_g": 1,
+    "carbohydrate_g": 7,
+    "lipid_g": 1.5
+  },
+  {
+    "description": "Leite de Soja (Original)",
+    "energy_kcal": 40,
+    "protein_g": 3,
+    "carbohydrate_g": 2,
+    "lipid_g": 1.8
+  },
+  {
+    "description": "Kombucha",
+    "energy_kcal": 15,
+    "protein_g": 0,
+    "carbohydrate_g": 4,
+    "lipid_g": 0
+  },
+  {
+    "description": "Suco de Laranja Integral (Caixinha)",
+    "energy_kcal": 45,
+    "protein_g": 0.7,
+    "carbohydrate_g": 10,
+    "lipid_g": 0
+  },
+  {
+    "description": "Suco de Uva Integral",
+    "energy_kcal": 65,
+    "protein_g": 0.5,
+    "carbohydrate_g": 15,
+    "lipid_g": 0
+  },
+  {
+    "description": "Néctar de Fruta (Del Valle)",
+    "energy_kcal": 40,
+    "protein_g": 0,
+    "carbohydrate_g": 10,
+    "lipid_g": 0
+  },
+  {
+    "description": "Queijo Cottage",
+    "energy_kcal": 98,
+    "protein_g": 11,
+    "carbohydrate_g": 3,
+    "lipid_g": 4
+  },
+  {
+    "description": "Cream Cheese",
+    "energy_kcal": 340,
+    "protein_g": 6,
+    "carbohydrate_g": 4,
+    "lipid_g": 34
+  },
+  {
+    "description": "Iogurte Grego Tradicional",
+    "energy_kcal": 110,
+    "protein_g": 5,
+    "carbohydrate_g": 15,
+    "lipid_g": 4
+  },
+  {
+    "description": "Iogurte Skyr",
+    "energy_kcal": 65,
+    "protein_g": 11,
+    "carbohydrate_g": 4,
+    "lipid_g": 0
+  },
+  {
+    "description": "Tapioca (Massa Pronta)",
+    "energy_kcal": 240,
+    "protein_g": 0,
+    "carbohydrate_g": 60,
+    "lipid_g": 0
+  },
+  {
+    "description": "Óleo de Coco",
+    "energy_kcal": 862,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 100
+  },
+  {
+    "description": "Manteiga Ghee",
+    "energy_kcal": 900,
+    "protein_g": 0,
+    "carbohydrate_g": 0,
+    "lipid_g": 100
+  },
+  {
+    "description": "Geleia de Frutas (Tradicional)",
+    "energy_kcal": 260,
+    "protein_g": 0,
+    "carbohydrate_g": 65,
+    "lipid_g": 0
+  },
+  {
+    "description": "Geleia de Frutas (Diet/Zero)",
+    "energy_kcal": 50,
+    "protein_g": 0,
+    "carbohydrate_g": 12,
+    "lipid_g": 0
+  },
+  {
+    "description": "Pão de Forma Branco",
+    "energy_kcal": 260,
+    "protein_g": 8,
+    "carbohydrate_g": 50,
+    "lipid_g": 3
+  },
+  {
+    "description": "Pão Sírio / Pita",
+    "energy_kcal": 270,
+    "protein_g": 9,
+    "carbohydrate_g": 55,
+    "lipid_g": 1
+  },
+  {
+    "description": "Massa Wrap (Rap10)",
+    "energy_kcal": 300,
+    "protein_g": 8,
+    "carbohydrate_g": 50,
+    "lipid_g": 8
+  },
+  {
+    "description": "Granola Tradicional",
+    "energy_kcal": 400,
+    "protein_g": 10,
+    "carbohydrate_g": 65,
+    "lipid_g": 10
+  },
+  {
+    "description": "Cereal Matinal (Chocolate)",
+    "energy_kcal": 380,
+    "protein_g": 7,
+    "carbohydrate_g": 75,
+    "lipid_g": 5
+  },
+  {
+    "description": "Bolo de Chocolate (Fatia Simples)",
+    "energy_kcal": 350,
+    "protein_g": 5,
+    "carbohydrate_g": 50,
+    "lipid_g": 15
+  },
+  {
+    "description": "Bolo Brownie",
+    "energy_kcal": 400,
+    "protein_g": 5,
+    "carbohydrate_g": 55,
+    "lipid_g": 20
+  },
+  {
+    "description": "Sushi (Misto)",
+    "energy_kcal": 140,
+    "protein_g": 5,
+    "carbohydrate_g": 25,
+    "lipid_g": 1
+  },
+  {
+    "description": "Temaki de Salmão",
+    "energy_kcal": 160,
+    "protein_g": 8,
+    "carbohydrate_g": 20,
+    "lipid_g": 5
+  },
+  {
+    "description": "Sashimi de Salmão",
+    "energy_kcal": 200,
+    "protein_g": 20,
+    "carbohydrate_g": 0,
+    "lipid_g": 13
+  },
+  {
+    "description": "Yakisoba (Carne e Frango)",
+    "energy_kcal": 150,
+    "protein_g": 8,
+    "carbohydrate_g": 20,
+    "lipid_g": 5
+  },
+  {
+    "description": "Poke (Salmão e Gohan)",
+    "energy_kcal": 140,
+    "protein_g": 7,
+    "carbohydrate_g": 18,
+    "lipid_g": 4
+  },
+  {
+    "description": "Pão de Alho",
+    "energy_kcal": 350,
+    "protein_g": 8,
+    "carbohydrate_g": 40,
+    "lipid_g": 18
+  },
+  {
+    "description": "Coração de Frango Assado (Churrasco)",
+    "energy_kcal": 250,
+    "protein_g": 20,
+    "carbohydrate_g": 0,
+    "lipid_g": 18
   }
 ]

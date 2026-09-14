@@ -1,0 +1,24 @@
+.routine-builder { width: 100%; max-width: 780px; margin: 0 auto; padding: 20px 20px max(28px, env(safe-area-inset-bottom)); }
+.builder-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+.builder-heading h1 { font-size: 24px; }
+.builder-section-heading { display: flex; align-items: center; justify-content: space-between; margin: 28px 0 8px; }
+.builder-section-heading h2 { font-size: 18px; }
+.builder-section-heading span, .builder-empty { font-size: 14px; color: var(--color-kindra-500); }
+.builder-empty { padding: 18px 0; }
+.builder-items { list-style: none; padding: 0; margin: 0; }
+.builder-item { padding: 16px 0 20px; border-bottom: 1px solid var(--color-kindra-200); }
+.builder-item-heading { display: flex; align-items: center; gap: 8px; }
+.builder-position { color: var(--color-kindra-500); font-size: 14px; }
+.builder-item-heading h3 { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 15px; font-weight: 600; }
+.builder-item-actions { display: flex; flex-shrink: 0; gap: 0; }
+.builder-item-actions .kindra-button { padding: 0; width: 44px; min-width: 44px; height: 44px; }
+.builder-item-fields { display: grid; grid-template-columns: 140px minmax(0, 1fr); align-items: start; gap: 14px; margin-top: 12px; }
+.builder-note { display: grid; gap: 8px; font-size: 14px; color: var(--color-kindra-700); }
+.builder-note textarea { width: 100%; min-width: 0; min-height: 48px; resize: vertical; border: 1px solid var(--color-kindra-300); background: var(--color-kindra-100); color: var(--color-kindra-950); border-radius: 8px; padding: 10px 12px; font-size: 16px; }
+.builder-add { width: 100%; margin-top: 20px; }
+.builder-save { display: flex; align-items: center; gap: 12px; margin-top: 28px; }
+.builder-delete { margin-top: 16px; color: var(--color-rose-300); }
+.builder-error { color: var(--color-rose-300); font-size: 14px; margin: 14px 0; }
+.routine-builder button:disabled { opacity: .45; }
+@media (max-width: 440px) { .builder-item-fields { grid-template-columns: 1fr; } }
+@media (min-width: 768px) { .routine-builder { padding-top: 36px; } }

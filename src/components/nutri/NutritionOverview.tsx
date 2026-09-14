@@ -36,45 +36,47 @@ export function NutritionOverview({ goal, consumed }: NutritionOverviewProps) {
   const remainingCarbs = targetCarbsG - consumed.carbsG;
   const remainingFat = targetFatG - consumed.fatG;
 
+  const macros = [
+    { label: 'Proteínas', remaining: remainingProtein },
+    { label: 'Carboidratos', remaining: remainingCarbs },
+    { label: 'Gorduras', remaining: remainingFat },
+  ];
   return (
-    <Card className="p-6 relative">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 shrink-0 bg-kindra-900 text-kindra-50 rounded-2xl flex items-center justify-center shadow-lg shadow-black/20 border border-kindra-800">
-              <Flame className="h-6 w-6" />
-            </div>
-            <div className="flex flex-col">
-              <h2 className="text-xl sm:text-2xl font-display font-bold text-kindra-950 tracking-tight leading-tight">
-                Meta Diária
-              </h2>
-              <p className="text-sm font-medium text-kindra-500">Saldo restante do dia</p>
-            </div>
-          </div>
+    <Card className="p-5 sm:p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <span className="eyebrow">Balanço do dia</span>
+          <h2 className="text-lg font-semibold mt-1">Sua meta diária</h2>
         </div>
-
-        <div className="flex items-end gap-2 mb-8">
-          <span className="text-5xl font-display font-bold text-kindra-950 tracking-tight">
-            {remainingKcal.toFixed(0)}
-          </span>
-          <span className="text-lg text-kindra-500 font-medium mb-1">kcal restantes</span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-          <div className="bg-kindra-50/50 rounded-xl p-3 sm:p-4 border border-kindra-100/50 flex flex-col items-center text-center">
-            <div className="text-xs font-medium text-kindra-500 mb-1">Proteínas restantes</div>
-            <div className="text-lg sm:text-xl font-semibold text-kindra-900">{remainingProtein.toFixed(1)}g</div>
+        <Flame size={22} className="text-teal-300" aria-hidden="true" />
+      </div>
+      <div className="flex items-baseline flex-wrap gap-2">
+        <span className="metric-number">{remainingKcal.toFixed(0)}</span>
+        <span className="text-sm text-kindra-500">kcal restantes</span>
+      </div>
+      <div className="flex justify-between gap-3 text-xs text-kindra-500 mt-5 mb-3">
+        <span>{consumed.kcal.toFixed(0)} consumidas</span>
+        <span>Meta: {targetKcal.toFixed(0)}</span>
+      </div>
+      <div className="metric-rail" aria-hidden="true">
+        <span
+          style={{
+            width: `${targetKcal > 0 ? Math.min(100, Math.max(0, (consumed.kcal / targetKcal) * 100)) : 0}%`,
+          }}
+        />
+      </div>
+      <div className="macro-grid">
+        {macros.map((macro) => (
+          <div key={macro.label}>
+            <p>{macro.label}</p>
+            <strong>
+              {macro.remaining.toFixed(1)}
+              <small>g</small>
+            </strong>
+            <span className="block text-[10px] text-kindra-500 mt-1">restantes</span>
           </div>
-          
-          <div className="bg-kindra-50/50 rounded-xl p-3 sm:p-4 border border-kindra-100/50 flex flex-col items-center text-center">
-            <div className="text-xs font-medium text-kindra-500 mb-1">Carbos restantes</div>
-            <div className="text-lg sm:text-xl font-semibold text-kindra-900">{remainingCarbs.toFixed(1)}g</div>
-          </div>
-
-          <div className="col-span-2 sm:col-span-1 bg-kindra-50/50 rounded-xl p-3 sm:p-4 border border-kindra-100/50 flex flex-col items-center text-center">
-            <div className="text-xs font-medium text-kindra-500 mb-1">Gorduras restantes</div>
-            <div className="text-lg sm:text-xl font-semibold text-kindra-900">{remainingFat.toFixed(1)}g</div>
-          </div>
-        </div>
-      </Card>
+        ))}
+      </div>
+    </Card>
   );
 }

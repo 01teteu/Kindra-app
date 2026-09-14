@@ -4,6 +4,7 @@ import { weightLogSchema, waterIntakeLogSchema, timeContextQuerySchema } from '.
 import { requireScope } from '../middlewares/auth.js';
 import { calculateAndSaveNutritionGoal, checkAndConsolidateNutriHistory } from '../services/nutrition.service.js';
 import { validatePlausibility, getDayBounds } from '../utils/timezone.js';
+import { removeWater } from '../controllers/water.controller.js';
 
 export const nutritionRoutes: FastifyPluginAsync = async (fastify) => {
   // Middleware de autenticação obrigatório: garante que apenas tokens de sessão completa acessem
@@ -140,6 +141,35 @@ export const nutritionRoutes: FastifyPluginAsync = async (fastify) => {
   // ==========================================
   // CONSUMO DE ÁGUA (WATER INTAKE LOGS)
   // ==========================================
+
+  fastify.delete('/water/:id', {
+    config: {
+      rateLimit: {
+        hook: 'preHandler', // Session verification runs first in onRequest.
+        max: 20,
+        timeWindow: '1 minute',
+        keyGenerator: request => {
+          const user = request.user as { id?: string };
+          return `water-delete:${user?.id || request.ip}`;
+        },
+      },
+    },
+    preValidation: async (request, reply) => {
+      if (request.headers['sec-fetch-site'] === 'cross-site') {
+        return reply.status(403).send({ error: 'Origem da requisição não permitida.' });
+      }
+    },
+    onResponse: async (request, reply) => {
+      const status = reply.statusCode;
+      const outcome = status === 204 ? 'removed' : status === 401 ? 'unauthenticated'
+        : status === 403 ? 'forbidden' : status === 429 ? 'rate_limited'
+        : status === 400 ? 'invalid_input' : status === 404 ? 'unavailable' : 'error';
+      request.log.info({
+        event: 'security.water_delete', outcome, statusCode: status,
+        count: 1, durationMs: Math.round(reply.elapsedTime * 100) / 100,
+      }, 'Hydration removal security metric');
+    },
+  }, removeWater);
 
   fastify.get('/water', async (request, reply) => {
     try {

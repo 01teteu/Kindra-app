@@ -128,6 +128,13 @@ export async function addWaterLog(amountMl: number): Promise<WaterIntakeLog> {
   return data;
 }
 
+export async function removeWaterLog(id: string): Promise<void> {
+  const ctx = getTimeContext();
+  await apiFetch(`/nutrition/water/${encodeURIComponent(id)}?referenceDate=${ctx.referenceDate}&timezoneOffset=${ctx.timezoneOffset}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function getWeightLogs(): Promise<WeightLog[]> {
   const data = await apiFetch('/nutrition/weight');
   return data;
@@ -167,4 +174,3 @@ export async function addMealEntry(category: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 
 export async function removeMealEntry(entryId: string): Promise<void> {
   return apiFetch(`/meals/entries/${entryId}`, { method: 'DELETE' });
 }
-

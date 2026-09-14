@@ -1,0 +1,105 @@
+.public-page {
+  min-height: 100dvh;
+  background: var(--color-kindra-base);
+  color: var(--color-kindra-950);
+}
+.public-container { width: min(100% - 48px, 1100px); margin-inline: auto; }
+.public-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: calc(24px + env(safe-area-inset-top)) 24px; border-bottom: 1px solid var(--color-kindra-200); }
+.public-nav { display: flex; align-items: center; gap: 12px; }
+.public-nav-detail, .public-footer a { color: var(--color-kindra-500); font-size: 13px; padding-block: 14px; transition: color var(--motion-fast); }
+.public-nav-detail:hover, .public-footer a:hover { color: var(--color-teal-300); }
+.public-error-copy { animation: page-enter 400ms ease-out; }
+.public-page h1, .public-page h2, .public-page h3 { font-family: var(--font-display); font-weight: 700; }
+.public-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; border-top: 1px solid var(--color-kindra-200); padding-block: 24px calc(24px + env(safe-area-inset-bottom)); }
+.public-footer p { color: var(--color-kindra-500); font-size: 12px; }
+.public-not-found { display: flex; flex-direction: column; }
+.public-error { flex: 1; display: grid; grid-template-columns: 1fr 1.3fr; gap: 64px; align-items: center; padding-block: 80px; }
+.public-error-code { font: 700 clamp(100px, 16vw, 210px)/1 var(--font-display); letter-spacing: -0.07em; color: var(--color-kindra-300); }
+.public-error h1 { font-size: clamp(36px, 4.5vw, 56px); line-height: 1.1; letter-spacing: -0.04em; margin-block: 20px; }
+.public-error-copy > p:not(.eyebrow) { max-width: 440px; color: var(--color-kindra-500); font-size: 15px; line-height: 1.8; }
+@media (max-width: 767px) {
+  .public-container { width: calc(100% - 40px); }
+  .public-header { gap: 12px; padding-block: calc(20px + env(safe-area-inset-top)) 20px; }
+  .public-nav { gap: 4px; }
+  .public-nav-detail { display: none; }
+  .public-footer { align-items: start; flex-direction: column; gap: 16px; }
+  .public-error { grid-template-columns: 1fr; gap: 32px; padding-block: 48px; }
+  .public-error-code { font-size: clamp(100px, 25vw, 180px); }
+  .public-not-found .public-header > .eyebrow { max-width: 120px; text-align: right; line-height: 1.8; }
+}
+@media (max-width: 380px) {
+  .public-container { width: calc(100% - 32px); }
+  .public-nav .kindra-button { padding-inline: 10px; }
+  .public-nav .kindra-button svg { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-error-copy { animation: none; }
+}
+
+/* Landing only: keep shared public/404 layout unchanged. */
+.kindra-landing .public-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 72px;
+  padding-block: 64px 72px;
+}
+.kindra-landing .public-hero h1 { margin: 0; letter-spacing: -0.045em; }
+.kindra-landing .public-hero-brand { display: block; font-size: clamp(72px, 7.5vw, 104px); line-height: 1; margin-bottom: 28px; }
+.kindra-landing .public-hero-proposal { display: block; font-size: clamp(30px, 3.1vw, 42px); line-height: 1.16; }
+.kindra-landing .public-lead { max-width: 410px; margin-top: 24px; color: var(--color-kindra-500); font-size: 15px; line-height: 1.8; }
+.kindra-landing .public-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.kindra-landing .public-product { min-width: 0; background: var(--color-kindra-100); border: 1px solid var(--color-kindra-200); border-radius: var(--control-radius); padding: 28px; }
+.kindra-landing .public-product-heading { border-bottom: 1px solid var(--color-kindra-300); padding-bottom: 20px; }
+.kindra-landing .public-product-heading h2 { font-size: 21px; letter-spacing: -0.025em; }
+.kindra-landing .public-product-heading p { margin-top: 6px; color: var(--color-kindra-500); font-size: 12px; }
+.kindra-landing .public-product h3 { font-size: 23px; letter-spacing: -0.025em; }
+.kindra-landing .public-product-training { padding-block: 24px; }
+.kindra-landing .public-product-context { color: var(--color-kindra-500); font-size: 13px; margin-top: 4px; }
+.kindra-landing .public-training-fields { display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px; margin-top: 20px; padding-left: 14px; border-left: 2px solid var(--color-teal-400); }
+.kindra-landing .public-training-fields dt { font-size: 13px; font-weight: 600; }
+.kindra-landing .public-training-fields dd { margin: 6px 0 0; font-size: 12px; color: var(--color-kindra-500); }
+.kindra-landing .public-product-nutrition { padding-block: 20px; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-product-detail { font-size: 13px; line-height: 1.8; margin-top: 12px; color: var(--color-kindra-700); }
+.kindra-landing .public-product-tracking > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--color-kindra-200); font-size: 13px; }
+.kindra-landing .public-product-tracking > div:first-child { margin-top: 0; }
+.kindra-landing .public-product-tracking dt { font-weight: 600; }
+.kindra-landing .public-product-tracking dd { margin: 0; color: var(--color-kindra-500); text-align: right; }
+.kindra-landing .public-benefits { padding-block: 44px 56px; border-top: 1px solid var(--color-kindra-200); scroll-margin-top: 24px; }
+.kindra-landing .public-section-heading { display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: end; margin-bottom: 32px; }
+.kindra-landing .public-section-heading h2 { max-width: 480px; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.2; letter-spacing: -0.035em; }
+.kindra-landing .public-section-heading > p { max-width: 320px; justify-self: end; font-size: 14px; line-height: 1.7; color: var(--color-kindra-500); }
+.kindra-landing .public-pillar-grid { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 32px; }
+.kindra-landing .public-pillar { padding-top: 20px; border-top: 1px solid var(--color-kindra-300); }
+.kindra-landing .public-pillar h3 { font-size: 19px; letter-spacing: -0.025em; }
+.kindra-landing .public-pillar p { margin-top: 12px; color: var(--color-kindra-500); font-size: 13px; line-height: 1.8; max-width: 340px; }
+.kindra-landing .public-footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; }
+.kindra-landing .public-footer-links a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 1023px) and (min-width: 768px) {
+  .kindra-landing .public-hero { gap: 32px; }
+  .kindra-landing .public-product { padding: 24px; }
+}
+@media (max-width: 767px) {
+  .kindra-landing .public-hero { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 36px 40px; }
+  .kindra-landing .public-hero-brand { font-size: 64px; margin-bottom: 22px; }
+  .kindra-landing .public-hero-proposal { font-size: 30px; }
+  .kindra-landing .public-lead { margin-top: 18px; font-size: 14px; line-height: 1.75; }
+  .kindra-landing .public-actions { margin-top: 22px; gap: 6px; }
+  .kindra-landing .public-actions .button-ghost { padding-inline: 12px; font-size: 13px; }
+  .kindra-landing .public-product { padding: 22px; }
+  .kindra-landing .public-product-heading { padding-bottom: 16px; }
+  .kindra-landing .public-product-training { padding-block: 20px; }
+  .kindra-landing .public-product-nutrition { padding-block: 16px; }
+  .kindra-landing .public-benefits { padding-block: 32px 40px; }
+  .kindra-landing .public-section-heading { grid-template-columns: 1fr; gap: 14px; margin-bottom: 24px; }
+  .kindra-landing .public-section-heading > p { justify-self: start; }
+  .kindra-landing .public-pillar-grid { grid-template-columns: 1fr; gap: 20px; }
+  .kindra-landing .public-pillar { padding-top: 20px; }
+  .kindra-landing .public-pillar p { margin-top: 8px; max-width: none; }
+  .kindra-landing .public-footer { gap: 8px; }
+  .kindra-landing .public-footer-links { gap: 8px 20px; }
+}
+@media (max-width: 380px) {
+  .kindra-landing .public-hero-proposal { font-size: 27px; }
+  .kindra-landing .public-actions { align-items: stretch; flex-direction: column; }
+}

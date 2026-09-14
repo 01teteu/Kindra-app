@@ -1,3 +1,4 @@
+import { Sheet } from '../ui/Sheet';
 import React, { useState } from 'react';
 import { X, Loader2, Utensils } from 'lucide-react';
 import * as nutritionApi from '../../lib/nutrition';
@@ -39,7 +40,7 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
 
       const newFood = await nutritionApi.createCustomFood(payload);
       onSuccess(newFood);
-      
+
       // Reset form
       setFormData({
         name: '',
@@ -62,26 +63,22 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md">
-      <div 
-        className="absolute inset-0"
-        onClick={onClose}
-      />
-      
-      <div className="relative bg-kindra-100 rounded-[32px] w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-kindra-200/50 flex flex-col max-h-[85vh] backdrop-blur-xl">
-        <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
+    <Sheet open={isOpen} onClose={onClose} label="Novo alimento">
+      <div className="sheet-panel relative">
+        <div className="p-5 sm:p-6 overflow-y-auto custom-scrollbar">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-kindra-200/50 flex items-center justify-center text-teal-400 border border-kindra-300/30">
                 <Utensils className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-display font-semibold text-kindra-950">Novo Alimento</h2>
+                <h2 className="text-xl font-display font-semibold text-kindra-950">Novo Alimento</h2>
                 <p className="text-sm font-medium text-kindra-500 mt-0.5">Valores para uma porção de 100g</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={onClose}
+              aria-label="Fechar cadastro de alimento"
               className="p-2.5 text-kindra-400 hover:text-kindra-950 hover:bg-kindra-200/50 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-kindra-300"
             >
               <X className="h-5 w-5" />
@@ -96,10 +93,10 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Nome do Alimento</label>
+              <label htmlFor="food-name" className="text-xs font-medium text-kindra-500">Nome do Alimento</label>
               <input
                 type="text"
-                name="name"
+                id="food-name" name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Ex: Arroz Branco Cozido"
@@ -110,10 +107,10 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Calorias (kcal)</label>
+                <label htmlFor="food-kcal" className="text-xs font-medium text-kindra-500">Calorias (kcal)</label>
                 <input
-                  type="number"
-                  name="kcal"
+                  type="number" inputMode="decimal"
+                  id="food-kcal" name="kcal"
                   value={formData.kcal}
                   onChange={handleChange}
                   placeholder="0"
@@ -125,10 +122,10 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Proteína (g)</label>
+                <label htmlFor="food-proteinG" className="text-xs font-medium text-kindra-500">Proteína (g)</label>
                 <input
-                  type="number"
-                  name="proteinG"
+                  type="number" inputMode="decimal"
+                  id="food-proteinG" name="proteinG"
                   value={formData.proteinG}
                   onChange={handleChange}
                   placeholder="0"
@@ -140,10 +137,10 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Carboidratos (g)</label>
+                <label htmlFor="food-carbsG" className="text-xs font-medium text-kindra-500">Carboidratos (g)</label>
                 <input
-                  type="number"
-                  name="carbsG"
+                  type="number" inputMode="decimal"
+                  id="food-carbsG" name="carbsG"
                   value={formData.carbsG}
                   onChange={handleChange}
                   placeholder="0"
@@ -155,10 +152,10 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-kindra-500 uppercase tracking-widest ml-1">Gorduras (g)</label>
+                <label htmlFor="food-fatG" className="text-xs font-medium text-kindra-500">Gorduras (g)</label>
                 <input
-                  type="number"
-                  name="fatG"
+                  type="number" inputMode="decimal"
+                  id="food-fatG" name="fatG"
                   value={formData.fatG}
                   onChange={handleChange}
                   placeholder="0"
@@ -174,7 +171,7 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full mt-8 flex items-center justify-center py-4 px-4 bg-teal-500 text-white rounded-2xl font-bold font-display text-lg tracking-wide hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-kindra-100 transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="kindra-button button-primary w-full mt-6"
             >
               {isSubmitting ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -185,6 +182,6 @@ export function CreateFoodModal({ isOpen, onClose, onSuccess }: CreateFoodModalP
           </form>
         </div>
       </div>
-    </div>
+    </Sheet>
   );
 }

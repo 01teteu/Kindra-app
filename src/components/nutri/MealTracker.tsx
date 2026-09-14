@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Plus, Coffee, Sun, Moon, Apple, Trash2 } from 'lucide-react';
 import type { Meal } from '../../lib/nutrition';
 import { AddFoodModal } from './AddFoodModal';
@@ -6,10 +6,10 @@ import { Card } from '../ui/Card';
 import { removeMealEntry } from '../../lib/nutrition';
 
 const CATEGORY_CONFIG = {
-  BREAKFAST: { label: 'Café da Manhã', icon: Coffee, color: 'bg-orange-50 text-orange-600 border-orange-100' },
-  LUNCH: { label: 'Almoço', icon: Sun, color: 'bg-yellow-50 text-yellow-600 border-yellow-100' },
-  DINNER: { label: 'Jantar', icon: Moon, color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
-  SNACK: { label: 'Lanches', icon: Apple, color: 'bg-green-50 text-green-600 border-green-100' }
+  BREAKFAST: { label: 'Café da Manhã', icon: Coffee, color: 'bg-teal-500/10 text-teal-300 border-teal-500/20' },
+  LUNCH: { label: 'Almoço', icon: Sun, color: 'bg-teal-500/10 text-teal-300 border-teal-500/20' },
+  DINNER: { label: 'Jantar', icon: Moon, color: 'bg-teal-500/10 text-teal-300 border-teal-500/20' },
+  SNACK: { label: 'Lanches', icon: Apple, color: 'bg-teal-500/10 text-teal-300 border-teal-500/20' }
 } as const;
 
 type CategoryKeys = keyof typeof CATEGORY_CONFIG;
@@ -68,7 +68,7 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
     return (
       <div className="space-y-4 animate-pulse">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="h-32 bg-white/60 rounded-3xl border border-white/40 shadow-sm" />
+          <div key={i} className="h-32 bg-kindra-100 rounded-[20px] border border-kindra-200 shadow-sm" />
         ))}
       </div>
     );
@@ -78,10 +78,10 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
 
   return (
     <>
-      <div className="space-y-4">
-        <h2 className="text-xl font-display font-bold text-kindra-900 px-1">Diário de Refeições</h2>
-        
-        <div className="space-y-4">
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-kindra-900 px-1">Suas refeições</h2>
+
+        <div className="space-y-3">
           {categories.map(category => {
             const config = CATEGORY_CONFIG[category];
             const Icon = config.icon;
@@ -90,18 +90,18 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
             const hasEntries = meal && meal.entries.length > 0;
 
             return (
-              <Card 
-                key={category} 
-                className="p-0 overflow-hidden relative transition-all duration-300 hover:shadow-2xl"
+              <Card
+                key={category}
+                className="p-0 overflow-hidden relative transition-all duration-300 hover:border-kindra-300"
               >
                 {/* Header */}
-                <div className="p-6 flex items-center justify-between border-b border-kindra-200/50">
-                  <div className="flex items-center gap-4">
-                    <div className={`h-12 w-12 shrink-0 rounded-2xl flex items-center justify-center shadow-lg shadow-black/5 border ${config.color}`}>
+                <div className="p-4 flex items-center justify-between gap-2 border-b border-kindra-200/50">
+                  <div className="flex items-center gap-3">
+                    <div className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center shadow-sm shadow-black/5 border ${config.color}`}>
                       <Icon className="h-6 w-6" />
                     </div>
                     <div className="flex flex-col">
-                      <h3 className="text-xl font-display font-bold text-kindra-950 tracking-tight leading-tight">{config.label}</h3>
+                      <h3 className="text-base font-semibold text-kindra-950 tracking-tight leading-tight">{config.label}</h3>
                       <p className="text-sm font-medium text-kindra-500 mt-0.5">
                         {totals.kcal.toFixed(0)} kcal consumidas
                       </p>
@@ -109,26 +109,27 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
                   </div>
                   <button
                     onClick={() => setActiveCategory(category)}
-                    className="h-10 w-10 rounded-xl bg-white border border-kindra-200 flex items-center justify-center text-kindra-600 hover:bg-kindra-50 hover:text-kindra-900 transition-colors group shadow-sm"
+                    aria-label={`Adicionar alimento em ${config.label}`}
+                    className="h-11 w-11 shrink-0 rounded-xl bg-kindra-100 border border-kindra-200 flex items-center justify-center text-kindra-600 hover:bg-kindra-50 hover:text-kindra-900 transition-colors group shadow-sm"
                   >
                     <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
                   </button>
                 </div>
 
                 {/* Content */}
-                <div className="p-6 bg-kindra-50/30">
+                <div className="px-4 py-3 bg-kindra-50/30">
                   {hasEntries ? (
                     <div className="space-y-6">
                       <div className="flex flex-col gap-4">
                         {meal.entries.map(entry => {
                           const multiplier = entry.amountGrams / 100;
                           return (
-                            <div key={entry.id} className="flex justify-between items-center gap-4">
+                            <div key={entry.id} className="flex justify-between items-center gap-2">
                               <div>
-                                <p className="text-base font-semibold text-kindra-900 line-clamp-1">{entry.food.name}</p>
+                                <p className="text-sm font-medium text-kindra-900 break-words">{entry.food.name}</p>
                                 <p className="text-sm text-kindra-500">{entry.amountGrams}g</p>
                               </div>
-                              <div className="flex items-center gap-3 shrink-0">
+                              <div className="flex items-center gap-1 shrink-0">
                                 <div className="text-right">
                                   <p className="text-base font-bold text-kindra-950">{(entry.food.kcal * multiplier).toFixed(0)} <span className="text-sm font-medium text-kindra-500">kcal</span></p>
                                 </div>
@@ -137,13 +138,13 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
                                   disabled={isDeleting === entry.id}
                                   className={`h-9 min-w-9 rounded-lg flex items-center justify-center transition-colors px-2 disabled:opacity-50 ${
                                     confirmDeleteId === entry.id
-                                      ? 'bg-red-500 text-white shadow-sm'
-                                      : 'bg-transparent text-red-500 hover:bg-red-50 hover:text-red-600'
+                                      ? 'bg-rose-500 text-white shadow-sm'
+                                      : 'bg-transparent text-rose-400 hover:bg-rose-500/10 hover:text-rose-400'
                                   }`}
                                   title="Remover alimento"
                                 >
                                   {isDeleting === entry.id ? (
-                                    <div className="h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                    <div className="h-4 w-4 border-2 border-rose-400 border-t-transparent rounded-full animate-spin" />
                                   ) : confirmDeleteId === entry.id ? (
                                     <span className="text-xs font-bold uppercase tracking-wider">Apagar?</span>
                                   ) : (
@@ -155,7 +156,7 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
                           );
                         })}
                       </div>
-                      
+
                       {/* Sub-macros summary */}
                       <div className="grid grid-cols-3 gap-3 pt-6 mt-2 border-t border-kindra-200/50">
                         <div className="bg-kindra-50/50 rounded-xl p-3 border border-kindra-100/50 flex flex-col items-center text-center">
@@ -173,7 +174,7 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
                       </div>
                     </div>
                   ) : (
-                    <div className="py-4 text-center">
+                    <div className="py-2">
                       <p className="text-sm font-medium text-kindra-400">Nenhum alimento registrado.</p>
                     </div>
                   )}
@@ -184,7 +185,7 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
         </div>
       </div>
 
-      <AddFoodModal 
+      <AddFoodModal
         isOpen={activeCategory !== null}
         onClose={() => setActiveCategory(null)}
         category={activeCategory}

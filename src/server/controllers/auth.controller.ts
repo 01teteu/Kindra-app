@@ -1,3 +1,4 @@
+import { sessionCookieOptions } from '../session-cookie.js';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { loginSchema, resendVerificationSchema, confirmVerificationSchema, forgotPasswordSchema, verifyResetCodeSchema, resetPasswordSchema } from '../schemas/auth.schema.js';
 import * as authService from '../services/auth.service.js';
@@ -24,10 +25,7 @@ export async function loginController(req: FastifyRequest, reply: FastifyReply) 
 
     // Setar Cookie HttpOnly
     reply.setCookie('token', token, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+      ...sessionCookieOptions(),
       maxAge: 60 * 60 * 24 // 24 hours
     });
 
@@ -145,10 +143,7 @@ export async function confirmVerificationController(req: FastifyRequest, reply: 
 
     // Setar Cookie HttpOnly
     reply.setCookie('token', token, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+      ...sessionCookieOptions(),
       maxAge: 60 * 60 * 24 // 24 hours
     });
 
@@ -310,10 +305,7 @@ export async function googleAuthController(req: FastifyRequest, reply: FastifyRe
 
     // Setar Cookie HttpOnly
     reply.setCookie('token', token, {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
+      ...sessionCookieOptions(),
       maxAge: 60 * 60 * 24 // 24 hours
     });
 

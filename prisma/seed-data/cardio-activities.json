@@ -1,0 +1,733 @@
+[
+  {
+    "name": "Corrida na Esteira",
+    "slug": "corrida-esteira",
+    "aliases": [
+      "Treadmill Run",
+      "Running Treadmill"
+    ],
+    "category": "RUNNING",
+    "equipment": "TREADMILL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": true,
+      "speed": true,
+      "heartRate": true,
+      "incline": true,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "treadmill-running",
+    "instructions": "Corra na esteira em velocidade compatível com o treino, mantendo postura estável e passada controlada.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Caminhada na Esteira",
+    "slug": "caminhada-esteira",
+    "aliases": [
+      "Treadmill Walk",
+      "Walking Treadmill"
+    ],
+    "category": "WALKING",
+    "equipment": "TREADMILL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": true,
+      "speed": true,
+      "heartRate": true,
+      "incline": true,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "treadmill-walking",
+    "instructions": "Caminhe na esteira em ritmo constante, mantendo postura ereta e passada confortável.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Caminhada Inclinada na Esteira",
+    "slug": "caminhada-inclinada-esteira",
+    "aliases": [
+      "Incline Treadmill Walk",
+      "Incline Walking"
+    ],
+    "category": "WALKING",
+    "equipment": "TREADMILL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": true,
+      "speed": true,
+      "heartRate": true,
+      "incline": true,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "incline-treadmill-walking",
+    "instructions": "Ajuste a inclinação da esteira e caminhe mantendo postura estável, sem se apoiar excessivamente nas barras.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Bicicleta Ergométrica",
+    "slug": "bicicleta-ergometrica",
+    "aliases": [
+      "Stationary Bike",
+      "Exercise Bike"
+    ],
+    "category": "CYCLING",
+    "equipment": "STATIONARY_BIKE",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": false,
+      "speed": true,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "stationary-cycling",
+    "instructions": "Ajuste o banco para uma posição confortável e pedale mantendo cadência e resistência adequadas ao objetivo do treino.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Air Bike",
+    "slug": "air-bike",
+    "aliases": [
+      "Assault Bike",
+      "Fan Bike"
+    ],
+    "category": "CYCLING",
+    "equipment": "AIR_BIKE",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "air-bike",
+    "instructions": "Pedale e mova as alças simultaneamente, coordenando braços e pernas. Ajuste a intensidade conforme o intervalo ou duração planejados.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Elíptico",
+    "slug": "eliptico",
+    "aliases": [
+      "Elliptical Trainer",
+      "Cross Trainer"
+    ],
+    "category": "ELLIPTICAL",
+    "equipment": "ELLIPTICAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": false,
+      "speed": true,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "elliptical",
+    "instructions": "Movimente braços e pernas de forma coordenada no aparelho, mantendo ritmo contínuo e postura estável.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Remo Ergométrico",
+    "slug": "remo-ergometrico",
+    "aliases": [
+      "Rowing Machine",
+      "Indoor Rower",
+      "Concept2 Row"
+    ],
+    "category": "ROWING",
+    "equipment": "ROWER",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": true,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "indoor-rowing",
+    "instructions": "Inicie o movimento com as pernas, depois estenda o quadril e finalize puxando a alça em direção ao tronco. Retorne na ordem inversa.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Escada Ergométrica",
+    "slug": "escada-ergometrica",
+    "aliases": [
+      "Stair Climber",
+      "Stair Machine",
+      "StairMaster"
+    ],
+    "category": "STAIR_CLIMBING",
+    "equipment": "STAIR_MACHINE",
+    "measurementType": "TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "stair-climbing-machine",
+    "instructions": "Suba os degraus mantendo ritmo constante e postura ereta. Evite transferir grande parte do peso para os apoios das mãos.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Ski Erg",
+    "slug": "ski-erg",
+    "aliases": [
+      "SkiErg",
+      "Ski Ergometer"
+    ],
+    "category": "SKI_ERG",
+    "equipment": "SKI_ERG",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": true,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "ski-erg",
+    "instructions": "Puxe as alças de cima para baixo usando braços, tronco e quadris de forma coordenada. Retorne mantendo o ritmo.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Empurrar Trenó",
+    "slug": "empurrar-treno",
+    "aliases": [
+      "Sled Push",
+      "Prowler Push"
+    ],
+    "category": "SLED",
+    "equipment": "SLED",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "sled-push",
+    "instructions": "Apoie as mãos no trenó, incline o corpo à frente e empurre usando passos curtos e fortes até completar a distância definida.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Puxar Trenó para Trás",
+    "slug": "puxar-treno-para-tras",
+    "aliases": [
+      "Backward Sled Drag",
+      "Reverse Sled Drag"
+    ],
+    "category": "SLED",
+    "equipment": "SLED",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "backward-sled-drag",
+    "instructions": "Segure as alças ou correias e caminhe para trás puxando o trenó. Mantenha passos controlados e tensão contínua.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Puxar Trenó para Frente",
+    "slug": "puxar-treno-para-frente",
+    "aliases": [
+      "Forward Sled Drag",
+      "Sled Pull"
+    ],
+    "category": "SLED",
+    "equipment": "SLED",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": true,
+      "reps": false
+    },
+    "energyProfileSlug": "forward-sled-drag",
+    "instructions": "Prenda a correia ao corpo ou segure as alças e caminhe para frente puxando o trenó em ritmo constante.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Battle Rope Ondas Alternadas",
+    "slug": "battle-rope-ondas-alternadas",
+    "aliases": [
+      "Alternating Battle Rope Waves",
+      "Battle Rope Alternating Waves"
+    ],
+    "category": "BATTLE_ROPE",
+    "equipment": "BATTLE_ROPE",
+    "measurementType": "TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "battle-rope-alternating-waves",
+    "instructions": "Segure uma ponta da corda em cada mão e produza ondas alternadas com os braços, mantendo joelhos levemente flexionados e tronco estável.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Battle Rope Ondas Simultâneas",
+    "slug": "battle-rope-ondas-simultaneas",
+    "aliases": [
+      "Double Battle Rope Waves",
+      "Battle Rope Power Waves"
+    ],
+    "category": "BATTLE_ROPE",
+    "equipment": "BATTLE_ROPE",
+    "measurementType": "TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "battle-rope-double-waves",
+    "instructions": "Segure as cordas e mova ambos os braços simultaneamente para produzir ondas. Mantenha postura firme durante o intervalo.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Battle Rope Slams",
+    "slug": "battle-rope-slams",
+    "aliases": [
+      "Battle Rope Slams",
+      "Rope Slams"
+    ],
+    "category": "BATTLE_ROPE",
+    "equipment": "BATTLE_ROPE",
+    "measurementType": "REPS_ONLY",
+    "supportedMetrics": {
+      "duration": false,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": true
+    },
+    "energyProfileSlug": "battle-rope-slams",
+    "instructions": "Eleve as cordas e golpeie-as em direção ao chão com força, usando braços e tronco de forma coordenada.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Pular Corda em Ritmo Contínuo",
+    "slug": "pular-corda-ritmo-continuo",
+    "aliases": [
+      "Jump Rope Continuous",
+      "Skipping Rope Cardio"
+    ],
+    "category": "JUMP_ROPE",
+    "equipment": "JUMP_ROPE",
+    "measurementType": "TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "jump-rope-continuous",
+    "instructions": "Gire a corda com os punhos e execute saltos baixos e ritmados, mantendo um ritmo sustentável durante o tempo planejado.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Double Under",
+    "slug": "double-under",
+    "aliases": [
+      "Double Unders",
+      "Double Under Jump Rope"
+    ],
+    "category": "JUMP_ROPE",
+    "equipment": "JUMP_ROPE",
+    "measurementType": "REPS_ONLY",
+    "supportedMetrics": {
+      "duration": false,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": true
+    },
+    "energyProfileSlug": "double-under",
+    "instructions": "Salte um pouco mais alto e faça a corda passar duas vezes sob os pés a cada salto, mantendo ritmo e aterrissagem controlados.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Burpee",
+    "slug": "burpee",
+    "aliases": [
+      "Burpees",
+      "Bodyweight Burpee"
+    ],
+    "category": "BODYWEIGHT_CONDITIONING",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "REPS_ONLY",
+    "supportedMetrics": {
+      "duration": false,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": true
+    },
+    "energyProfileSlug": "burpee",
+    "instructions": "Agache, leve as mãos ao chão, estenda as pernas para trás, retorne os pés para perto das mãos e finalize levantando.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Burpee com Salto",
+    "slug": "burpee-com-salto",
+    "aliases": [
+      "Burpee Jump",
+      "Jumping Burpee"
+    ],
+    "category": "BODYWEIGHT_CONDITIONING",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "REPS_ONLY",
+    "supportedMetrics": {
+      "duration": false,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": true
+    },
+    "energyProfileSlug": "jumping-burpee",
+    "instructions": "Execute o burpee e finalize cada repetição com um salto vertical controlado antes de iniciar a próxima.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Polichinelo",
+    "slug": "polichinelo",
+    "aliases": [
+      "Jumping Jack",
+      "Jumping Jacks"
+    ],
+    "category": "BODYWEIGHT_CONDITIONING",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "REPS_ONLY",
+    "supportedMetrics": {
+      "duration": false,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": true
+    },
+    "energyProfileSlug": "jumping-jacks",
+    "instructions": "Salte afastando os pés enquanto eleva os braços acima da cabeça. Retorne à posição inicial e repita em ritmo contínuo.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Corrida com Joelhos Altos",
+    "slug": "corrida-joelhos-altos",
+    "aliases": [
+      "High Knees",
+      "High Knee Run"
+    ],
+    "category": "RUNNING_DRILL",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "high-knees",
+    "instructions": "Corra parado elevando os joelhos de forma alternada, mantendo cadência rápida e tronco estável.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Corrida Estacionária",
+    "slug": "corrida-estacionaria",
+    "aliases": [
+      "Running in Place",
+      "Jogging in Place"
+    ],
+    "category": "RUNNING_DRILL",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "running-in-place",
+    "instructions": "Corra no mesmo lugar em ritmo contínuo, mantendo os braços ativos e aterrissagens leves.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Shuttle Run",
+    "slug": "shuttle-run",
+    "aliases": [
+      "Suicide Run",
+      "Shuttle Sprint",
+      "Corrida Vai e Volta"
+    ],
+    "category": "RUNNING",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": false,
+      "speed": true,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "shuttle-run",
+    "instructions": "Corra entre dois ou mais pontos marcados, mudando de direção de forma controlada e acelerando novamente a cada trecho.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Sprint Curto",
+    "slug": "sprint-curto",
+    "aliases": [
+      "Short Sprint",
+      "Sprint Running"
+    ],
+    "category": "RUNNING",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "pace": true,
+      "speed": true,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": false
+    },
+    "energyProfileSlug": "short-sprint",
+    "instructions": "Acelere em uma distância curta com técnica controlada e reduza a velocidade progressivamente após o trecho.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Box Jump",
+    "slug": "box-jump",
+    "aliases": [
+      "Salto na Caixa",
+      "Box Jumps"
+    ],
+    "category": "PLYOMETRIC",
+    "equipment": "BOX",
+    "measurementType": "REPS_ONLY",
+    "supportedMetrics": {
+      "duration": false,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": true
+    },
+    "energyProfileSlug": "box-jump",
+    "instructions": "Salte sobre uma caixa estável usando extensão coordenada de quadris, joelhos e tornozelos. Aterrisse com controle e desça com segurança.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Salto Agachado",
+    "slug": "salto-agachado",
+    "aliases": [
+      "Squat Jump",
+      "Jump Squat"
+    ],
+    "category": "PLYOMETRIC",
+    "equipment": "BODYWEIGHT",
+    "measurementType": "REPS_ONLY",
+    "supportedMetrics": {
+      "duration": false,
+      "distance": false,
+      "pace": false,
+      "speed": false,
+      "heartRate": true,
+      "incline": false,
+      "resistance": false,
+      "reps": true
+    },
+    "energyProfileSlug": "squat-jump",
+    "instructions": "Desça em um agachamento confortável e salte verticalmente. Aterrisse suavemente e controle a transição para a próxima repetição.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  }
+]

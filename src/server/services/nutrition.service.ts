@@ -1,12 +1,13 @@
 import prisma from '../db.js';
+import type { Prisma } from '@prisma/client';
 import { getDayBounds } from '../utils/timezone.js';
 
 /**
  * Gatilho "Lazy" de Consolidação Diária (Fechamento de Caixa / Streaks).
  * Verifica se a data de referência atual é superior à última ativação.
  */
-export async function checkAndConsolidateNutriHistory(userId: string, referenceDate: string, timezoneOffset: number) {
-  const user = await prisma.user.findUnique({
+export async function checkAndConsolidateNutriHistory(userId: string, referenceDate: string, timezoneOffset: number, db: Prisma.TransactionClient = prisma) {
+  const user = await db.user.findUnique({
     where: { id: userId },
     select: { lastActiveDay: true, currentStreak: true, longestStreak: true }
   });
@@ -17,7 +18,7 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
 
   // Se for o primeiro acesso de todos (sem lastActiveDay), apenas seta para hoje e encerra
   if (!user.lastActiveDay) {
-    await prisma.user.update({
+    await db.user.update({
       where: { id: userId },
       data: { lastActiveDay: currentAbstractDate }
     });
@@ -48,7 +49,7 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
   }
 
   // Busca a Meta Atual do usuário (usaremos como retrato da meta dos dias que passaram)
-  const currentGoal = await prisma.nutritionGoal.findFirst({
+  const currentGoal = await db.nutritionGoal.findFirst({
     where: { userId },
     orderBy: { createdAt: 'desc' }
   });
@@ -77,7 +78,7 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
     const { startOfDayUTC: processingStart, endOfDayUTC: processingEnd } = getDayBounds(processingRefStr, timezoneOffset);
 
     // 1. Somar toda a água registrada no dia
-    const waterLogs = await prisma.waterIntakeLog.aggregate({
+    const waterLogs = await db.waterIntakeLog.aggregate({
       where: {
         userId,
         loggedAt: {
@@ -92,7 +93,7 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
     const waterGoalAchieved = waterIngested >= targetWater && targetWater > 0;
 
     // 1b. Buscar Refeições e Calcular Macros
-    const meals = await prisma.meal.findMany({
+    const meals = await db.meal.findMany({
       where: {
         userId,
         loggedAt: {
@@ -129,7 +130,7 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
     const proteinGoalAchieved = isAboveFloor(consumedProteinG, targetProteinG, 0.15);
 
     // 2. Gravar o Histórico do dia processado
-    await prisma.historyUserNutri.upsert({
+    await db.historyUserNutri.upsert({
       where: {
         userId_date: { userId, date: processingDate }
       },
@@ -169,25 +170,22 @@ export async function checkAndConsolidateNutriHistory(userId: string, referenceD
 
   // 4. Salvar Novo Status
   
-  await prisma.$transaction([
-    // Atualiza o perfil do usuário
-    prisma.user.update({
+  await db.user.update({
       where: { id: userId },
       data: {
         lastActiveDay: currentAbstractDate,
         currentStreak: newCurrentStreak,
         longestStreak: newLongestStreak
       }
-    })
-  ]);
+    });
 }
 
 /**
  * Recalcula a meta nutricional do usuário baseando-se no perfil (Profile)
  * e usando a fórmula Mifflin-St Jeor.
  */
-export async function calculateAndSaveNutritionGoal(userId: string) {
-  const profile = await prisma.profile.findUnique({ where: { userId } });
+export async function calculateAndSaveNutritionGoal(userId: string, db: Prisma.TransactionClient = prisma) {
+  const profile = await db.profile.findUnique({ where: { userId } });
   
   if (!profile) {
     throw new Error('Perfil não encontrado');
@@ -247,7 +245,7 @@ export async function calculateAndSaveNutritionGoal(userId: string) {
   const targetWaterMl = profile.weightKg * 35;
 
   // 6. Salvar e retornar nova meta
-  const newGoal = await prisma.nutritionGoal.create({
+  const newGoal = await db.nutritionGoal.create({
     data: {
       userId,
       targetKcal: Math.round(targetKcal),

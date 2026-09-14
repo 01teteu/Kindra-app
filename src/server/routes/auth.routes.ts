@@ -1,3 +1,4 @@
+import { sessionCookieOptions } from '../session-cookie.js';
 import { FastifyInstance } from 'fastify';
 import { 
   loginController, 
@@ -35,12 +36,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 
   // Logout - Limpa o cookie de forma totalmente segura (seguindo as mesmas flags da criação)
   fastify.post('/logout', async (request, reply) => {
-    reply.clearCookie('token', { 
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'none',
-    });
+    reply.clearCookie('token', sessionCookieOptions());
     return reply.send({ message: 'Logout realizado com sucesso' });
   });
 

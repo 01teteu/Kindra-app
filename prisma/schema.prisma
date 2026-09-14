@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -33,6 +33,7 @@ model User {
   passwordResetTokens       PasswordResetToken[]
   profile                   Profile?
   routines                  Routine[]
+  weeklyTrainingPlans       WeeklyTrainingPlan[]
   waterIntakeLogs           WaterIntakeLog[]
   weightLogs                WeightLog[]
   workoutSessions           WorkoutSession[]
@@ -124,18 +125,32 @@ model ProfilePhysicalLimitation {
 }
 
 model Exercise {
-  id               String            @id @default(uuid())
-  name             String
-  targetMuscle     String
-  equipment        String
-  isCustom         Boolean           @default(false)
+  id               String                  @id @default(uuid())
+  origin           ExerciseOrigin
   userId           String?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  user             User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug             String
+  name             String
+  aliases          String[]
+  primaryMuscle    String
+  secondaryMuscles String[]
+  muscleRegion     String?
+  equipment        String
+  movementPattern  String?
+  measurementType  ExerciseMeasurementType
+  laterality       ExerciseLaterality?
+  instructions     String?
+  thumbnailUrl     String?
+  videoUrl         String?
+  isActive         Boolean                 @default(true)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  user             User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   routineExercises RoutineExercise[]
   workoutExercises WorkoutExercise[]
 
+  // GLOBAL slug uniqueness and ownership checks are enforced in the SQL migration.
+  @@unique([userId, slug])
+  @@index([origin, isActive, primaryMuscle])
   @@map("exercises")
 }
 
@@ -148,8 +163,56 @@ model Routine {
   exercises RoutineExercise[]
   user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   sessions  WorkoutSession[]
+  weeklyTrainingDays WeeklyTrainingDay[]
 
   @@map("routines")
+}
+
+enum WeeklyTrainingPlanSource {
+  GENERATED
+  CUSTOM
+}
+
+enum TrainingDayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model WeeklyTrainingPlan {
+  id        String @id @default(uuid())
+  userId    String
+  name      String
+  isActive  Boolean @default(false)
+  source    WeeklyTrainingPlanSource
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  days      WeeklyTrainingDay[]
+
+  // SQL enforces one active plan per user and immutable ownership.
+  @@index([userId])
+  @@map("weekly_training_plans")
+}
+
+model WeeklyTrainingDay {
+  id        String @id @default(uuid())
+  planId    String
+  dayOfWeek TrainingDayOfWeek
+  routineId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plan      WeeklyTrainingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  routine   Routine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+
+  // SQL also requires the routine and plan to have the same owner.
+  @@unique([planId, dayOfWeek])
+  @@index([routineId])
+  @@map("weekly_training_days")
 }
 
 model RoutineExercise {
@@ -158,59 +221,109 @@ model RoutineExercise {
   exerciseId String
   order      Int      @default(0)
   notes      String?
+  // Planned seconds; null means unspecified, 0 explicitly means no rest.
+  restTime   Int?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: NoAction)
   routine    Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
 
+  @@index([exerciseId])
   @@map("routine_exercises")
 }
 
 model WorkoutSession {
-  id          String            @id @default(uuid())
+  id          String               @id @default(uuid())
   userId      String
   routineId   String?
   name        String
-  startedAt   DateTime          @default(now())
+  status      WorkoutSessionStatus @default(ACTIVE)
+  startedAt   DateTime             @default(now())
   endedAt     DateTime?
-  volumeTotal Float             @default(0)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  // Future cache: completed WORKING + completed DROP_SET segments, excluding WARMUP.
+  // Only weight/reps-compatible measurements; never count the DROP_SET parent.
+  volumeTotal Float                @default(0)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
   exercises   WorkoutExercise[]
-  routine     Routine?          @relation(fields: [routineId], references: [id])
-  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routine     Routine?             @relation(fields: [routineId], references: [id])
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // SQL migration also enforces one ACTIVE session per user (partial unique index).
+  @@index([userId, startedAt(sort: Desc)])
+  @@index([routineId])
   @@map("workout_sessions")
 }
 
 model WorkoutExercise {
-  id           String         @id @default(uuid())
-  sessionId    String
-  exerciseId   String
-  order        Int            @default(0)
-  notes        String?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  exercise     Exercise       @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  sessionIdRel WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sets         WorkoutSet[]
+  // Copied once from RoutineExercise; does not drive WorkoutSet or Live timers.
+  restTimeSnapshot        Int?
+  // Captured by an INSERT trigger; immutable even when the catalog changes.
+  exerciseNameSnapshot    String                  @default(dbgenerated())
+  primaryMuscleSnapshot   String                  @default(dbgenerated())
+  equipmentSnapshot       String                  @default(dbgenerated())
+  measurementTypeSnapshot ExerciseMeasurementType @default(dbgenerated())
+  id                      String                  @id @default(uuid())
+  sessionId               String
+  exerciseId              String
+  order                   Int                     @default(0)
+  notes                   String?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  exercise                Exercise                @relation(fields: [exerciseId], references: [id], onDelete: NoAction)
+  sessionIdRel            WorkoutSession          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sets                    WorkoutSet[]
 
+  @@unique([sessionId, order])
+  @@index([exerciseId, sessionId])
   @@map("workout_exercises")
 }
 
 model WorkoutSet {
-  id                String          @id @default(uuid())
+  id                String           @id @default(uuid())
   workoutExerciseId String
   setNumber         Int
-  reps              Int             @default(0)
-  weight            Float           @default(0)
-  isCompleted       Boolean         @default(false)
-  restTime          Int             @default(0)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  type              WorkoutSetType   @default(WORKING)
+  // Simple sets only. DROP_SET stores these exclusively in its segments.
+  reps              Int?
+  weight            Float?
+  // Canonical completion; derive isCompleted as completedAt != null.
+  completedAt       DateTime?
+  // Planned rest in seconds AFTER this logical set; 0 means no planned rest.
+  restTime          Int              @default(0)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  workoutExercise   WorkoutExercise  @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  segments          DropSetSegment[]
 
+  @@unique([workoutExerciseId, setNumber])
   @@map("workout_sets")
+}
+
+model DropSetSegment {
+  id           String     @id @default(uuid())
+  workoutSetId String
+  order        Int
+  weight       Float
+  reps         Int
+  // Records performed stages even before the logical DROP_SET is finished.
+  completedAt  DateTime?
+  workoutSet   WorkoutSet @relation(fields: [workoutSetId], references: [id], onDelete: Cascade)
+
+  @@unique([workoutSetId, order])
+  @@map("drop_set_segments")
+}
+
+enum WorkoutSetType {
+  WARMUP
+  WORKING
+  DROP_SET
+}
+
+enum WorkoutSessionStatus {
+  ACTIVE
+  COMPLETED
+  DISCARDED
 }
 
 model WeightLog {
@@ -318,4 +431,137 @@ model MealEntry {
   meal        Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
 
   @@map("meal_entries")
+}
+
+enum ExerciseOrigin {
+  GLOBAL
+  CUSTOM
+}
+
+enum ExerciseMeasurementType {
+  WEIGHT_REPS
+  REPS_ONLY
+  TIME
+  DISTANCE_TIME
+}
+
+enum CardioMeasurementType {
+  DISTANCE_TIME
+  REPS_ONLY
+  TIME
+}
+
+enum SportMeasurementType {
+  DURATION
+  DISTANCE_TIME
+  ROUNDS_TIME
+}
+
+enum ExerciseLaterality {
+  BILATERAL
+  UNILATERAL
+  ALTERNATING
+}
+
+enum SportEnvironment {
+  INDOOR
+  OUTDOOR
+  MIXED
+  WATER
+}
+
+enum SportParticipantMode {
+  INDIVIDUAL
+  DUAL
+  TEAM
+}
+
+enum EnergyProfileDomain {
+  STRENGTH
+  CARDIO
+  SPORT
+}
+
+enum EnergySourceMode {
+  DIRECT_OR_CLOSE_MATCH
+  DERIVED
+}
+
+model CardioActivity {
+  id                 String                @id @default(uuid())
+  name               String
+  slug               String                @unique
+  aliases            String[]
+  category           String
+  equipment          String
+  measurementType    CardioMeasurementType
+  instructions       String
+  supportsDuration   Boolean
+  supportsDistance   Boolean
+  supportsPace       Boolean
+  supportsSpeed      Boolean
+  supportsHeartRate  Boolean
+  supportsIncline    Boolean
+  supportsResistance Boolean
+  supportsReps       Boolean
+  thumbnailUrl       String?
+  videoUrl           String?
+  energyProfileId    String
+  energyProfile      EnergyProfile         @relation(fields: [energyProfileId], references: [id], onDelete: Restrict)
+  isActive           Boolean               @default(true)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@index([energyProfileId])
+  @@index([category, isActive])
+  @@map("cardio_activities")
+}
+
+model Sport {
+  id                String               @id @default(uuid())
+  name              String
+  slug              String               @unique
+  aliases           String[]
+  category          String
+  environment       SportEnvironment
+  participantMode   SportParticipantMode
+  measurementType   SportMeasurementType
+  description       String
+  supportsDuration  Boolean
+  supportsDistance  Boolean
+  supportsHeartRate Boolean
+  supportsRounds    Boolean
+  supportsScore     Boolean
+  thumbnailUrl      String?
+  videoUrl          String?
+  energyProfileId   String
+  energyProfile     EnergyProfile        @relation(fields: [energyProfileId], references: [id], onDelete: Restrict)
+  isActive          Boolean              @default(true)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([energyProfileId])
+  @@index([category, isActive])
+  @@map("sports")
+}
+
+model EnergyProfile {
+  id               String              @id @default(uuid())
+  name             String
+  slug             String              @unique
+  domain           EnergyProfileDomain
+  metLight         Float
+  metModerate      Float
+  metVigorous      Float
+  sourceName       String
+  sourceMode       EnergySourceMode
+  sourceNote       String
+  isActive         Boolean             @default(true)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  cardioActivities CardioActivity[]
+  sports           Sport[]
+
+  @@index([domain, isActive])
+  @@map("energy_profiles")
 }

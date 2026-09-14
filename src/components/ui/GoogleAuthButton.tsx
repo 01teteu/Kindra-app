@@ -9,23 +9,23 @@ export function GoogleAuthButton() {
 
   // Devido a políticas estritas de anti-tracking do Safari/Chrome em iframes
   // o fluxo de popup Customizado (useGoogleLogin) costuma lançar exceções incontroláveis (Object)
-  // dentro do iframe do AI Studio. 
-  // 
+  // dentro do iframe do AI Studio.
+  //
   // Para garantir que não haja erros de runtime na UI, usamos o componente nativo
   // do Google. Ele usa UX baseada em iframe (renderizando o próprio botão), o que não bloqueia.
-  // 
+  //
   // Para deixá-lo mais bonito e integrado, aplicamos as personalizações máximas
   // permitidas pelas propriedades nativas (theme, size, shape="pill").
 
   const handleSuccess = async (credentialResponse: any) => {
     try {
       setError('');
-      
-      const response = await apiFetch('/auth/google', { 
+
+      const response = await apiFetch('/auth/google', {
         // O backend agora valida estritamente a assinatura e a "audience" do ID Token.
-        data: { credential: credentialResponse.credential } 
+        data: { credential: credentialResponse.credential }
       });
-      
+
       if (!response.user.hasProfile) {
         navigate('/onboarding');
       } else {
@@ -39,7 +39,7 @@ export function GoogleAuthButton() {
   return (
     <div className="w-full flex flex-col items-center">
       {error && (
-        <p className="text-red-500 text-xs text-center mb-3 font-medium px-2">{error}</p>
+        <p className="text-rose-400 text-xs text-center mb-3 font-medium px-2">{error}</p>
       )}
       <div className="w-full flex justify-center custom-google-btn-wrapper">
         <GoogleLogin

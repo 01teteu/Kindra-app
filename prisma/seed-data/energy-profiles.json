@@ -1,0 +1,1106 @@
+[
+  {
+    "name": "Musculação",
+    "slug": "strength-training",
+    "domain": "STRENGTH",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 5.0,
+      "VIGOROUS": 6.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Faixa baseada em treino resistido e exercícios de condicionamento do Compendium 2024."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Corrida na Esteira",
+    "slug": "treadmill-running",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 6.5,
+      "MODERATE": 9.3,
+      "VIGOROUS": 12.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Faixas de corrida por velocidade."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Caminhada na Esteira",
+    "slug": "treadmill-walking",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 2.8,
+      "MODERATE": 3.8,
+      "VIGOROUS": 5.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Caminhada em ritmos leve a rápido."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Caminhada Inclinada na Esteira",
+    "slug": "incline-treadmill-walking",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 5.3,
+      "VIGOROUS": 7.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Caminhada em subida/inclinação."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Bicicleta Ergométrica",
+    "slug": "stationary-cycling",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 10.8
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Bicicleta ergométrica por potência/esforço."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Air Bike",
+    "slug": "air-bike",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 5.5,
+      "MODERATE": 8.8,
+      "VIGOROUS": 12.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa conservadora baseada em ciclismo estacionário e condicionamento vigoroso."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Elíptico",
+    "slug": "elliptical",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 5.0,
+      "VIGOROUS": 9.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Elíptico moderado 5.0 MET e vigoroso 9.0 MET; leve aproximado."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Remo Ergométrico",
+    "slug": "indoor-rowing",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 5.0,
+      "VIGOROUS": 11.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Remo ergométrico por potência/esforço."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Escada Ergométrica",
+    "slug": "stair-climbing-machine",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.5,
+      "MODERATE": 7.0,
+      "VIGOROUS": 9.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Escada/step e stair treadmill."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Ski Erg",
+    "slug": "ski-erg",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 6.8,
+      "MODERATE": 10.5,
+      "VIGOROUS": 18.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Ski machine e SkiErg em velocidades crescentes."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Empurrar Trenó",
+    "slug": "sled-push",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa por esforço de condicionamento/carga."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Puxar Trenó para Trás",
+    "slug": "backward-sled-drag",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa por esforço de condicionamento/carga."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Puxar Trenó para Frente",
+    "slug": "forward-sled-drag",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa por esforço de condicionamento/carga."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Battle Rope Ondas Alternadas",
+    "slug": "battle-rope-alternating-waves",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 3.8,
+      "MODERATE": 5.5,
+      "VIGOROUS": 7.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Battle rope incluída em calistenia vigorosa; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Battle Rope Ondas Simultâneas",
+    "slug": "battle-rope-double-waves",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 3.8,
+      "MODERATE": 5.5,
+      "VIGOROUS": 7.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Battle rope incluída em calistenia vigorosa; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Battle Rope Slams",
+    "slug": "battle-rope-slams",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa baseada em calistenia/condicionamento vigoroso."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Pular Corda em Ritmo Contínuo",
+    "slug": "jump-rope-continuous",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 8.3,
+      "MODERATE": 11.0,
+      "VIGOROUS": 12.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Pular corda em diferentes ritmos."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Double Under",
+    "slug": "double-under",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 8.3,
+      "MODERATE": 10.0,
+      "VIGOROUS": 12.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Double under tem referência específica de 10 MET; extremos aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Burpee",
+    "slug": "burpee",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 3.8,
+      "MODERATE": 5.5,
+      "VIGOROUS": 7.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Burpee aparece entre calistenias vigorosas; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Burpee com Salto",
+    "slug": "jumping-burpee",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.5,
+      "MODERATE": 6.5,
+      "VIGOROUS": 8.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Versão com salto estimada acima do burpee convencional."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Polichinelo",
+    "slug": "jumping-jacks",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 3.8,
+      "MODERATE": 5.5,
+      "VIGOROUS": 7.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Jumping jacks aparecem entre calistenias vigorosas; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Corrida com Joelhos Altos",
+    "slug": "high-knees",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.8,
+      "MODERATE": 6.5,
+      "VIGOROUS": 8.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa baseada em jogging estacionário e drills de corrida."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Corrida Estacionária",
+    "slug": "running-in-place",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 4.8,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Jogging parado tem referência de 4.8 MET; intensidades maiores aproximadas."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Shuttle Run",
+    "slug": "shuttle-run",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 7.0,
+      "MODERATE": 9.0,
+      "VIGOROUS": 11.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Shuttle running tem referência de 11 MET; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Sprint Curto",
+    "slug": "short-sprint",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 8.5,
+      "MODERATE": 12.0,
+      "VIGOROUS": 14.8
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Faixas de corrida rápida por velocidade."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Box Jump",
+    "slug": "box-jump",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 5.0,
+      "MODERATE": 7.0,
+      "VIGOROUS": 9.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa para pliometria baseada em condicionamento e saltos."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Salto Agachado",
+    "slug": "squat-jump",
+    "domain": "CARDIO",
+    "met": {
+      "LIGHT": 5.0,
+      "MODERATE": 7.0,
+      "VIGOROUS": 9.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa para pliometria baseada em condicionamento e saltos."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Futebol",
+    "slug": "football-soccer",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 7.0,
+      "VIGOROUS": 9.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Walking soccer, casual soccer e competitive soccer."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Futsal",
+    "slug": "futsal",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.0,
+      "MODERATE": 7.8,
+      "VIGOROUS": 9.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Futsal possui referência direta de 7.8 MET; extremos aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Basquete",
+    "slug": "basketball",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.0,
+      "MODERATE": 7.5,
+      "VIGOROUS": 9.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Arremessos, jogo geral e drills."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Vôlei",
+    "slug": "volleyball",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.0,
+      "MODERATE": 4.0,
+      "VIGOROUS": 6.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Vôlei recreativo, geral e competitivo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Vôlei de Praia",
+    "slug": "beach-volleyball",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Vôlei de praia tem referência direta de 8 MET; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Handebol",
+    "slug": "handball",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 6.0,
+      "MODERATE": 8.0,
+      "VIGOROUS": 12.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Handebol em equipe e geral."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Rugby",
+    "slug": "rugby",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.0,
+      "MODERATE": 6.3,
+      "VIGOROUS": 8.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Rugby touch e rugby union competitivo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Futebol Americano",
+    "slug": "american-football",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Football leve/touch e competitivo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Beisebol",
+    "slug": "baseball",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 2.5,
+      "MODERATE": 4.0,
+      "VIGOROUS": 5.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Playing catch, practice e jogo geral."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Softbol",
+    "slug": "softball",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 5.0,
+      "VIGOROUS": 6.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Practice, jogo geral e pitching."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Hóquei de Campo",
+    "slug": "field-hockey",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.5,
+      "MODERATE": 6.0,
+      "VIGOROUS": 7.8
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Hóquei de campo tem referência direta de 7.8 MET; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Hóquei no Gelo",
+    "slug": "ice-hockey",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.5,
+      "MODERATE": 8.0,
+      "VIGOROUS": 10.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Patinação leve, hockey geral e competitivo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Polo Aquático",
+    "slug": "water-polo",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 6.0,
+      "MODERATE": 8.0,
+      "VIGOROUS": 10.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Polo aquático tem referência direta de 10 MET; níveis inferiores aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Tênis",
+    "slug": "tennis",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.5,
+      "MODERATE": 6.8,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Duplas, geral moderado e competitivo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Padel",
+    "slug": "padel",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 7.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa por similaridade com esportes de raquete."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Badminton",
+    "slug": "badminton",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.5,
+      "MODERATE": 7.0,
+      "VIGOROUS": 9.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Social, competitivo e match play."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Tênis de Mesa",
+    "slug": "table-tennis",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.0,
+      "MODERATE": 4.0,
+      "VIGOROUS": 5.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Tênis de mesa tem referência de 4 MET; extremos aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Squash",
+    "slug": "squash",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.5,
+      "MODERATE": 7.3,
+      "VIGOROUS": 12.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Squash geral e competitivo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Pickleball",
+    "slug": "pickleball",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 5.0,
+      "VIGOROUS": 6.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa conservadora baseada em esportes de raquete recreativos."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Boxe",
+    "slug": "boxing",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.8,
+      "MODERATE": 7.8,
+      "VIGOROUS": 12.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Saco, sparring e boxe em ringue."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Kickboxing",
+    "slug": "kickboxing",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.3,
+      "MODERATE": 7.3,
+      "VIGOROUS": 10.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Kickboxing e artes marciais em ritmos crescentes."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Muay Thai",
+    "slug": "muay-thai",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.3,
+      "MODERATE": 8.0,
+      "VIGOROUS": 10.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Artes marciais em ritmo lento/moderado; Muay Thai citado no grupo de 10.3 MET."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Jiu-Jitsu Brasileiro",
+    "slug": "brazilian-jiu-jitsu",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.3,
+      "MODERATE": 8.0,
+      "VIGOROUS": 10.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Jujitsu incluído no grupo de artes marciais do Compendium."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Judô",
+    "slug": "judo",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.3,
+      "MODERATE": 10.3,
+      "VIGOROUS": 11.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Artes marciais e referência específica para judô."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Wrestling",
+    "slug": "wrestling",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.5,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Wrestling competitivo tem referência de 6 MET; extremos aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "MMA",
+    "slug": "mixed-martial-arts",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.3,
+      "MODERATE": 8.0,
+      "VIGOROUS": 10.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa baseada em boxe e artes marciais de intensidade semelhante."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Capoeira",
+    "slug": "capoeira",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.0,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DERIVED",
+      "note": "Estimativa baseada em artes marciais e movimentos ginásticos."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Karatê",
+    "slug": "karate",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.3,
+      "MODERATE": 8.0,
+      "VIGOROUS": 10.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Karatê citado no grupo de artes marciais de 10.3 MET."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Taekwondo",
+    "slug": "taekwondo",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.3,
+      "MODERATE": 10.3,
+      "VIGOROUS": 14.3
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Artes marciais moderadas e simulação de combate de taekwondo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Natação",
+    "slug": "swimming",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.8,
+      "MODERATE": 6.0,
+      "VIGOROUS": 9.8
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Natação recreativa, geral e nado rápido."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Surfe",
+    "slug": "surfing",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.0,
+      "MODERATE": 5.0,
+      "VIGOROUS": 6.8
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Surf geral, competitivo e remada em prancha."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Canoagem",
+    "slug": "canoeing",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 2.8,
+      "MODERATE": 5.8,
+      "VIGOROUS": 12.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Canoagem leve, moderada e competição."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Caiaque",
+    "slug": "kayaking",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 5.0,
+      "VIGOROUS": 13.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Caiaque recreativo/moderado e competição."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Remo",
+    "slug": "outdoor-rowing",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 8.0,
+      "VIGOROUS": 12.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Remo recreativo e competitivo."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Stand Up Paddle",
+    "slug": "stand-up-paddle",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 2.8,
+      "MODERATE": 6.5,
+      "VIGOROUS": 9.8
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "SUP por cadência de remada."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Escalada",
+    "slug": "rock-climbing",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.0,
+      "MODERATE": 7.3,
+      "VIGOROUS": 10.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Escalada geral/difícil e speed climbing."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Boulder",
+    "slug": "bouldering",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 6.0,
+      "MODERATE": 8.8,
+      "VIGOROUS": 10.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Boulder possui referência de 8.8 MET; extremos aproximados."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Skate",
+    "slug": "skateboarding",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.0,
+      "MODERATE": 6.8,
+      "VIGOROUS": 10.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Skate moderado e longboard em velocidades crescentes."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Ciclismo de Estrada",
+    "slug": "road-cycling",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 4.3,
+      "MODERATE": 7.0,
+      "VIGOROUS": 10.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Ciclismo fácil, moderado e rápido."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Mountain Bike",
+    "slug": "mountain-biking",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 5.8,
+      "MODERATE": 8.5,
+      "VIGOROUS": 14.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Estrada de terra, mountain bike geral e subida vigorosa."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Ginástica Artística",
+    "slug": "artistic-gymnastics",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.8,
+      "MODERATE": 6.0,
+      "VIGOROUS": 8.0
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Ginástica geral e movimentos competitivos; vigoroso aproximado."
+    },
+    "isActive": true
+  },
+  {
+    "name": "Golfe",
+    "slug": "golf",
+    "domain": "SPORT",
+    "met": {
+      "LIGHT": 3.5,
+      "MODERATE": 4.5,
+      "VIGOROUS": 5.5
+    },
+    "source": {
+      "name": "2024 Compendium of Physical Activities",
+      "mode": "DIRECT_OR_CLOSE_MATCH",
+      "note": "Driving range/cart, golf geral e caminhada/carga aproximada."
+    },
+    "isActive": true
+  }
+]

@@ -1,167 +1,93 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { apiFetch } from '../lib/api';
-import { Card } from '../components/ui/Card';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { Plus, Play, Dumbbell, AlertCircle } from 'lucide-react';
+import { Input } from '../components/ui/Input';
+import { Sheet } from '../components/ui/Sheet';
+import { Plus, Play, Dumbbell, ArrowUpRight, Pencil, X } from 'lucide-react';
+import { createWeeklyTrainingStore } from '../components/workout/weeklyTrainingState';
+import { localTrainingWeekday, trainingToday, trainingWeekdays, weekdayLabels, type TrainingWeekday } from '../shared/weeklyTraining';
+import './weekly-training.css';
+
+type Editor = { kind: 'create' } | { kind: 'rename'; planId: string } | { kind: 'day'; planId: string; day: TrainingWeekday };
 
 export function Workout() {
   const navigate = useNavigate();
-  const [routines, setRoutines] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState('');
-
-  const loadData = async () => {
-    setIsLoading(true);
-    setFetchError('');
-    try {
-      const routinesData = await apiFetch('/workouts/routines');
-      setRoutines(routinesData);
-      setIsLoading(false);
-    } catch (err: any) {
-      if (err.status === 401 || err.status === 403) {
-        navigate('/login');
-      } else {
-        setFetchError(err.message || 'Falha ao conectar com o servidor.');
-        setIsLoading(false);
-      }
-    }
-  };
-
+  const [store] = useState(createWeeklyTrainingStore);
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
+  const [editor, setEditor] = useState<Editor | null>(null);
+  const [name, setName] = useState('');
+  const [routineId, setRoutineId] = useState('');
+  const [today, setToday] = useState(() => new Date());
+  useEffect(() => { void store.load(); }, [store]);
+  useEffect(() => { if (state.authExpired) navigate('/login'); }, [state.authExpired, navigate]);
   useEffect(() => {
-    loadData();
-  }, [navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-kindra-500 font-medium animate-pulse flex items-center gap-2">
-          <Dumbbell className="w-5 h-5 animate-spin" /> Carregando treinos...
-        </div>
-      </div>
-    );
-  }
-
-  if (fetchError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-md w-full text-center space-y-4">
-          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-6 h-6" />
+    const refresh = () => setToday(new Date());
+    const timer = window.setInterval(refresh, 30000);
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { clearInterval(timer); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
+  }, []);
+  const selected = state.plans.find(plan => plan.id === state.selectedId);
+  const active = state.plans.find(plan => plan.isActive) ?? null;
+  const day = trainingToday(active, today);
+  const weekday = localTrainingWeekday(today);
+  const error = state.error && (!state.errorPlanId || state.errorPlanId === state.selectedId) ? state.error : '';
+  const close = () => setEditor(null);
+  const openCreate = () => { setName(''); setEditor({ kind: 'create' }); };
+  const save = async () => {
+    if (!editor) return;
+    const target = editor;
+    const success = target.kind === 'create' ? await store.create(name.trim())
+      : target.kind === 'rename' ? await store.rename(target.planId, name.trim())
+      : routineId ? await store.setDay(target.planId, target.day, routineId) : await store.removeDay(target.planId, target.day);
+    if (success) setEditor(current => current === target ? null : current);
+  };
+  return <div className="page-container weekly-page">
+    <header className="page-heading"><div><span className="eyebrow">Movimento</span><h1 className="mt-2">Seus treinos.</h1></div><Dumbbell size={22} aria-hidden="true" /></header>
+    {!editor && error && <div role="alert" className="weekly-error">{error} <Button variant="ghost" onClick={() => void store.load()} disabled={state.pending || state.loading}>Tentar novamente</Button></div>}
+    {!state.loaded && state.loading && <p role="status">Carregando sua semana...</p>}
+    {state.loaded && <>
+      {active && <section className="weekly-today" aria-label="Treino de hoje">
+        <p className="text-kindra-500">Hoje · {weekdayLabels[weekday].full}</p>
+        <h2>{day ? day.routine.name : 'Hoje é descanso'}</h2>
+        {day && <><p>{day.routine.exerciseCount} {day.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}</p>
+          <Button isLoading={state.pending} onClick={async () => { if (await store.start(day.routineId)) navigate('/workout/live'); }}><Play size={16} /> Iniciar treino</Button></>}
+      </section>}
+      <section aria-label="Minha Semana" className="weekly-section">
+        <div className="section-heading"><h2>Minha Semana</h2>{state.plans.length > 0 && <Button variant="ghost" size="sm" onClick={openCreate} disabled={state.pending}><Plus size={16} /> Novo plano</Button>}</div>
+        {!state.plans.length ? <div className="weekly-empty"><p>Organize sua semana de treino</p><Button onClick={openCreate}><Plus size={16} /> Criar plano</Button></div> : selected && <>
+          <div className="weekly-plan-heading">
+            <label className="weekly-plan-select">Plano<select aria-label="Plano semanal" value={selected.id} onChange={event => { store.select(event.target.value); close(); }}>{state.plans.map(plan => <option key={plan.id} value={plan.id}>{plan.name}{plan.isActive ? ' · Ativo' : ''}</option>)}</select></label>
+            <Button variant="ghost" aria-label="Renomear plano" disabled={state.pending} onClick={() => { setName(selected.name); setEditor({ kind: 'rename', planId: selected.id }); }}><Pencil size={17} /></Button>
           </div>
-          <h2 className="text-xl font-bold text-kindra-900">Erro de Conexão</h2>
-          <p className="text-kindra-600 pb-4">{fetchError}</p>
-          <Button onClick={loadData} className="w-full">
-            Tentar Novamente
-          </Button>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex justify-center p-4 relative overflow-hidden">
-      {/* Subtle Studio Lighting Effect */}
-      <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-kindra-200/40 blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-kindra-300/20 blur-[100px] pointer-events-none" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-2xl relative z-10 pt-4"
-      >
-        <div className="flex items-start justify-between mb-10 px-2">
-          <h1 className="text-2xl font-display font-bold text-kindra-950 tracking-tight">
-            Treinos
-          </h1>
-        </div>
-
-        <div className="space-y-8">
-          {/* Quick Start Section */}
-          <section>
-            <div className="flex items-center gap-3 mb-4 px-2">
-              <h2 className="text-xs font-bold text-kindra-500 uppercase tracking-widest">
-                Ação Rápida
-              </h2>
-              <div className="h-px bg-kindra-200/50 flex-1"></div>
-            </div>
-            
-            <button 
-              onClick={() => navigate('/workout/live')}
-              className="w-full group rounded-[2rem] bg-kindra-100 p-6 shadow-xl shadow-black/5 border border-kindra-200/50 backdrop-blur-xl text-left flex items-center justify-between hover:border-kindra-300 hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-kindra-900 shadow-sm group-hover:scale-105 transition-transform duration-300">
-                  <Play className="w-5 h-5 fill-current ml-1" />
-                </div>
-                <div>
-                  <h3 className="font-bold font-display text-kindra-950 text-xl tracking-tight mb-1">Treino Livre</h3>
-                  <p className="text-kindra-500 text-sm font-medium">Comece a registrar sem um plano fixo</p>
-                </div>
-              </div>
-            </button>
-          </section>
-
-          {/* My Routines Section */}
-          <section>
-            <div className="flex items-center justify-between mb-4 px-2">
-              <div className="flex items-center gap-3 flex-1">
-                <h2 className="text-xs font-bold text-kindra-500 uppercase tracking-widest">
-                  Suas Rotinas
-                </h2>
-                <div className="h-px bg-kindra-200/50 flex-1 mr-4"></div>
-              </div>
-              <button 
-                onClick={() => navigate('/routines/new')}
-                className="text-sm font-bold text-kindra-950 flex items-center gap-1 hover:text-kindra-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" /> Criar
-              </button>
-            </div>
-
-            {routines.length === 0 ? (
-              <Card className="flex flex-col items-center justify-center text-center py-10">
-                <div className="w-16 h-16 bg-white rounded-full shadow-sm border border-kindra-200/50 flex items-center justify-center mb-5">
-                  <Dumbbell className="w-6 h-6 text-kindra-400" />
-                </div>
-                <h3 className="font-display font-bold text-kindra-950 text-xl mb-2 tracking-tight">Construa seu treino</h3>
-                <p className="text-kindra-500 text-sm font-medium max-w-[260px] leading-relaxed mb-8">
-                  Crie sua primeira rotina para registrar sua evolução de forma inteligente.
-                </p>
-                <Button onClick={() => navigate('/routines/new')} className="rounded-full px-8">
-                  Criar Nova Rotina
-                </Button>
-              </Card>
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {routines.map(routine => (
-                  <div 
-                    key={routine.id} 
-                    className="rounded-[2rem] bg-kindra-100 p-6 shadow-xl shadow-black/5 border border-kindra-200/50 backdrop-blur-xl hover:border-kindra-300 hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[160px] cursor-pointer group"
-                    onClick={() => navigate(`/workout/live?routineId=${routine.id}`)}
-                  >
-                    <div>
-                      <h3 className="font-display font-bold text-kindra-950 text-lg leading-tight truncate mb-2">
-                        {routine.name}
-                      </h3>
-                      <p className="text-sm font-medium text-kindra-500 line-clamp-2 leading-relaxed">
-                        {routine.exercises.length > 0 
-                          ? routine.exercises.map((e: any) => e.exercise.name).join(' • ') 
-                          : 'Rotina vazia'}
-                      </p>
-                    </div>
-                    <div className="mt-6 text-sm font-bold text-kindra-900 flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
-                      <Play className="w-4 h-4 fill-current" /> Iniciar
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        </div>
-      </motion.div>
-    </div>
-  );
+          <div className="weekly-plan-status"><span>{selected.isActive ? 'Plano ativo' : 'Plano inativo'} · {selected.source === 'GENERATED' ? 'Gerado' : 'Personalizado'}</span>
+            {!selected.isActive && <Button size="sm" variant="outline" disabled={state.pending} onClick={() => void store.activate(selected.id)}>Ativar plano</Button>}
+          </div>
+          <ol className="weekly-days">{trainingWeekdays.map(key => {
+            const assigned = selected.days.find(item => item.dayOfWeek === key);
+            return <li key={key}><button className="weekly-day" data-weekday={key} disabled={state.pending} aria-label={`Editar ${weekdayLabels[key].full}`} onClick={() => { setRoutineId(assigned?.routineId ?? ''); setEditor({ kind: 'day', planId: selected.id, day: key }); }}>
+              <span className={`weekly-day-label ${key === weekday ? 'weekly-current-day' : ''}`}><span>{weekdayLabels[key].short}</span>{key === weekday && <small>Hoje</small>}</span>
+              <span className="weekly-day-content"><strong>{assigned?.routine.name ?? 'Descanso'}</strong>{assigned && <small>{assigned.routine.exerciseCount} {assigned.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}</small>}</span>
+              <Pencil size={15} className="text-kindra-500 shrink-0" aria-hidden="true" />
+            </button></li>;
+          })}</ol>
+        </>}
+      </section>
+      <section aria-label="Suas rotinas"><div className="section-heading"><h2>Suas rotinas</h2><Button variant="ghost" size="sm" onClick={() => navigate('/routines/new')}><Plus size={15} /> Criar rotina</Button></div><div className="mb-3"><Button variant="ghost" size="sm" onClick={() => navigate('/workout/live')}><Play size={15} /> Treino livre</Button></div>
+        {state.routines.length ? <div className="grid gap-3 sm:grid-cols-2">{state.routines.map(routine => <div key={routine.id} className="kindra-card p-4"><button className="text-left weekly-routine w-full min-h-11" onClick={() => navigate(`/workout/live?routineId=${routine.id}`)}><span><strong>{routine.name}</strong><small>{routine.exerciseCount} {routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}</small></span><ArrowUpRight size={18} className="shrink-0 text-teal-300" /></button><Button variant="ghost" size="sm" className="mt-2" aria-label={`Editar ${routine.name}`} onClick={() => navigate(`/routines/${routine.id}/edit`)}><Pencil size={15} /> Editar rotina</Button></div>)}</div> : <p className="text-kindra-500">Você ainda não tem rotinas cadastradas.</p>}
+      </section>
+      <Link to="/workout/exercises" className="routine-link mt-5"><Dumbbell size={20} /><div className="flex-1"><h3>Explore os exercícios</h3><p>Busque por nome ou grupo muscular.</p></div><ArrowUpRight size={17} /></Link>
+    </>}
+    <Sheet open={Boolean(editor)} onClose={close} label={editor?.kind === 'day' ? `Editar ${weekdayLabels[editor.day].full}` : editor?.kind === 'rename' ? 'Renomear plano' : 'Criar plano'}>
+      {editor && <form className="weekly-editor" onSubmit={event => { event.preventDefault(); void save(); }}>
+        <div className="weekly-editor-heading"><h2>{editor.kind === 'day' ? weekdayLabels[editor.day].full : editor.kind === 'rename' ? 'Renomear plano' : 'Criar plano'}</h2><Button type="button" variant="ghost" aria-label="Fechar" onClick={close}><X size={20} /></Button></div>
+        {editor.kind === 'day' ? <><label className="weekly-field">Treino do dia<select aria-label="Treino do dia" value={routineId} onChange={event => setRoutineId(event.target.value)} disabled={state.pending}><option value="">Descanso</option>{state.routines.map(routine => <option key={routine.id} value={routine.id}>{routine.name} · {routine.exerciseCount} exercícios</option>)}</select></label>
+          {!state.routines.length && <p className="text-kindra-500">Nenhuma rotina cadastrada para associar.</p>}
+        </> : <label className="weekly-field">Nome do plano<Input autoFocus aria-label="Nome do plano" value={name} onChange={event => setName(event.target.value)} maxLength={100} required disabled={state.pending} /></label>}
+        {error && <p role="alert" className="weekly-error">{error}</p>}
+        <Button className="w-full" type="submit" isLoading={state.pending} disabled={editor.kind !== 'day' && !name.trim()}>Salvar alterações</Button>
+        {editor.kind === 'day' && selected?.days.some(item => item.dayOfWeek === editor.day) && <Button className="w-full" type="button" variant="ghost" disabled={state.pending} onClick={async () => { const target = editor; if (await store.removeDay(target.planId, target.day)) setEditor(current => current === target ? null : current); }}>Remover treino do dia</Button>}
+      </form>}
+    </Sheet>
+  </div>;
 }

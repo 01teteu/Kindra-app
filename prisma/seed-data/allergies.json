@@ -1,0 +1,42 @@
+[
+  {
+    "id": "55742383-a09d-455d-a9ba-c3eab375c446",
+    "name": "Amendoim",
+    "isCustom": false
+  },
+  {
+    "id": "1dcbb1a6-90ec-4126-9ef2-aff1714f1fe8",
+    "name": "Frutos do mar",
+    "isCustom": false
+  },
+  {
+    "id": "368f2975-9007-4573-b4cc-e3532498bcc8",
+    "name": "Glúten",
+    "isCustom": false
+  },
+  {
+    "id": "7a6bbb12-6c43-41f3-9f7b-5a0768ac62f6",
+    "name": "Lactose",
+    "isCustom": false
+  },
+  {
+    "id": "dae633ce-1e50-4350-939d-6bb16d1b1be7",
+    "name": "Nenhuma",
+    "isCustom": false
+  },
+  {
+    "id": "240a5f68-bf13-426f-bf83-1b69527950ba",
+    "name": "Nozes",
+    "isCustom": false
+  },
+  {
+    "id": "89e963a5-174c-484b-9c7c-d30711b5d330",
+    "name": "Ovo",
+    "isCustom": false
+  },
+  {
+    "id": "75ce9d7f-25f8-479c-8bf2-ad4b28d3681f",
+    "name": "Soja",
+    "isCustom": false
+  }
+]

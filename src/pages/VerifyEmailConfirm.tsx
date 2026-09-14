@@ -1,3 +1,4 @@
+import { AuthLayout } from '../components/layout/AuthLayout';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { CheckCircle2, XCircle } from 'lucide-react';
@@ -9,7 +10,7 @@ export function VerifyEmailConfirm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  
+
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verificando seu e-mail...');
 
@@ -24,7 +25,7 @@ export function VerifyEmailConfirm() {
       .then((res) => {
         setStatus('success');
         setMessage(res.message || 'E-mail verificado com sucesso! Redirecionando...');
-        
+
         // Auto-login success, redirect to onboarding or home based on profile
         setTimeout(() => {
           if (!res.user.hasProfile) {
@@ -41,7 +42,7 @@ export function VerifyEmailConfirm() {
   }, [token, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <AuthLayout>
       <Card className="w-full max-w-md text-center">
         {status === 'loading' && (
           <div className="mx-auto w-16 h-16 bg-kindra-200 rounded-full flex items-center justify-center mb-6 animate-pulse">
@@ -50,13 +51,13 @@ export function VerifyEmailConfirm() {
         )}
 
         {status === 'success' && (
-          <div className="mx-auto w-16 h-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-6">
+          <div className="mx-auto w-16 h-16 bg-teal-500/10 text-teal-300 rounded-full flex items-center justify-center mb-6">
             <CheckCircle2 className="w-8 h-8" />
           </div>
         )}
 
         {status === 'error' && (
-          <div className="mx-auto w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-6">
+          <div className="mx-auto w-16 h-16 bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center mb-6">
             <XCircle className="w-8 h-8" />
           </div>
         )}
@@ -64,7 +65,7 @@ export function VerifyEmailConfirm() {
         <h1 className="text-xl sm:text-3xl font-display font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-4 text-kindra-950">
           {status === 'loading' ? 'Verificando...' : status === 'success' ? 'Sucesso!' : 'Falha na Verificação'}
         </h1>
-        
+
         <p className="text-kindra-400 mb-8">
           {message}
         </p>
@@ -77,6 +78,6 @@ export function VerifyEmailConfirm() {
           </Link>
         )}
       </Card>
-    </div>
+    </AuthLayout>
   );
 }

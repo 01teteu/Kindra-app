@@ -4,7 +4,8 @@ import { WaterTracker } from '../components/nutri/WaterTracker';
 import { WeightTracker } from '../components/nutri/WeightTracker';
 import { StreakPanel } from '../components/nutri/StreakPanel';
 import { MealTracker } from '../components/nutri/MealTracker';
-import { MoreVertical, RefreshCw, Scale, Calendar, Droplet, Beef, Wheat } from 'lucide-react';
+import { AreaWelcome } from '../components/nutri/AreaWelcome';
+import { MoreVertical, RefreshCw, Calendar, Droplet, Beef, Wheat, Flame } from 'lucide-react';
 import * as nutritionApi from '../lib/nutrition';
 import type { NutritionGoal, WaterIntakeLog, WeightLog, NutritionHistoryResponse, Meal } from '../lib/nutrition';
 
@@ -15,10 +16,17 @@ export function Nutri() {
   const [weightLogs, setWeightLogs] = useState<WeightLog[]>([]);
   const [streakData, setStreakData] = useState<NutritionHistoryResponse | null>(null);
   const [meals, setMeals] = useState<Meal[]>([]);
-  
+
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [actionError, setActionError] = useState('');
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [isAddingWater, setIsAddingWater] = useState(false);
+  const [removingWaterId, setRemovingWaterId] = useState<string | null>(null);
+  const [isRefreshingWater, setIsRefreshingWater] = useState(false);
+  const [waterError, setWaterError] = useState('');
+  const [waterNotice, setWaterNotice] = useState('');
+  const waterBusy = useRef(false);
   const [isAddingWeight, setIsAddingWeight] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,6 +43,7 @@ export function Nutri() {
   }, []);
 
   const fetchDashboardData = async () => {
+    setLoadError('');
     try {
       const [currentGoal, water, weight, historyRes, mealsData] = await Promise.all([
         nutritionApi.getCurrentGoal(),
@@ -51,6 +60,7 @@ export function Nutri() {
       setMeals(mealsData);
     } catch (error) {
       console.error('Failed to fetch nutri data:', error);
+      setLoadError('Não foi possível carregar seu diário. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -89,24 +99,82 @@ export function Nutri() {
   };
 
   const handleAddWater = async (ml: number) => {
+    if (waterBusy.current) return false;
+    waterBusy.current = true;
     setIsAddingWater(true);
+    setWaterError('');
+    setWaterNotice('');
     try {
       const newLog = await nutritionApi.addWaterLog(ml);
-      setWaterLogs([newLog, ...waterLogs]);
+      setWaterLogs(previous => [newLog, ...previous]);
+      setWaterNotice(`${ml} ml registrados.`);
+      return true;
     } catch (error) {
       console.error('Failed to add water:', error);
+      setWaterError('Não foi possível registrar a água. Tente novamente.');
+      return false;
     } finally {
       setIsAddingWater(false);
+      waterBusy.current = false;
+    }
+  };
+
+  const handleRefreshWater = async () => {
+    if (waterBusy.current) return;
+    waterBusy.current = true;
+    setIsRefreshingWater(true);
+    setWaterError('');
+    setWaterNotice('');
+    try {
+      setWaterLogs(await nutritionApi.getWaterLogs());
+      setWaterNotice('Registros de hoje atualizados.');
+    } catch {
+      setWaterError('Não foi possível atualizar os registros. Tente novamente.');
+    } finally {
+      waterBusy.current = false;
+      setIsRefreshingWater(false);
+    }
+  };
+
+  const handleRemoveWater = async (id: string) => {
+    if (waterBusy.current) return false;
+    waterBusy.current = true;
+    setRemovingWaterId(id);
+    setWaterError('');
+    setWaterNotice('');
+    try {
+      await nutritionApi.removeWaterLog(id);
+      setWaterLogs(previous => previous.filter(log => log.id !== id));
+      setWaterNotice('Registro removido. Consumo atualizado; sua meta continua igual.');
+      try {
+        setWaterLogs(await nutritionApi.getWaterLogs());
+      } catch {
+        setWaterError('O registro foi removido, mas não foi possível sincronizar a lista. Atualize os registros.');
+      }
+      return true;
+    } catch (error: unknown) {
+      const status = (error as { status?: number }).status;
+      setWaterError(status === 429
+        ? 'Muitas tentativas. Aguarde um minuto antes de tentar novamente.'
+        : status === 404 || status === 400
+          ? 'Registro indisponível para remoção. Apenas registros de hoje ainda não consolidados podem ser removidos. Atualize a lista.'
+          : 'Não foi possível remover o registro. Atualize a lista para conferir o consumo antes de tentar novamente.');
+      return false;
+    } finally {
+      setRemovingWaterId(null);
+      waterBusy.current = false;
     }
   };
 
   const handleAddWeight = async (kg: number) => {
     setIsAddingWeight(true);
+    setActionError('');
     try {
       const newLog = await nutritionApi.addWeightLog(kg);
       setWeightLogs([newLog, ...weightLogs]);
     } catch (error) {
       console.error('Failed to add weight:', error);
+      setActionError('Não foi possível registrar o peso. Tente novamente.');
     } finally {
       setIsAddingWeight(false);
     }
@@ -114,7 +182,7 @@ export function Nutri() {
 
   const currentWaterMl = waterLogs.reduce((sum, log) => sum + log.amountMl, 0);
   const targetWaterMl = goal?.targetWaterMl || 2000;
-  
+
   // Verifica se o usuário bateu as tolerâncias exigidas das metas
   const isWithinTolerance = (consumed: number, target: number, margin: number) => {
     if (target <= 0) return false;
@@ -130,38 +198,38 @@ export function Nutri() {
   const todayCarbsAchieved = goal ? isWithinTolerance(consumedTotals.carbsG, goal.targetCarbsG, 0.10) : false;
   const todayFatAchieved = goal ? isWithinTolerance(consumedTotals.fatG, goal.targetFatG, 0.10) : false;
   const todayWaterAchieved = targetWaterMl > 0 && currentWaterMl >= targetWaterMl;
-  
+
   // A "chama" acende APENAS se todos passarem nas regras do jogo
   const todayAchieved = todayWaterAchieved && todayKcalAchieved && todayProteinAchieved && todayCarbsAchieved && todayFatAchieved;
 
   return (
-    <div className="min-h-screen p-4 relative overflow-hidden bg-kindra-50 pb-24">
-      {/* Subtle Studio Lighting Effect */}
-      <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-kindra-200/40 blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-teal-500/10 blur-[100px] pointer-events-none" />
-      
-      <div className="w-full max-w-2xl mx-auto relative z-10 pt-4 px-2 space-y-6">
-        <div className="flex items-center justify-between">
+    <div className="page-container">
+
+
+
+
+      <div className="w-full">
+        <div className="page-heading">
           <div>
-            <h1 className="text-2xl font-display font-bold text-kindra-950 tracking-tight">
+            <h1 className="text-kindra-950">
               Nutrição
             </h1>
             <p className="text-sm font-medium text-kindra-500 mt-1">
-              Seu acompanhamento diário
+              Pequenos hábitos. Todos os dias.
             </p>
           </div>
 
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-xl bg-kindra-100 shadow-sm border border-kindra-200/50 text-kindra-400 hover:text-kindra-900 hover:bg-kindra-200/50 transition-colors"
-              title="Opções"
+              className="icon-button"
+              title="Opções" aria-label="Opções de nutrição" aria-expanded={isMenuOpen}
             >
               <MoreVertical className="h-5 w-5" />
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-kindra-100 rounded-xl shadow-xl shadow-black/20 border border-kindra-200/50 z-50 overflow-hidden py-1">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-kindra-100 rounded-xl shadow-sm shadow-black/20 border border-kindra-200/50 z-50 overflow-hidden py-1">
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
@@ -178,69 +246,57 @@ export function Nutri() {
           </div>
         </div>
 
-        {/* --- INÍCIO DA ÁREA DE ABAS --- */}
-        <div className="flex bg-kindra-100/80 p-1 rounded-xl border border-kindra-200/50 shadow-sm relative w-full sm:w-max mx-auto">
-           {/* Tab 1: Diário (Ativa por enquanto) */}
-           <button 
-             className={`flex-1 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'diario' ? 'bg-kindra-200 text-kindra-950 shadow-sm border border-kindra-300/30' : 'text-kindra-500 hover:text-kindra-700'}`}
-             onClick={() => setActiveTab('diario')}
-           >
-             Diário
-           </button>
-           {/* Tab 2: Hidratação (Futura, apenas estrutura) */}
-           <button 
-             className={`flex-1 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'hidratacao' ? 'bg-kindra-200 text-kindra-950 shadow-sm border border-kindra-300/30' : 'text-kindra-500 hover:text-kindra-700'}`}
-             onClick={() => setActiveTab('hidratacao')}
-           >
-             Hidratação
-           </button>
+        <div className="segmented-tabs" role="tablist" aria-label="Acompanhamento nutricional">
+          {(['diario', 'hidratacao'] as const).map((tab, index) => <button key={tab} id={`tab-${tab}`} role="tab"
+            aria-selected={activeTab === tab} aria-controls={`panel-${tab}`} tabIndex={activeTab === tab ? 0 : -1}
+            onClick={() => setActiveTab(tab)} onKeyDown={event => {
+              if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+                event.preventDefault();
+                const next = event.key === 'Home' ? 'diario' : event.key === 'End' ? 'hidratacao' : index === 0 ? 'hidratacao' : 'diario';
+                setActiveTab(next); document.getElementById(`tab-${next}`)?.focus();
+              }
+            }}>{tab === 'diario' ? 'Diário' : 'Hidratação'}</button>)}
         </div>
-        {/* --- FIM DA ÁREA DE ABAS --- */}
 
-        {isLoading ? (
+        {actionError && <p role="alert" className="mb-4 p-4 rounded-xl bg-rose-500/10 text-rose-400 text-sm">{actionError}</p>}
+        {loadError ? <div role="alert" className="kindra-card p-6 text-center"><p className="text-sm text-kindra-600 mb-4">{loadError}</p><button onClick={fetchDashboardData} className="kindra-button button-outline">Tentar novamente</button></div> : isLoading ? (
           <div className="animate-pulse space-y-4">
-            <div className="h-48 bg-white/50 rounded-2xl"></div>
-            <div className="h-40 bg-white/50 rounded-2xl"></div>
-            <div className="h-32 bg-white/50 rounded-2xl"></div>
+            <div className="h-48 bg-kindra-100 rounded-2xl"></div>
+            <div className="h-40 bg-kindra-100 rounded-2xl"></div>
+            <div className="h-32 bg-kindra-100 rounded-2xl"></div>
           </div>
         ) : (
           <>
             {activeTab === 'diario' && (
-              <div className="space-y-6">
-                <StreakPanel 
-                  streak={streakData?.currentStreak || 0} 
-                  history={streakData?.history || []} 
-                  todayAchieved={todayAchieved} 
-                />
-
-                <NutritionOverview 
-                  goal={goal} 
-                  consumed={consumedTotals}
-                />
-                
-                <WeightTracker 
-                  logs={weightLogs} 
-                  onAddWeight={handleAddWeight} 
-                  isAdding={isAddingWeight} 
-                />
-                
-                <MealTracker 
-                  meals={meals}
-                  isLoading={isLoading}
-                  onUpdate={fetchDashboardData}
-                />
+              <AreaWelcome area="diario" userId={goal?.userId}>
+              <div className="nutrition-layout">
+                <div className="nutrition-primary">
+                  <NutritionOverview goal={goal} consumed={consumedTotals} />
+                  <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} />
+                  <WeightTracker logs={weightLogs} onAddWeight={handleAddWeight} isAdding={isAddingWeight} />
+                </div>
+                <div className="nutrition-secondary"><MealTracker meals={meals} isLoading={isLoading} onUpdate={fetchDashboardData} /></div>
               </div>
+              </AreaWelcome>
             )}
 
             {activeTab === 'hidratacao' && (
-              <div className="space-y-6">
-                <WaterTracker 
-                  currentMl={currentWaterMl} 
-                  targetMl={targetWaterMl} 
-                  onAddWater={handleAddWater} 
-                  isAdding={isAddingWater} 
+              <AreaWelcome area="hidratacao" userId={goal?.userId}>
+              <div className="nutrition-layout">
+                <WaterTracker
+                  currentMl={currentWaterMl}
+                  targetMl={targetWaterMl}
+                  onAddWater={handleAddWater}
+                  isAdding={isAddingWater}
+                  logs={waterLogs}
+                  onRemoveWater={handleRemoveWater}
+                  removingId={removingWaterId}
+                  onRefresh={handleRefreshWater}
+                  isRefreshing={isRefreshingWater}
+                  error={waterError}
+                  notice={waterNotice}
                 />
-                
+
                 {/* --- HISTÓRICO DIÁRIO EMBUTIDO --- */}
                 <div className="pt-2">
                   <div className="flex items-center gap-3 mb-4 px-1">
@@ -272,15 +328,14 @@ export function Nutri() {
 
                         return (
                           <div key={day.id} className="bg-kindra-100/80 rounded-[24px] p-5 border border-kindra-200/50 shadow-sm relative overflow-hidden group">
-                            {/* Decorative background glow based on achievement */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-[40px] -mr-16 -mt-16 pointer-events-none transition-opacity duration-500 ${allAchieved ? 'bg-teal-500/20 opacity-100' : 'bg-rose-500/10 opacity-50'}`} />
+
 
                             <div className="relative z-10">
                               <div className="flex justify-between items-center mb-5">
                                 <span className="font-display font-bold text-kindra-950 capitalize text-lg">{dateStr}</span>
                                 {allAchieved ? (
-                                  <span className="text-xs font-bold tracking-widest text-teal-600 bg-teal-500/10 border border-teal-500/20 px-3 py-1.5 rounded-full uppercase flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                                  <span className="text-xs font-bold tracking-widest text-teal-300 bg-teal-500/10 border border-teal-500/20 px-3 py-1.5 rounded-full uppercase flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
                                     Perfeito
                                   </span>
                                 ) : (
@@ -289,10 +344,10 @@ export function Nutri() {
                                   </span>
                                 )}
                               </div>
-                              
+
                               <div className="grid grid-cols-2 gap-2.5">
                                 {/* Água recebe destaque extra */}
-                                <div className={`rounded-2xl p-4 border transition-colors ${day.waterGoalAchieved ? 'bg-white/80 border-teal-500/30 shadow-sm shadow-teal-500/5' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
+                                <div className={`rounded-2xl p-4 border transition-colors ${day.waterGoalAchieved ? 'bg-kindra-100 border-teal-500/30 shadow-sm shadow-teal-500/5' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
                                   <div className="flex items-center gap-2 text-xs font-bold text-kindra-400 uppercase tracking-widest mb-1.5">
                                     <Droplet className={`h-4 w-4 ${day.waterGoalAchieved ? 'text-teal-500' : 'text-kindra-400'}`} /> Água
                                   </div>
@@ -301,17 +356,17 @@ export function Nutri() {
                                     <span className="text-xs font-medium text-kindra-500">ml</span>
                                   </div>
                                 </div>
-                                
-                                <div className={`rounded-2xl p-4 border transition-colors ${day.kcalGoalAchieved ? 'bg-white/80 border-teal-500/30 shadow-sm shadow-teal-500/5' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
+
+                                <div className={`rounded-2xl p-4 border transition-colors ${day.kcalGoalAchieved ? 'bg-kindra-100 border-teal-500/30 shadow-sm shadow-teal-500/5' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
                                   <div className="flex items-center gap-2 text-xs font-bold text-kindra-400 uppercase tracking-widest mb-1.5">
-                                    🔥 Kcal
+                                    <Flame className="h-4 w-4" /> Kcal
                                   </div>
                                   <div className="flex items-baseline gap-1">
                                     <span className="text-2xl font-display font-bold text-kindra-950">{Math.round(day.consumedKcal)}</span>
                                   </div>
                                 </div>
 
-                                <div className={`rounded-2xl p-3 border transition-colors ${day.proteinGoalAchieved ? 'bg-white/60 border-teal-500/20' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
+                                <div className={`rounded-2xl p-3 border transition-colors ${day.proteinGoalAchieved ? 'bg-kindra-100 border-teal-500/20' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
                                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-kindra-400 uppercase tracking-widest mb-1">
                                     <Beef className="h-3 w-3" /> Prot
                                   </div>
@@ -321,7 +376,7 @@ export function Nutri() {
                                   </div>
                                 </div>
 
-                                <div className={`rounded-2xl p-3 border transition-colors ${day.carbsGoalAchieved ? 'bg-white/60 border-teal-500/20' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
+                                <div className={`rounded-2xl p-3 border transition-colors ${day.carbsGoalAchieved ? 'bg-kindra-100 border-teal-500/20' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
                                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-kindra-400 uppercase tracking-widest mb-1">
                                     <Wheat className="h-3 w-3" /> Carb
                                   </div>
@@ -339,6 +394,7 @@ export function Nutri() {
                   </div>
                 </div>
               </div>
+              </AreaWelcome>
             )}
           </>
         )}

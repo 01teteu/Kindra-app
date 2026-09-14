@@ -34,3 +34,12 @@ export const waterIntakeLogSchema = z.object({
 
 export type WeightLogInput = z.infer<typeof weightLogSchema>;
 export type WaterIntakeLogInput = z.infer<typeof waterIntakeLogSchema>;
+
+export const removeWaterParamsSchema = z.object({ id: z.string().uuid() }).strict();
+
+// Extend only this operation: existing POST/GET contracts stay unchanged.
+export const removeWaterQuerySchema = timeContextQuerySchema.extend({
+  referenceDate: z.string().date('Data de referência inválida.'),
+  timezoneOffset: z.string().regex(/^-?\d+$/, 'Fuso horário obrigatório e inteiro.')
+    .transform(Number).pipe(timeContextSchema.shape.timezoneOffset),
+}).strict();

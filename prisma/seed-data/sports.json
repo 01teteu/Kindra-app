@@ -1,0 +1,1072 @@
+[
+  {
+    "name": "Futebol",
+    "slug": "futebol",
+    "aliases": [
+      "Football",
+      "Soccer"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "football-soccer",
+    "description": "Esporte coletivo jogado principalmente com os pés, envolvendo corrida, mudanças de direção e esforços intermitentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Futsal",
+    "slug": "futsal",
+    "aliases": [
+      "Indoor Soccer",
+      "Futsal Football"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "futsal",
+    "description": "Modalidade de futebol em quadra, com esforços curtos e frequentes, acelerações e mudanças rápidas de direção.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Basquete",
+    "slug": "basquete",
+    "aliases": [
+      "Basketball"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "MIXED",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "basketball",
+    "description": "Esporte coletivo com corrida, saltos, acelerações e mudanças de direção frequentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Vôlei",
+    "slug": "volei",
+    "aliases": [
+      "Volleyball",
+      "Indoor Volleyball"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "volleyball",
+    "description": "Esporte coletivo com saltos, deslocamentos curtos e ações explosivas.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Vôlei de Praia",
+    "slug": "volei-de-praia",
+    "aliases": [
+      "Beach Volleyball"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "beach-volleyball",
+    "description": "Vôlei praticado na areia, com deslocamentos curtos, saltos e esforço adicional devido ao terreno.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Handebol",
+    "slug": "handebol",
+    "aliases": [
+      "Handball"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "handball",
+    "description": "Esporte coletivo com corrida, arremessos, contato e mudanças rápidas de direção.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Rugby",
+    "slug": "rugby",
+    "aliases": [
+      "Rugby Union",
+      "Rugby Football"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "rugby",
+    "description": "Esporte coletivo de contato com corrida, acelerações, disputas físicas e esforços intermitentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Futebol Americano",
+    "slug": "futebol-americano",
+    "aliases": [
+      "American Football"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "american-football",
+    "description": "Esporte coletivo de contato com esforços explosivos curtos separados por pausas frequentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Beisebol",
+    "slug": "beisebol",
+    "aliases": [
+      "Baseball"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "baseball",
+    "description": "Esporte coletivo com corrida curta, arremessos, rebatidas e períodos de menor intensidade.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Softbol",
+    "slug": "softbol",
+    "aliases": [
+      "Softball"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "softball",
+    "description": "Esporte coletivo semelhante ao beisebol, com rebatidas, arremessos e deslocamentos curtos.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Hóquei de Campo",
+    "slug": "hoquei-de-campo",
+    "aliases": [
+      "Field Hockey"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "field-hockey",
+    "description": "Esporte coletivo com corrida contínua e intermitente, acelerações e mudanças de direção.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Hóquei no Gelo",
+    "slug": "hoquei-no-gelo",
+    "aliases": [
+      "Ice Hockey"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "ice-hockey",
+    "description": "Esporte coletivo no gelo com patinação intensa, contato e esforços intermitentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Polo Aquático",
+    "slug": "polo-aquatico",
+    "aliases": [
+      "Water Polo"
+    ],
+    "category": "TEAM_SPORT",
+    "environment": "WATER",
+    "participantMode": "TEAM",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "water-polo",
+    "description": "Esporte coletivo aquático que combina natação, sustentação corporal e disputas pela bola.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Tênis",
+    "slug": "tenis",
+    "aliases": [
+      "Tennis"
+    ],
+    "category": "RACKET_SPORT",
+    "environment": "MIXED",
+    "participantMode": "DUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "tennis",
+    "description": "Esporte de raquete com deslocamentos rápidos, mudanças de direção e esforços intermitentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Padel",
+    "slug": "padel",
+    "aliases": [
+      "Pádel",
+      "Paddle Tennis"
+    ],
+    "category": "RACKET_SPORT",
+    "environment": "MIXED",
+    "participantMode": "DUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "padel",
+    "description": "Esporte de raquete em quadra fechada por paredes, com deslocamentos curtos e trocas frequentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Badminton",
+    "slug": "badminton",
+    "aliases": [
+      "Badminton Singles",
+      "Badminton Doubles"
+    ],
+    "category": "RACKET_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "badminton",
+    "description": "Esporte de raquete com acelerações, saltos e mudanças rápidas de direção.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Tênis de Mesa",
+    "slug": "tenis-de-mesa",
+    "aliases": [
+      "Table Tennis",
+      "Ping Pong"
+    ],
+    "category": "RACKET_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "table-tennis",
+    "description": "Esporte de raquete com movimentos rápidos de braços, tronco e deslocamentos curtos.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Squash",
+    "slug": "squash",
+    "aliases": [
+      "Squash Racquets"
+    ],
+    "category": "RACKET_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "squash",
+    "description": "Esporte de raquete de alta intensidade, com deslocamentos rápidos e mudanças constantes de direção.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Pickleball",
+    "slug": "pickleball",
+    "aliases": [
+      "Pickle Ball"
+    ],
+    "category": "RACKET_SPORT",
+    "environment": "MIXED",
+    "participantMode": "DUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "pickleball",
+    "description": "Esporte de raquete em quadra com deslocamentos curtos e trocas frequentes.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Boxe",
+    "slug": "boxe",
+    "aliases": [
+      "Boxing"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "boxing",
+    "description": "Modalidade de combate baseada em golpes de punho, movimentação, esquivas e rounds.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Kickboxing",
+    "slug": "kickboxing",
+    "aliases": [
+      "Kick Boxing"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "kickboxing",
+    "description": "Modalidade de combate com golpes de punho e pernas, normalmente organizada em rounds.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Muay Thai",
+    "slug": "muay-thai",
+    "aliases": [
+      "Thai Boxing"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "muay-thai",
+    "description": "Arte marcial de trocação com socos, chutes, joelhos, cotovelos e clinch.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Jiu-Jitsu Brasileiro",
+    "slug": "jiu-jitsu-brasileiro",
+    "aliases": [
+      "BJJ",
+      "Brazilian Jiu-Jitsu"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "brazilian-jiu-jitsu",
+    "description": "Arte marcial de grappling com controle, quedas, transições e finalizações.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Judô",
+    "slug": "judo",
+    "aliases": [
+      "Judo"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "judo",
+    "description": "Arte marcial com projeções, imobilizações e técnicas de solo.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Wrestling",
+    "slug": "wrestling",
+    "aliases": [
+      "Luta Olímpica",
+      "Freestyle Wrestling",
+      "Greco-Roman Wrestling"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "wrestling",
+    "description": "Modalidade de luta com quedas, controle corporal e esforços intensos de curta duração.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "MMA",
+    "slug": "mma",
+    "aliases": [
+      "Mixed Martial Arts",
+      "Artes Marciais Mistas"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "mixed-martial-arts",
+    "description": "Modalidade de combate que combina trocação, quedas e luta no solo.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Capoeira",
+    "slug": "capoeira",
+    "aliases": [
+      "Capoeira Angola",
+      "Capoeira Regional"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "MIXED",
+    "participantMode": "DUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "capoeira",
+    "description": "Prática corporal brasileira que combina luta, movimentos acrobáticos, esquivas e ritmo.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Karatê",
+    "slug": "karate",
+    "aliases": [
+      "Karate"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "karate",
+    "description": "Arte marcial com golpes, defesas e movimentação, praticada em treino técnico ou combate.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Taekwondo",
+    "slug": "taekwondo",
+    "aliases": [
+      "Tae Kwon Do"
+    ],
+    "category": "COMBAT_SPORT",
+    "environment": "INDOOR",
+    "participantMode": "DUAL",
+    "measurementType": "ROUNDS_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": true,
+      "score": false
+    },
+    "energyProfileSlug": "taekwondo",
+    "description": "Arte marcial com forte uso de chutes, deslocamentos rápidos e combate em rounds.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Natação",
+    "slug": "natacao",
+    "aliases": [
+      "Swimming",
+      "Lap Swimming"
+    ],
+    "category": "WATER_SPORT",
+    "environment": "WATER",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "swimming",
+    "description": "Atividade aquática de deslocamento por diferentes estilos e intensidades.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Surfe",
+    "slug": "surfe",
+    "aliases": [
+      "Surfing"
+    ],
+    "category": "WATER_SPORT",
+    "environment": "WATER",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "surfing",
+    "description": "Esporte aquático com remada, equilíbrio e manobras sobre ondas.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Canoagem",
+    "slug": "canoagem",
+    "aliases": [
+      "Canoeing"
+    ],
+    "category": "WATER_SPORT",
+    "environment": "WATER",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "canoeing",
+    "description": "Esporte aquático de propulsão com remo em canoa, praticado em diferentes ritmos e distâncias.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Caiaque",
+    "slug": "caiaque",
+    "aliases": [
+      "Kayaking"
+    ],
+    "category": "WATER_SPORT",
+    "environment": "WATER",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "kayaking",
+    "description": "Esporte aquático de propulsão com remo em caiaque, envolvendo principalmente membros superiores e tronco.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Remo",
+    "slug": "remo-esportivo",
+    "aliases": [
+      "Rowing",
+      "Outdoor Rowing"
+    ],
+    "category": "WATER_SPORT",
+    "environment": "WATER",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "outdoor-rowing",
+    "description": "Esporte aquático realizado em embarcação, combinando força de pernas, tronco e braços.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Stand Up Paddle",
+    "slug": "stand-up-paddle",
+    "aliases": [
+      "SUP",
+      "Paddle Boarding",
+      "Standup Paddle"
+    ],
+    "category": "WATER_SPORT",
+    "environment": "WATER",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "stand-up-paddle",
+    "description": "Esporte aquático em prancha com remo, exigindo equilíbrio e trabalho contínuo de tronco e membros superiores.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Escalada",
+    "slug": "escalada",
+    "aliases": [
+      "Rock Climbing",
+      "Sport Climbing"
+    ],
+    "category": "CLIMBING",
+    "environment": "MIXED",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "rock-climbing",
+    "description": "Atividade de escalada em parede ou rocha, combinando força, técnica, pegada e resistência.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Boulder",
+    "slug": "boulder",
+    "aliases": [
+      "Bouldering"
+    ],
+    "category": "CLIMBING",
+    "environment": "MIXED",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "bouldering",
+    "description": "Escalada em blocos ou paredes baixas, com movimentos curtos, técnicos e frequentemente intensos.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Skate",
+    "slug": "skate",
+    "aliases": [
+      "Skateboarding"
+    ],
+    "category": "BOARD_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "skateboarding",
+    "description": "Esporte sobre skate que combina deslocamento, equilíbrio e execução de manobras.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Ciclismo de Estrada",
+    "slug": "ciclismo-estrada",
+    "aliases": [
+      "Road Cycling",
+      "Outdoor Cycling"
+    ],
+    "category": "CYCLING_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "road-cycling",
+    "description": "Ciclismo praticado em vias ou estradas, com intensidade variável conforme velocidade, terreno e duração.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Mountain Bike",
+    "slug": "mountain-bike",
+    "aliases": [
+      "MTB",
+      "Mountain Biking"
+    ],
+    "category": "CYCLING_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DISTANCE_TIME",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "mountain-biking",
+    "description": "Ciclismo em trilhas e terrenos irregulares, com variações de esforço, inclinação e técnica.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Ginástica Artística",
+    "slug": "ginastica-artistica",
+    "aliases": [
+      "Artistic Gymnastics",
+      "Gymnastics"
+    ],
+    "category": "GYMNASTICS",
+    "environment": "INDOOR",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": false,
+      "heartRate": true,
+      "rounds": false,
+      "score": false
+    },
+    "energyProfileSlug": "artistic-gymnastics",
+    "description": "Modalidade com elementos de força, equilíbrio, flexibilidade, saltos e movimentos acrobáticos.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  },
+  {
+    "name": "Golfe",
+    "slug": "golfe",
+    "aliases": [
+      "Golf"
+    ],
+    "category": "PRECISION_SPORT",
+    "environment": "OUTDOOR",
+    "participantMode": "INDIVIDUAL",
+    "measurementType": "DURATION",
+    "supportedMetrics": {
+      "duration": true,
+      "distance": true,
+      "heartRate": true,
+      "rounds": false,
+      "score": true
+    },
+    "energyProfileSlug": "golf",
+    "description": "Esporte de precisão com caminhadas entre jogadas, swings e variação de esforço conforme o percurso.",
+    "media": {
+      "thumbnailUrl": null,
+      "videoUrl": null
+    },
+    "isActive": true
+  }
+]

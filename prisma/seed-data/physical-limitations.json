@@ -1,0 +1,47 @@
+[
+  {
+    "id": "8f1115e2-2bf7-4de3-bd4f-6bad51afe65f",
+    "name": "Asma",
+    "isCustom": false
+  },
+  {
+    "id": "02f4940a-b928-44d2-afc3-a9c87cf89e94",
+    "name": "Diabetes",
+    "isCustom": false
+  },
+  {
+    "id": "27f006ce-2dd9-4bcf-b0bc-f8c54dd29ca2",
+    "name": "Hipertensão",
+    "isCustom": false
+  },
+  {
+    "id": "c77b1665-6feb-47bc-a848-2938ac97709e",
+    "name": "Hérnia de disco",
+    "isCustom": false
+  },
+  {
+    "id": "fa066623-06c9-4b43-bb8b-92dc4385afec",
+    "name": "Lesão no joelho",
+    "isCustom": false
+  },
+  {
+    "id": "5119218d-a97f-40e0-953a-6ac9a8af51d6",
+    "name": "Lesão no ombro",
+    "isCustom": false
+  },
+  {
+    "id": "bca2f12e-b384-4e92-8904-ea738b9f6aaf",
+    "name": "Mobilidade reduzida",
+    "isCustom": false
+  },
+  {
+    "id": "09ab1d62-180a-4ba4-8b1e-836065ddab42",
+    "name": "Nenhuma",
+    "isCustom": false
+  },
+  {
+    "id": "fe08ec6d-2106-4fd1-9ccc-d904b24fc422",
+    "name": "Problemas articulares",
+    "isCustom": false
+  }
+]

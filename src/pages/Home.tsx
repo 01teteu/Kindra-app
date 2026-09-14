@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { useNavigate, Link } from 'react-router-dom';
 import { apiFetch } from '../lib/api';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { LogOut, AlertCircle, Droplets, Trophy, Flame } from 'lucide-react';
+import { LogOut, AlertCircle, Droplets, ArrowUpRight, Utensils, Dumbbell } from 'lucide-react';
 
 export function Home() {
   const navigate = useNavigate();
@@ -59,8 +58,8 @@ export function Home() {
   if (fetchError) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-md w-full text-center space-y-4">
-          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <Card className="max-w-md w-full p-6 text-center space-y-4">
+          <div className="w-12 h-12 bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-6 h-6" />
           </div>
           <h2 className="text-xl font-bold text-kindra-900">Erro de Conexão</h2>
@@ -74,92 +73,76 @@ export function Home() {
   }
 
   const profile = user?.profile;
-  const imc = profile && profile.heightCm > 0 
-    ? (profile.weightKg / Math.pow(profile.heightCm / 100, 2)).toFixed(1) 
-    : '--';
+  const imc =
+    profile && profile.heightCm > 0
+      ? (profile.weightKg / Math.pow(profile.heightCm / 100, 2)).toFixed(1)
+      : '--';
+
+  const goalLabel = profile?.goal === 'Manutencao' ? 'Manutenção' : profile?.goal;
 
   return (
-    <div className="flex justify-center p-4 relative overflow-hidden">
-      {/* Subtle Studio Lighting Effect */}
-      <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-kindra-200/40 blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-kindra-300/20 blur-[100px] pointer-events-none" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-2xl relative z-10 pt-4"
-      >
-        {/* Header Section */}
-        <div className="flex items-start justify-between mb-10 px-2">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-kindra-100 text-kindra-900 rounded-full flex items-center justify-center font-bold text-2xl shadow-sm border border-kindra-200/50 backdrop-blur-xl">
-              {profile?.firstName?.charAt(0).toUpperCase() || 'U'}
-            </div>
-            <div>
-              <h1 className="text-2xl font-display font-bold text-kindra-950 tracking-tight">
-                Olá, {profile?.firstName}
-              </h1>
-              <p className="text-sm font-medium text-kindra-500 mt-1">
-                IMC {imc} • {profile?.goal}
-              </p>
-            </div>
-          </div>
-          <button 
-            onClick={handleLogout} 
-            className="w-10 h-10 rounded-full bg-kindra-100 flex items-center justify-center text-kindra-500 hover:text-kindra-950 shadow-sm border border-kindra-200/50 backdrop-blur-xl transition-colors mt-2" 
-            aria-label="Sair"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+    <div className="page-container">
+      <header className="page-heading">
+        <div>
+          <span className="eyebrow">Seu espaço</span>
+          <h1 className="mt-2">Olá, {profile?.firstName}.</h1>
+          <p>Vamos cuidar do seu dia?</p>
         </div>
-
-        <div className="space-y-6">
-          <div className="flex items-center gap-3 mb-2 px-2">
-            <h2 className="text-xs font-bold text-kindra-500 uppercase tracking-widest">
-              Visão Geral de Hoje
-            </h2>
-            <div className="h-px bg-kindra-200/50 flex-1"></div>
+        <button onClick={handleLogout} className="icon-button" aria-label="Sair da conta">
+          <LogOut size={18} />
+        </button>
+      </header>
+      <Card className="home-feature">
+        <span className="eyebrow text-teal-300">Um passo de cada vez</span>
+        <span className="feature-index" aria-hidden="true">
+          K / 01
+        </span>
+        <h2>
+          Sua rotina.
+          <br />
+          <span className="silver-text">Seu melhor ritmo.</span>
+        </h2>
+        <p>Registre suas refeições e acompanhe o que faz parte da sua evolução.</p>
+        <Link className="kindra-button button-primary" to="/nutri">
+          Abrir meu diário <ArrowUpRight size={17} />
+        </Link>
+      </Card>
+      <div className="section-heading">
+        <h2>Faz parte do seu dia</h2>
+        <span className="eyebrow">Sua rotina</span>
+      </div>
+      <div className="home-links">
+        <Link to="/nutri" className="routine-link">
+          <span className="link-icon">
+            <Utensils size={20} />
+          </span>
+          <div className="flex-1">
+            <h3>Nutrição</h3>
+            <p>Refeições, água e suas metas.</p>
           </div>
-
-          {/* Cards de Dashboard (Mockados por enquanto) */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Card Água */}
-            <Card className="p-5 flex flex-col justify-between aspect-square rounded-[2rem] bg-gradient-to-br from-white to-blue-50/50 border-blue-100/50 shadow-xl shadow-blue-900/5">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-4 shadow-sm">
-                <Droplets className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-display font-bold text-kindra-950 text-3xl tracking-tight">1.2<span className="text-lg text-kindra-500 font-medium">/3L</span></h3>
-                <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mt-1">Água</p>
-              </div>
-            </Card>
-
-            {/* Card Streaks/Fogo */}
-            <Card className="p-5 flex flex-col justify-between aspect-square rounded-[2rem] bg-gradient-to-br from-white to-orange-50/50 border-orange-100/50 shadow-xl shadow-orange-900/5">
-              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-4 shadow-sm">
-                <Flame className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-display font-bold text-kindra-950 text-3xl tracking-tight">4 <span className="text-lg text-kindra-500 font-medium">dias</span></h3>
-                <p className="text-xs font-bold text-orange-600 uppercase tracking-wider mt-1">Ofensiva</p>
-              </div>
-            </Card>
+          <ArrowUpRight size={17} className="text-kindra-500" />
+        </Link>
+        <Link to="/workout" className="routine-link">
+          <span className="link-icon">
+            <Dumbbell size={20} />
+          </span>
+          <div className="flex-1">
+            <h3>Treinos</h3>
+            <p>Encontre seu próximo movimento.</p>
           </div>
-
-          {/* Card Recorde Pessoal */}
-          <Card className="p-6 rounded-[2rem] bg-kindra-100/80 backdrop-blur-xl border border-kindra-200/50 shadow-xl shadow-black/5 flex items-center gap-5">
-            <div className="w-14 h-14 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center shadow-sm shrink-0">
-              <Trophy className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-kindra-500 uppercase tracking-widest mb-1">Último PR</p>
-              <h3 className="font-display font-bold text-kindra-950 text-xl tracking-tight leading-tight">Agachamento Livre</h3>
-              <p className="text-sm font-medium text-kindra-600 mt-1">100kg por 8 repetições</p>
-            </div>
-          </Card>
+          <ArrowUpRight size={17} className="text-kindra-500" />
+        </Link>
+      </div>
+      <dl className="profile-strip">
+        <div>
+          <dt>Seu objetivo</dt>
+          <dd>{goalLabel || 'Não informado'}</dd>
         </div>
-      </motion.div>
+        <div>
+          <dt>IMC registrado</dt>
+          <dd>{imc}</dd>
+        </div>
+      </dl>
     </div>
   );
 }
