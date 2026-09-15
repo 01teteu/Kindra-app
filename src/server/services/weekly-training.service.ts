@@ -2,6 +2,8 @@ import { Prisma } from '@prisma/client';
 import prisma from '../db.js';
 import type { CreatePlanInput } from '../schemas/weekly-training.schema.js';
 import type { TrainingWeekday } from '../../shared/weeklyTraining.js';
+import type { StarterTrainingInput } from '../../shared/starterTraining.js';
+import { generateStarterTrainingPlan, StarterTrainingError } from '../domain/starter-training.js';
 
 export class WeeklyTrainingError extends Error {
   constructor(public readonly statusCode: number, message: string) { super(message); }
@@ -56,6 +58,39 @@ export function createPlan(userId: string, input: CreatePlanInput) {
     return response(await tx.weeklyTrainingPlan.create({ data: {
       userId, name: input.name, source: input.source, isActive: !active,
       days: { create: input.days ?? [] },
+    }, select: planSelect }));
+  });
+}
+export function generatePlan(userId: string, input: StarterTrainingInput) {
+  return transaction(async tx => {
+    const profile = await tx.profile.findUnique({ where: { userId }, select: { physicalLimitations: { select: { physicalLimitationId: true } } } });
+    if (!profile) throw new WeeklyTrainingError(409, 'Conclua seu perfil antes de criar uma base inicial.');
+    if (profile.physicalLimitations.length) throw new WeeklyTrainingError(422,
+      'A geração de base inicial ainda não adapta exercícios às limitações físicas cadastradas no seu perfil. Você pode montar sua semana manualmente.');
+    const catalog = await tx.exercise.findMany({ where: {
+      isActive: true, measurementType: 'WEIGHT_REPS', equipment: { in: input.equipment },
+      OR: [{ origin: 'GLOBAL', userId: null }, { origin: 'CUSTOM', userId }],
+    }, select: { id: true, slug: true, origin: true, primaryMuscle: true, movementPattern: true,
+      equipment: true, laterality: true, measurementType: true } });
+    let structure;
+    try { structure = generateStarterTrainingPlan(input, catalog); }
+    catch (error) {
+      if (error instanceof StarterTrainingError) throw new WeeklyTrainingError(422, error.message);
+      throw error;
+    }
+    // Match routine creation's shared row locks. Catalog deactivation/edits
+    // racing this transaction must serialize before or after generation.
+    const ids = [...new Set(structure.routines.flatMap(routine => routine.exercises.map(ex => ex.exerciseId)))].sort();
+    await tx.$queryRaw`SELECT id FROM exercises WHERE id IN (${Prisma.join(ids)}) ORDER BY id FOR SHARE`;
+    const routines = [];
+    for (const routine of structure.routines) {
+      routines.push(await tx.routine.create({ data: { userId, name: routine.name,
+        exercises: { create: routine.exercises } }, select: { id: true } }));
+    }
+    const active = await tx.weeklyTrainingPlan.findFirst({ where: { userId, isActive: true }, select: { id: true } });
+    return response(await tx.weeklyTrainingPlan.create({ data: {
+      userId, name: structure.name, source: 'GENERATED', isActive: !active,
+      days: { create: structure.days.map(day => ({ dayOfWeek: day.dayOfWeek, routineId: routines[day.routineIndex].id })) },
     }, select: planSelect }));
   });
 }

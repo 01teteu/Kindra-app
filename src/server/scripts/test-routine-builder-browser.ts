@@ -164,7 +164,7 @@ try {
   assert.equal(routine.exercises[0].notes, 'Descer com controle');
   console.log('PASS browser Builder: rota real, catálogo/busca, 3 exercícios, reorder/remoção, notas/descanso, cancelar saída, erro preserva rascunho, duplo submit e 390/1280/1920px.');
 
-  await clickText('Criar plano'); await fill('input[aria-label="Nome do plano"]', 'Semana'); await clickText('Salvar alterações');
+  await clickText('Montar manualmente'); await fill('input[aria-label="Nome do plano"]', 'Semana'); await clickText('Salvar alterações');
   await wait(`document.querySelectorAll('.weekly-day').length===7`);
   const today = await evaluate(`['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'][new Date().getDay()]`);
   await click(`[data-weekday="${today}"]`);

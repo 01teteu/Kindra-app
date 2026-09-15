@@ -7,8 +7,10 @@ import { Plus, Play, Dumbbell, ArrowUpRight, Pencil, X } from 'lucide-react';
 import { createWeeklyTrainingStore } from '../components/workout/weeklyTrainingState';
 import { localTrainingWeekday, trainingToday, trainingWeekdays, weekdayLabels, type TrainingWeekday } from '../shared/weeklyTraining';
 import './weekly-training.css';
+import { starterEquipment, type StarterTrainingInput } from '../shared/starterTraining';
+import { equipmentLabels } from '../shared/activityOptions';
 
-type Editor = { kind: 'create' } | { kind: 'rename'; planId: string } | { kind: 'day'; planId: string; day: TrainingWeekday };
+type Editor = { kind: 'create' } | { kind: 'generate' } | { kind: 'rename'; planId: string } | { kind: 'day'; planId: string; day: TrainingWeekday };
 
 export function Workout() {
   const navigate = useNavigate();
@@ -17,6 +19,8 @@ export function Workout() {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [name, setName] = useState('');
   const [routineId, setRoutineId] = useState('');
+  const [trainingDays, setTrainingDays] = useState<StarterTrainingInput['trainingDaysPerWeek'] | ''>('');
+  const [equipment, setEquipment] = useState<StarterTrainingInput['equipment']>([]);
   const [today, setToday] = useState(() => new Date());
   useEffect(() => { void store.load(); }, [store]);
   useEffect(() => { if (state.authExpired) navigate('/login'); }, [state.authExpired, navigate]);
@@ -32,12 +36,14 @@ export function Workout() {
   const day = trainingToday(active, today);
   const weekday = localTrainingWeekday(today);
   const error = state.error && (!state.errorPlanId || state.errorPlanId === state.selectedId) ? state.error : '';
-  const close = () => setEditor(null);
+  const close = () => { if (editor?.kind !== 'generate' || !state.pending) setEditor(null); };
   const openCreate = () => { setName(''); setEditor({ kind: 'create' }); };
   const save = async () => {
     if (!editor) return;
     const target = editor;
-    const success = target.kind === 'create' ? await store.create(name.trim())
+    if (target.kind === 'generate' && (!trainingDays || !equipment.length)) return;
+    const success = target.kind === 'generate' ? await store.generate({ trainingDaysPerWeek: trainingDays as StarterTrainingInput['trainingDaysPerWeek'], equipment })
+      : target.kind === 'create' ? await store.create(name.trim())
       : target.kind === 'rename' ? await store.rename(target.planId, name.trim())
       : routineId ? await store.setDay(target.planId, target.day, routineId) : await store.removeDay(target.planId, target.day);
     if (success) setEditor(current => current === target ? null : current);
@@ -55,7 +61,7 @@ export function Workout() {
       </section>}
       <section aria-label="Minha Semana" className="weekly-section">
         <div className="section-heading"><h2>Minha Semana</h2>{state.plans.length > 0 && <Button variant="ghost" size="sm" onClick={openCreate} disabled={state.pending}><Plus size={16} /> Novo plano</Button>}</div>
-        {!state.plans.length ? <div className="weekly-empty"><p>Organize sua semana de treino</p><Button onClick={openCreate}><Plus size={16} /> Criar plano</Button></div> : selected && <>
+        {!state.plans.length ? <div className="weekly-empty"><p>Organize sua semana de treino</p><p className="text-kindra-500">Crie uma base inicial. Você pode editar tudo depois.</p><div className="weekly-empty-actions"><Button variant="outline" onClick={openCreate}>Montar manualmente</Button><Button onClick={() => setEditor({ kind: 'generate' })}>Criar uma base para mim</Button></div></div> : selected && <>
           <div className="weekly-plan-heading">
             <label className="weekly-plan-select">Plano<select aria-label="Plano semanal" value={selected.id} onChange={event => { store.select(event.target.value); close(); }}>{state.plans.map(plan => <option key={plan.id} value={plan.id}>{plan.name}{plan.isActive ? ' · Ativo' : ''}</option>)}</select></label>
             <Button variant="ghost" aria-label="Renomear plano" disabled={state.pending} onClick={() => { setName(selected.name); setEditor({ kind: 'rename', planId: selected.id }); }}><Pencil size={17} /></Button>
@@ -78,14 +84,19 @@ export function Workout() {
       </section>
       <Link to="/workout/exercises" className="routine-link mt-5"><Dumbbell size={20} /><div className="flex-1"><h3>Explore os exercícios</h3><p>Busque por nome ou grupo muscular.</p></div><ArrowUpRight size={17} /></Link>
     </>}
-    <Sheet open={Boolean(editor)} onClose={close} label={editor?.kind === 'day' ? `Editar ${weekdayLabels[editor.day].full}` : editor?.kind === 'rename' ? 'Renomear plano' : 'Criar plano'}>
+    <Sheet open={Boolean(editor)} onClose={close} label={editor?.kind === 'generate' ? 'Criar base inicial' : editor?.kind === 'day' ? `Editar ${weekdayLabels[editor.day].full}` : editor?.kind === 'rename' ? 'Renomear plano' : 'Criar plano'}>
       {editor && <form className="weekly-editor" onSubmit={event => { event.preventDefault(); void save(); }}>
-        <div className="weekly-editor-heading"><h2>{editor.kind === 'day' ? weekdayLabels[editor.day].full : editor.kind === 'rename' ? 'Renomear plano' : 'Criar plano'}</h2><Button type="button" variant="ghost" aria-label="Fechar" onClick={close}><X size={20} /></Button></div>
-        {editor.kind === 'day' ? <><label className="weekly-field">Treino do dia<select aria-label="Treino do dia" value={routineId} onChange={event => setRoutineId(event.target.value)} disabled={state.pending}><option value="">Descanso</option>{state.routines.map(routine => <option key={routine.id} value={routine.id}>{routine.name} · {routine.exerciseCount} exercícios</option>)}</select></label>
+        <div className="weekly-editor-heading"><h2>{editor.kind === 'generate' ? 'Criar base inicial' : editor.kind === 'day' ? weekdayLabels[editor.day].full : editor.kind === 'rename' ? 'Renomear plano' : 'Criar plano'}</h2><Button type="button" variant="ghost" aria-label="Fechar" disabled={editor.kind === 'generate' && state.pending} onClick={close}><X size={20} /></Button></div>
+        {editor.kind === 'generate' ? <>
+          <p className="text-kindra-500">Uma base geral de musculação, sem ajuste por objetivo ou experiência. Você pode editar tudo depois.</p>
+          <label className="weekly-field">Quantos dias você quer treinar por semana?<select autoFocus aria-label="Dias por semana" value={trainingDays} onChange={event => setTrainingDays(event.target.value ? Number(event.target.value) as StarterTrainingInput['trainingDaysPerWeek'] : '')} disabled={state.pending} required><option value="">Selecione</option>{[2, 3, 4].map(days => <option key={days} value={days}>{days} dias</option>)}</select></label>
+          <fieldset disabled={state.pending}><legend>Quais equipamentos você tem disponíveis?</legend><div className="weekly-equipment">{starterEquipment.map(value => <label key={value}><input type="checkbox" value={value} checked={equipment.includes(value)} onChange={event => setEquipment(current => event.target.checked ? [...current, value] : current.filter(item => item !== value))} />{equipmentLabels[value]}</label>)}</div></fieldset>
+          {state.pending && <p role="status">Criando sua base inicial...</p>}
+        </> : editor.kind === 'day' ? <><label className="weekly-field">Treino do dia<select aria-label="Treino do dia" value={routineId} onChange={event => setRoutineId(event.target.value)} disabled={state.pending}><option value="">Descanso</option>{state.routines.map(routine => <option key={routine.id} value={routine.id}>{routine.name} · {routine.exerciseCount} exercícios</option>)}</select></label>
           {!state.routines.length && <p className="text-kindra-500">Nenhuma rotina cadastrada para associar.</p>}
         </> : <label className="weekly-field">Nome do plano<Input autoFocus aria-label="Nome do plano" value={name} onChange={event => setName(event.target.value)} maxLength={100} required disabled={state.pending} /></label>}
         {error && <p role="alert" className="weekly-error">{error}</p>}
-        <Button className="w-full" type="submit" isLoading={state.pending} disabled={editor.kind !== 'day' && !name.trim()}>Salvar alterações</Button>
+        <Button className="w-full" type="submit" isLoading={state.pending} disabled={editor.kind === 'generate' ? !trainingDays || !equipment.length : editor.kind !== 'day' && !name.trim()}>{editor.kind === 'generate' ? 'Criar base inicial' : 'Salvar alterações'}</Button>
         {editor.kind === 'day' && selected?.days.some(item => item.dayOfWeek === editor.day) && <Button className="w-full" type="button" variant="ghost" disabled={state.pending} onClick={async () => { const target = editor; if (await store.removeDay(target.planId, target.day)) setEditor(current => current === target ? null : current); }}>Remover treino do dia</Button>}
       </form>}
     </Sheet>

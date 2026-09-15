@@ -1,5 +1,6 @@
 import { apiFetch } from '../../lib/api';
 import type { RoutineSummary, TrainingWeekday, WeeklyTrainingPlan } from '../../shared/weeklyTraining';
+import type { StarterTrainingInput } from '../../shared/starterTraining';
 
 type Request = (path: string, options?: { method?: string; data?: object }) => Promise<any>;
 interface State {
@@ -26,7 +27,10 @@ export function createWeeklyTrainingStore(request: Request = apiFetch) {
       const exists = state.plans.some(row => row.id === plan.id);
       const plans = state.plans.map(row => row.id === plan.id ? plan : activate ? { ...row, isActive: false } : row);
       if (!exists) plans.unshift(plan);
-      update({ plans, selectedId: planId ? state.selectedId : plan.id, loaded: true });
+      const routines = path === '/generate'
+        ? [...new Map([...state.routines, ...plan.days.map(day => day.routine)].map(routine => [routine.id, routine])).values()]
+        : state.routines;
+      update({ plans, routines, selectedId: planId ? state.selectedId : plan.id, loaded: true });
       return true;
     } catch (error) { fail(error, planId); return false; }
     finally { update({ pending: false }); }
@@ -50,6 +54,7 @@ export function createWeeklyTrainingStore(request: Request = apiFetch) {
       finally { if (version === revision) update({ loading: false }); }
     },
     create: (name: string) => save('', 'POST', { name, source: 'CUSTOM' }),
+    generate: (input: StarterTrainingInput) => save('/generate', 'POST', input),
     rename: (id: string, name: string) => save(`/${id}`, 'PATCH', { name }, id),
     activate: (id: string) => save(`/${id}/activate`, 'POST', {}, id, true),
     setDay: (id: string, day: TrainingWeekday, routineId: string) => save(`/${id}/days/${day}`, 'PUT', { routineId }, id),

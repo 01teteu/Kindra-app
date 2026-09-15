@@ -10,6 +10,7 @@ export async function workoutRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', requireScope('session'));
   
   fastify.post('/plans', weekly.createPlan);
+  fastify.post('/plans/generate', weekly.generatePlan);
   fastify.get('/plans', weekly.listPlans);
   fastify.get('/plans/active', weekly.getActivePlan);
   fastify.get('/plans/:planId', weekly.getPlan);

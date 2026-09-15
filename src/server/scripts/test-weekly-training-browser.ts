@@ -124,7 +124,7 @@ try {
   assert.equal(await db.weeklyTrainingPlan.count({ where: { userId: user.id } }), 0);
   assert.equal(await db.workoutSession.count({ where: { userId: user.id } }), 0);
   await capture('empty-mobile');
-  await clickText('Criar plano');
+  await clickText('Montar manualmente');
   await wait(`document.querySelector('dialog[open]')!==null`);
   assert.equal(await evaluate(`document.querySelector('dialog').contains(document.activeElement)`), true);
   await fill('input[aria-label="Nome do plano"]', 'Minha semana');

@@ -17,6 +17,14 @@ export async function createPlan(req: FastifyRequest, reply: FastifyReply) {
   } catch (error) { return fail(reply, error); }
 }
 
+export async function generatePlan(req: FastifyRequest, reply: FastifyReply) {
+  try {
+    const userId = (req.user as { id: string }).id;
+    const { trainingDaysPerWeek, equipment } = schema.generatePlanSchema.parse(req.body);
+    return reply.status(201).send(await service.generatePlan(userId, { trainingDaysPerWeek, equipment }));
+  } catch (error) { return fail(reply, error); }
+}
+
 export async function listPlans(req: FastifyRequest, reply: FastifyReply) {
   try {
     const userId = (req.user as { id: string }).id;
