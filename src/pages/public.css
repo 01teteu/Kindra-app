@@ -36,70 +36,114 @@
   .public-error-copy { animation: none; }
 }
 
-/* Landing only: keep shared public/404 layout unchanged. */
+/* Landing only: shared public/404 rules and design tokens stay unchanged. */
 .kindra-landing .public-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   align-items: center;
-  gap: 72px;
-  padding-block: 64px 72px;
+  gap: 64px;
+  padding-block: 64px 80px;
 }
-.kindra-landing .public-hero h1 { margin: 0; letter-spacing: -0.045em; }
-.kindra-landing .public-hero-brand { display: block; font-size: clamp(72px, 7.5vw, 104px); line-height: 1; margin-bottom: 28px; }
-.kindra-landing .public-hero-proposal { display: block; font-size: clamp(30px, 3.1vw, 42px); line-height: 1.16; }
-.kindra-landing .public-lead { max-width: 410px; margin-top: 24px; color: var(--color-kindra-500); font-size: 15px; line-height: 1.8; }
-.kindra-landing .public-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
-.kindra-landing .public-product { min-width: 0; background: var(--color-kindra-100); border: 1px solid var(--color-kindra-200); border-radius: var(--control-radius); padding: 28px; }
-.kindra-landing .public-product-heading { border-bottom: 1px solid var(--color-kindra-300); padding-bottom: 20px; }
-.kindra-landing .public-product-heading h2 { font-size: 21px; letter-spacing: -0.025em; }
-.kindra-landing .public-product-heading p { margin-top: 6px; color: var(--color-kindra-500); font-size: 12px; }
-.kindra-landing .public-product h3 { font-size: 23px; letter-spacing: -0.025em; }
-.kindra-landing .public-product-training { padding-block: 24px; }
-.kindra-landing .public-product-context { color: var(--color-kindra-500); font-size: 13px; margin-top: 4px; }
-.kindra-landing .public-training-fields { display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px; margin-top: 20px; padding-left: 14px; border-left: 2px solid var(--color-teal-400); }
-.kindra-landing .public-training-fields dt { font-size: 13px; font-weight: 600; }
-.kindra-landing .public-training-fields dd { margin: 6px 0 0; font-size: 12px; color: var(--color-kindra-500); }
-.kindra-landing .public-product-nutrition { padding-block: 20px; border-top: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-product-detail { font-size: 13px; line-height: 1.8; margin-top: 12px; color: var(--color-kindra-700); }
-.kindra-landing .public-product-tracking > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--color-kindra-200); font-size: 13px; }
-.kindra-landing .public-product-tracking > div:first-child { margin-top: 0; }
-.kindra-landing .public-product-tracking dt { font-weight: 600; }
-.kindra-landing .public-product-tracking dd { margin: 0; color: var(--color-kindra-500); text-align: right; }
-.kindra-landing .public-benefits { padding-block: 44px 56px; border-top: 1px solid var(--color-kindra-200); scroll-margin-top: 24px; }
-.kindra-landing .public-section-heading { display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: end; margin-bottom: 32px; }
-.kindra-landing .public-section-heading h2 { max-width: 480px; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.2; letter-spacing: -0.035em; }
-.kindra-landing .public-section-heading > p { max-width: 320px; justify-self: end; font-size: 14px; line-height: 1.7; color: var(--color-kindra-500); }
-.kindra-landing .public-pillar-grid { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 32px; }
-.kindra-landing .public-pillar { padding-top: 20px; border-top: 1px solid var(--color-kindra-300); }
-.kindra-landing .public-pillar h3 { font-size: 19px; letter-spacing: -0.025em; }
-.kindra-landing .public-pillar p { margin-top: 12px; color: var(--color-kindra-500); font-size: 13px; line-height: 1.8; max-width: 340px; }
+.kindra-landing .public-context { color: var(--color-kindra-500); font-size: 13px; margin-bottom: 16px; }
+.kindra-landing .public-hero h1 { font-size: clamp(36px, 4vw, 56px); line-height: 1.12; letter-spacing: -0.045em; text-wrap: initial; }
+.kindra-landing .public-lead { max-width: 440px; margin-top: 24px; color: var(--color-kindra-500); font-size: 16px; line-height: 1.8; }
+.kindra-landing .public-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+.kindra-landing .public-demo-caption { color: var(--color-kindra-500); font-size: 12px; line-height: 1.6; margin-bottom: 20px; }
+.kindra-landing .public-week { padding: 28px; }
+.kindra-landing .public-week-heading h2 { font-size: 26px; letter-spacing: -0.035em; }
+.kindra-landing .public-week-heading p { margin-top: 8px; font-size: 14px; line-height: 1.7; color: var(--color-kindra-500); }
+.kindra-landing .public-week-days { margin-top: 24px; }
+.kindra-landing .public-week-days li { display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 12px 0; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-week-day { flex: 0 0 36px; font-size: 12px; font-weight: 600; color: var(--color-kindra-500); }
+.kindra-landing .public-week-day small { display: block; font-size: 11px; font-weight: 400; margin-top: 2px; }
+.kindra-landing .public-week-current .public-week-day { color: var(--color-teal-300); }
+.kindra-landing .public-week-routine { font-size: 14px; font-weight: 600; }
+.kindra-landing .public-week-rest { font-size: 14px; color: var(--color-kindra-500); }
+.kindra-landing .public-week-count { margin-left: auto; color: var(--color-kindra-500); font-size: 12px; }
+.kindra-landing .public-week-note { padding-top: 16px; border-top: 1px solid var(--color-kindra-200); font-size: 12px; line-height: 1.7; color: var(--color-kindra-500); }
+.kindra-landing .public-benefits { padding-block: 48px 64px; border-top: 1px solid var(--color-kindra-200); scroll-margin-top: 24px; }
+.kindra-landing .public-section-heading { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: end; margin-bottom: 48px; }
+.kindra-landing .public-section-heading h2,
+.kindra-landing .public-feature-copy h2,
+.kindra-landing .public-start h2 { font-size: clamp(28px, 3vw, 36px); line-height: 1.2; letter-spacing: -0.035em; }
+.kindra-landing .public-section-heading > p,
+.kindra-landing .public-feature-copy > p:not(.public-context),
+.kindra-landing .public-start p { font-size: 16px; line-height: 1.8; color: var(--color-kindra-500); max-width: 440px; }
+.kindra-landing .public-feature-row { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 64px; align-items: center; }
+.kindra-landing .public-feature-copy h3 { font-size: 26px; line-height: 1.25; letter-spacing: -0.035em; }
+.kindra-landing .public-feature-copy > p:last-child { margin-top: 20px; }
+.kindra-landing .public-example { min-width: 0; padding-block: 8px; }
+.kindra-landing .public-example h3,
+.kindra-landing .public-nutrition-example h3 { font-size: 21px; letter-spacing: -0.025em; }
+.kindra-landing .public-set-table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; font-size: 14px; font-variant-numeric: tabular-nums; }
+.kindra-landing .public-set-table th,
+.kindra-landing .public-set-table td { padding: 16px 8px; border-bottom: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-set-table th:first-child,
+.kindra-landing .public-set-table td:first-child { padding-left: 0; }
+.kindra-landing .public-set-table thead { font-size: 12px; color: var(--color-kindra-500); }
+.kindra-landing .public-set-table th { font-weight: 500; }
+.kindra-landing .public-set-done { display: inline-flex; align-items: center; gap: 6px; color: var(--color-teal-300); font-size: 12px; }
+.kindra-landing .public-nutrition,
+.kindra-landing .public-history { padding-block: 64px; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-nutrition-example { padding: 28px; }
+.kindra-landing .public-balance { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.kindra-landing .public-balance > span { color: var(--color-kindra-500); font-size: 14px; }
+.kindra-landing .public-balance-labels { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--color-kindra-500); margin-block: 20px 12px; }
+.kindra-landing .public-macros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.kindra-landing .public-macros dt { font-size: 12px; color: var(--color-kindra-500); }
+.kindra-landing .public-macros dd { font-size: 17px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.kindra-landing .public-macros dd span { display: block; font-size: 11px; font-weight: 400; color: var(--color-kindra-500); margin-top: 4px; }
+.kindra-landing .public-meals { margin-top: 24px; font-size: 13px; }
+.kindra-landing .public-meals > div { display: flex; justify-content: space-between; gap: 16px; padding-block: 16px; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-meals > div:last-child { padding-bottom: 0; }
+.kindra-landing .public-meals dd { text-align: right; font-variant-numeric: tabular-nums; }
+.kindra-landing .public-meals dd span { display: block; font-size: 12px; color: var(--color-kindra-500); margin-top: 4px; }
+.kindra-landing .public-history-days { margin-top: 20px; }
+.kindra-landing .public-history-days li { display: flex; flex-direction: column; gap: 8px; padding-block: 20px; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-history-days time { font-size: 14px; font-weight: 600; }
+.kindra-landing .public-history-days li > span { color: var(--color-kindra-500); font-size: 14px; font-variant-numeric: tabular-nums; }
+.kindra-landing .public-weight { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 20px; padding-top: 24px; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-weight dt { font-size: 12px; color: var(--color-kindra-500); margin-bottom: 8px; }
+.kindra-landing .public-weight dd { font-size: 14px; }
+.kindra-landing .public-weight > div:first-child dd { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kindra-landing .public-weight dd > span { font-size: 14px; font-weight: 400; color: var(--color-kindra-500); }
+.kindra-landing .public-start { display: flex; justify-content: space-between; align-items: center; gap: 32px; padding-block: 48px; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .public-start p { margin-top: 12px; }
+.kindra-landing .public-start > a { flex-shrink: 0; }
 .kindra-landing .public-footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; }
 .kindra-landing .public-footer-links a { display: inline-flex; align-items: center; min-height: 44px; }
-@media (max-width: 1023px) and (min-width: 768px) {
-  .kindra-landing .public-hero { gap: 32px; }
-  .kindra-landing .public-product { padding: 24px; }
+@media (min-width: 768px) and (max-width: 1023px) {
+  .kindra-landing .public-hero,
+  .kindra-landing .public-section-heading,
+  .kindra-landing .public-feature-row { gap: 32px; }
+  .kindra-landing .public-week,
+  .kindra-landing .public-nutrition-example { padding: 20px; }
 }
 @media (max-width: 767px) {
-  .kindra-landing .public-hero { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 36px 40px; }
-  .kindra-landing .public-hero-brand { font-size: 64px; margin-bottom: 22px; }
-  .kindra-landing .public-hero-proposal { font-size: 30px; }
-  .kindra-landing .public-lead { margin-top: 18px; font-size: 14px; line-height: 1.75; }
-  .kindra-landing .public-actions { margin-top: 22px; gap: 6px; }
-  .kindra-landing .public-actions .button-ghost { padding-inline: 12px; font-size: 13px; }
-  .kindra-landing .public-product { padding: 22px; }
-  .kindra-landing .public-product-heading { padding-bottom: 16px; }
-  .kindra-landing .public-product-training { padding-block: 20px; }
-  .kindra-landing .public-product-nutrition { padding-block: 16px; }
-  .kindra-landing .public-benefits { padding-block: 32px 40px; }
-  .kindra-landing .public-section-heading { grid-template-columns: 1fr; gap: 14px; margin-bottom: 24px; }
-  .kindra-landing .public-section-heading > p { justify-self: start; }
-  .kindra-landing .public-pillar-grid { grid-template-columns: 1fr; gap: 20px; }
-  .kindra-landing .public-pillar { padding-top: 20px; }
-  .kindra-landing .public-pillar p { margin-top: 8px; max-width: none; }
-  .kindra-landing .public-footer { gap: 8px; }
+  .kindra-landing .public-hero,
+  .kindra-landing .public-section-heading,
+  .kindra-landing .public-feature-row { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .kindra-landing .public-hero { padding-block: 40px 48px; }
+  .kindra-landing .public-hero h1 { font-size: clamp(32px, 7vw, 40px); }
+  .kindra-landing .public-actions { align-items: stretch; flex-direction: column; margin-top: 24px; }
+  .kindra-landing .public-week,
+  .kindra-landing .public-nutrition-example { padding: 20px; }
+  .kindra-landing .public-benefits,
+  .kindra-landing .public-nutrition,
+  .kindra-landing .public-history { padding-block: 40px; }
+  .kindra-landing .public-section-heading { gap: 16px; margin-bottom: 32px; }
+  .kindra-landing .public-feature-copy > p:last-child { margin-top: 16px; }
+  .kindra-landing .public-start { align-items: stretch; flex-direction: column; gap: 24px; padding-block: 40px; }
   .kindra-landing .public-footer-links { gap: 8px 20px; }
 }
 @media (max-width: 380px) {
-  .kindra-landing .public-hero-proposal { font-size: 27px; }
-  .kindra-landing .public-actions { align-items: stretch; flex-direction: column; }
+  .kindra-landing .public-week,
+  .kindra-landing .public-nutrition-example { padding: 16px; }
+  .kindra-landing .public-week-days li { gap: 12px; }
+  .kindra-landing .public-macros { grid-template-columns: 1fr; gap: 12px; }
+  .kindra-landing .public-macros > div { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .kindra-landing .public-macros dd { margin: 0; font-size: 14px; }
+  .kindra-landing .public-macros dd span { display: inline; margin-left: 4px; }
+  .kindra-landing .public-set-table th,
+  .kindra-landing .public-set-table td { padding-inline: 4px; }
 }

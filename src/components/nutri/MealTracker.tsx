@@ -92,7 +92,7 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
             return (
               <Card
                 key={category}
-                className="p-0 overflow-hidden relative transition-all duration-300 hover:border-kindra-300"
+                className="nutrition-meal-card p-0 overflow-hidden relative transition-all duration-300 hover:border-kindra-300"
               >
                 {/* Header */}
                 <div className="p-4 flex items-center justify-between gap-2 border-b border-kindra-200/50">

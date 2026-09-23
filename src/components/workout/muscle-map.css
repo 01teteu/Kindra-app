@@ -1,0 +1,45 @@
+.muscle-map { margin:0; display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); border:1px solid var(--color-kindra-200); border-radius:var(--surface-radius); overflow:hidden; background:var(--color-kindra-100); }
+.muscle-map-drawing { padding:28px 32px; background:var(--color-kindra-base); }
+.muscle-map-views { display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+.muscle-map-view { min-width:0; text-align:center; }
+.muscle-map-view-label { display:block; margin-bottom:18px; font-size:13px; color:var(--color-kindra-500); }
+.muscle-map-view svg { display:block; width:100%; height:430px; }
+.muscle-map-region { stroke:var(--color-kindra-base); stroke-width:5; stroke-linejoin:round; }
+.muscle-map-neutral { fill:var(--color-kindra-300); }
+.muscle-map-primary { fill:var(--color-teal-400); }
+.muscle-map-secondary-fill { fill:var(--color-kindra-800); }
+.muscle-map-hatch { stroke:var(--color-kindra-400); }
+.muscle-map-legend { display:flex; justify-content:center; gap:24px; margin-top:24px; font-size:12px; color:var(--color-kindra-700); }
+.muscle-map-legend span, .muscle-map-group h3 { display:flex; align-items:center; gap:9px; }
+.muscle-map i { display:inline-block; width:12px; height:12px; flex-shrink:0; border-radius:3px; }
+.muscle-map-swatch-primary { background:var(--color-teal-400); }
+.muscle-map-swatch-secondary { background:repeating-linear-gradient(125deg,var(--color-kindra-800) 0 3px,var(--color-kindra-400) 3px 4px); }
+.muscle-map-details { padding:36px; display:flex; flex-direction:column; }
+.muscle-map-intro > p { margin:0 0 12px; font-size:13px; color:var(--color-kindra-500); }
+.muscle-map-intro h2 { margin:0 0 30px; font-family:var(--font-display); font-size:30px; line-height:1.18; font-weight:700; }
+.muscle-map-group { padding:20px 0; border-top:1px solid var(--color-kindra-200); }
+.muscle-map-group h3 { font-size:12px; font-weight:500; color:var(--color-kindra-500); margin:0 0 12px; }
+.muscle-map-primary-name { font-size:23px; margin:0; font-weight:500; }
+.muscle-map-note { color:var(--color-kindra-500); font-size:12px; line-height:1.7; margin:10px 0 0; }
+.muscle-map-group ul { list-style:none; padding:0; margin:0; display:grid; gap:12px; }
+.muscle-map-group li { font-size:15px; }
+.muscle-map-group small { display:block; margin-top:4px; color:var(--color-kindra-500); font-size:12px; line-height:1.6; }
+.muscle-map-footnote { margin:auto 0 0; padding-top:24px; color:var(--color-kindra-500); font-size:11px; line-height:1.7; }
+.exercise-thumbnail { position:relative; }
+.muscle-map-compact { position:absolute; inset:0; padding:6px; overflow:hidden; }
+.muscle-map-compact .muscle-map-views { height:100%; gap:4px; max-width:240px; margin:auto; }
+.muscle-map-compact .muscle-map-view { height:100%; min-height:0; }
+.muscle-map-compact .muscle-map-view-label { display:none; }
+.muscle-map-compact .muscle-map-view svg { height:100%; width:100%; }
+.muscle-map-focused { padding:3px; }
+.muscle-map-focused .muscle-map-views { grid-template-columns:1fr; gap:0; }
+@media(max-width:760px) {
+  .muscle-map { grid-template-columns:1fr; }
+  .muscle-map-drawing { padding:22px 18px; }
+  .muscle-map-views { gap:20px; }
+  .muscle-map-view svg { height:300px; }
+  .muscle-map-view-label { margin-bottom:12px; }
+  .muscle-map-legend { margin-top:18px; }
+  .muscle-map-details { padding:26px 24px; border-top:1px solid var(--color-kindra-200); }
+  .muscle-map-intro h2 { font-size:26px; margin-bottom:24px; }
+}

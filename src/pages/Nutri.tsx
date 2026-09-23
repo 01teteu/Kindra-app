@@ -5,6 +5,7 @@ import { WeightTracker } from '../components/nutri/WeightTracker';
 import { StreakPanel } from '../components/nutri/StreakPanel';
 import { MealTracker } from '../components/nutri/MealTracker';
 import { AreaWelcome } from '../components/nutri/AreaWelcome';
+import './nutri.css';
 import { MoreVertical, RefreshCw, Calendar, Droplet, Beef, Wheat, Flame } from 'lucide-react';
 import * as nutritionApi from '../lib/nutrition';
 import type { NutritionGoal, WaterIntakeLog, WeightLog, NutritionHistoryResponse, Meal } from '../lib/nutrition';
@@ -203,7 +204,7 @@ export function Nutri() {
   const todayAchieved = todayWaterAchieved && todayKcalAchieved && todayProteinAchieved && todayCarbsAchieved && todayFatAchieved;
 
   return (
-    <div className="page-container">
+    <div className="page-container nutri-page">
 
 
 

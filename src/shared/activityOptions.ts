@@ -13,6 +13,8 @@ export interface CatalogExercise {
   id: string;
   name: string;
   primaryMuscle: string;
+  secondaryMuscles?: string[] | null;
+  muscleRegion?: string | null;
   equipment: string;
   origin: 'GLOBAL' | 'CUSTOM';
   thumbnailUrl?: string | null;

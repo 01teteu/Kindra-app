@@ -6,6 +6,7 @@ export const catalogSchema = z.array(z.object({
   id: z.string(), name: z.string(), primaryMuscle: z.string(), equipment: z.string(),
   origin: z.enum(['GLOBAL', 'CUSTOM']), measurementType: z.enum(['WEIGHT_REPS', 'REPS_ONLY', 'TIME', 'DISTANCE_TIME']),
   thumbnailUrl: z.string().nullable().optional(), videoUrl: z.string().nullable().optional(),
+  secondaryMuscles: z.array(z.string()).nullable().optional(), muscleRegion: z.string().nullable().optional(),
 }));
 export type LiveCatalogExercise = z.infer<typeof catalogSchema.element>;
 const metric = z.number().finite().nonnegative().nullable();

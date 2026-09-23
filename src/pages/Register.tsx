@@ -13,10 +13,13 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { TermsModal } from '../components/ui/TermsModal';
 import { GoogleAuthButton } from '../components/ui/GoogleAuthButton';
+import { useToast } from '../components/ui/ToastProvider';
+
+const REGISTER_ERROR_TOAST_ID = 'register-error';
 
 export function Register() {
   const navigate = useNavigate();
-  const [serverError, setServerError] = useState('');
+  const { showToast, dismissToast } = useToast();
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -51,7 +54,7 @@ export function Register() {
 
   const onSubmit = async (data: RegisterInput) => {
     try {
-      setServerError('');
+      dismissToast(REGISTER_ERROR_TOAST_ID);
       const { confirmPassword, acceptTerms, ...submitData } = data;
       const res = await apiFetch('/users/register', { data: submitData });
 
@@ -63,9 +66,19 @@ export function Register() {
       navigate('/verify-email', { state: { email: data.email } });
     } catch (err: any) {
       if (err.status) {
-        setServerError(err.message);
+        showToast({
+          id: REGISTER_ERROR_TOAST_ID,
+          type: 'error',
+          title: 'Não foi possível criar sua conta',
+          message: err.message,
+        });
       } else {
-        setServerError('Erro de rede: não foi possível conectar ao servidor.');
+        showToast({
+          id: REGISTER_ERROR_TOAST_ID,
+          type: 'error',
+          title: 'Não foi possível criar sua conta',
+          message: 'Erro de rede: não foi possível conectar ao servidor.',
+        });
       }
     }
   };
@@ -151,22 +164,6 @@ export function Register() {
                 error={errors.confirmPassword?.message}
               />
             </div>
-
-            {/* Server Error Float (Toast) */}
-            <AnimatePresence>
-              {serverError && (
-                <motion.div
-                  initial={{ opacity: 0, y: -50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  role="alert" className="border border-rose-500/25 bg-rose-500/10 p-4 rounded-xl text-sm"
-                >
-                  <p className="text-sm font-medium text-kindra-950 text-center">
-                    {serverError}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             <div className="flex flex-col gap-1 pt-2">
               <label className="flex items-center gap-3 cursor-pointer group">

@@ -42,7 +42,7 @@ export function NutritionOverview({ goal, consumed }: NutritionOverviewProps) {
     { label: 'Gorduras', remaining: remainingFat },
   ];
   return (
-    <Card className="p-5 sm:p-6">
+    <Card className="nutrition-goal-card p-5 sm:p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <span className="eyebrow">Balanço do dia</span>

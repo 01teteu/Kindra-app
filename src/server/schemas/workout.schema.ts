@@ -1,4 +1,42 @@
 import { z } from 'zod';
+import { getLocalDateRangeBounds } from '../utils/timezone.js';
+
+const progressCursorSchema = z.object({
+  startedAt: z.iso.datetime(), sessionId: z.string().uuid(),
+  startDate: z.string(), endDate: z.string(), timeZone: z.string(), exerciseId: z.string().uuid(),
+}).strict();
+
+export const workoutProgressQuerySchema = z.object({
+  startDate: z.string().length(10), endDate: z.string().length(10),
+  timeZone: z.string().min(1).max(100), exerciseId: z.string().uuid().optional(),
+  limit: z.coerce.number().int().min(1).max(200).default(200),
+  cursor: z.string().min(1).max(1024).regex(/^[A-Za-z0-9_-]+$/).optional(),
+}).strict().transform((query, ctx) => {
+  let bounds: ReturnType<typeof getLocalDateRangeBounds>;
+  try {
+    bounds = getLocalDateRangeBounds(query.startDate, query.endDate, query.timeZone);
+  } catch (error) {
+    if (!(error instanceof RangeError)) throw error;
+    ctx.addIssue({ code: 'custom', message: error.message });
+    return z.NEVER;
+  }
+  let cursor: z.infer<typeof progressCursorSchema> | undefined;
+  if (query.cursor) {
+    try {
+      cursor = progressCursorSchema.parse(JSON.parse(Buffer.from(query.cursor, 'base64url').toString('utf8')));
+      if (cursor.startDate !== query.startDate || cursor.endDate !== query.endDate
+        || cursor.timeZone !== query.timeZone || cursor.exerciseId !== query.exerciseId
+        || new Date(cursor.startedAt) < bounds.startInclusiveUTC || new Date(cursor.startedAt) >= bounds.endExclusiveUTC) {
+        throw new Error('Cursor does not belong to this filter');
+      }
+    } catch {
+      ctx.addIssue({ code: 'custom', message: 'Cursor de progresso inválido para os filtros informados.' });
+      return z.NEVER;
+    }
+  }
+  return { ...query, ...bounds, cursor };
+});
+export type WorkoutProgressQuery = z.infer<typeof workoutProgressQuerySchema>;
 
 const routineName = z.string().trim().min(1, 'O nome da rotina é obrigatório').max(100, 'Nome muito longo');
 const routineExercises = z.array(z.object({

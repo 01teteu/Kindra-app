@@ -30,6 +30,7 @@ export async function workoutRoutes(fastify: FastifyInstance) {
   fastify.get('/sessions/:sessionId/previous-performance', workoutController.getPreviousPerformanceController);
   fastify.get('/sessions/:sessionId/personal-records', workoutController.getPersonalRecordsController);
   fastify.get('/history', workoutController.getHistoryController);
+  fastify.get('/progress', workoutController.getProgressController);
   fastify.get('/sessions/:sessionId', workoutController.getSessionController);
   fastify.post('/sessions/:sessionId/finish', workoutController.finishSessionController);
   fastify.post('/sessions/:sessionId/discard', workoutController.discardSessionController);

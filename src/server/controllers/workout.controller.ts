@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import * as workoutService from '../services/workout.service.js';
 import { createRoutineSchema, updateRoutineSchema, routineParamsSchema, routineQuerySchema } from '../schemas/workout.schema.js';
 import { z } from 'zod';
+import { getWorkoutProgress, ProgressExerciseNotFoundError } from '../services/workout-progress.service.js';
 import { startSessionSchema, sessionParamsSchema, workoutExerciseParamsSchema, addSessionExerciseSchema, workoutExerciseNotesSchema } from '../schemas/workout.schema.js';
 
 function sessionError(reply: FastifyReply, error: unknown) {
@@ -50,6 +51,18 @@ export async function getHistoryController(req: FastifyRequest, reply: FastifyRe
     const query = workoutSchema.workoutHistoryQuerySchema.parse(req.query);
     return reply.send(await workoutService.getHistory((req.user as { id: string }).id, query));
   } catch (error) { return sessionError(reply, error); }
+}
+
+export async function getProgressController(req: FastifyRequest, reply: FastifyReply) {
+  try {
+    const query = workoutSchema.workoutProgressQuerySchema.parse(req.query);
+    return reply.send(await getWorkoutProgress((req.user as { id: string }).id, query));
+  } catch (error) {
+    if (error instanceof z.ZodError) return reply.status(400).send({ error: error.issues[0].message, details: error.format() });
+    if (error instanceof ProgressExerciseNotFoundError) return reply.status(404).send({ error: error.message });
+    req.log.error({ err: error }, 'Falha ao consultar progresso de treino');
+    return reply.status(500).send({ error: 'Erro ao consultar progresso de treino.' });
+  }
 }
 
 export async function addSessionExerciseController(req: FastifyRequest, reply: FastifyReply) {

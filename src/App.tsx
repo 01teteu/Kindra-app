@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { AppLayout } from './components/layout/AppLayout';
+import { ToastProvider } from './components/ui/ToastProvider';
 
 const Landing = lazy(() => import('./pages/Landing').then((module) => ({ default: module.Landing })));
 const NotFound = lazy(() => import('./pages/NotFound').then((module) => ({ default: module.NotFound })));
@@ -41,6 +42,7 @@ const Workout = lazy(() =>
 );
 
 const RoutineBuilder = lazy(() => import('./pages/RoutineBuilder').then(module => ({ default: module.RoutineBuilder })));
+const WorkoutProgress = lazy(() => import('./pages/WorkoutProgress').then(module => ({ default: module.WorkoutProgress })));
 
 const Settings = lazy(() => import('./pages/Settings').then(module => ({ default: module.Settings })));
 const NutritionSettings = lazy(() => import('./pages/Settings').then(module => ({ default: module.NutritionSettings })));
@@ -52,17 +54,18 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <GoogleOAuthProvider clientId={googleClientId}>
         <BrowserRouter>
-          <Suspense
-            fallback={
-              <div
-                role="status"
-                className="min-h-dvh grid place-items-center text-sm text-kindra-500"
-              >
-                Carregando Kindra…
-              </div>
-            }
-          >
-            <Routes>
+          <ToastProvider>
+            <Suspense
+              fallback={
+                <div
+                  role="status"
+                  className="min-h-dvh grid place-items-center text-sm text-kindra-500"
+                >
+                  Carregando Kindra…
+                </div>
+              }
+            >
+              <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
@@ -78,6 +81,7 @@ export default function App() {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/settings/nutrition" element={<NutritionSettings />} />
                 <Route path="/workout" element={<Workout />} />
+                <Route path="/workout/progress" element={<WorkoutProgress />} />
               </Route>
 
               <Route path="/routines/new" element={<RoutineBuilder />} />
@@ -86,8 +90,9 @@ export default function App() {
               <Route path="/workout/exercises" element={<ExerciseCatalog />} />
 
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+              </Routes>
+            </Suspense>
+          </ToastProvider>
         </BrowserRouter>
       </GoogleOAuthProvider>
     </MotionConfig>

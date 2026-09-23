@@ -61,7 +61,7 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
   };
 
   return (
-    <Card className="p-5 sm:p-6 relative overflow-hidden self-start">
+    <Card className="nutrition-water-card p-5 sm:p-6 relative overflow-hidden self-start">
       <div className="relative z-10">
         <div className="flex items-center gap-4 mb-6">
           <div className="h-10 w-10 shrink-0 bg-kindra-200 text-teal-300 rounded-xl flex items-center justify-center">

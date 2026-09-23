@@ -1,19 +1,22 @@
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { apiFetch } from '../lib/api';
 import { loginSchema, type LoginInput } from '../lib/validations';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { GoogleAuthButton } from '../components/ui/GoogleAuthButton';
+import { useToast } from '../components/ui/ToastProvider';
+
+const LOGIN_ERROR_TOAST_ID = 'login-error';
 
 export function Login() {
   const navigate = useNavigate();
-  const [serverError, setServerError] = useState('');
+  const { showToast, dismissToast } = useToast();
 
   useEffect(() => {
     // Se o usuário já estiver logado, pula o login
@@ -38,7 +41,7 @@ export function Login() {
 
   const onSubmit = async (data: LoginInput) => {
     try {
-      setServerError('');
+      dismissToast(LOGIN_ERROR_TOAST_ID);
       const response = await apiFetch('/auth/login', { data });
 
       // O JWT agora é gerenciado pelo navegador (HttpOnly Cookie)
@@ -53,9 +56,19 @@ export function Login() {
         navigate('/verify-email', { state: { email: data.email } });
       } else {
         if (err.status) {
-          setServerError(err.message);
+          showToast({
+            id: LOGIN_ERROR_TOAST_ID,
+            type: 'error',
+            title: 'Não foi possível entrar',
+            message: err.message,
+          });
         } else {
-          setServerError('Erro de rede: não foi possível conectar ao servidor.');
+          showToast({
+            id: LOGIN_ERROR_TOAST_ID,
+            type: 'error',
+            title: 'Não foi possível entrar',
+            message: 'Erro de rede: não foi possível conectar ao servidor.',
+          });
         }
       }
     }
@@ -105,22 +118,6 @@ export function Login() {
                 </Link>
               </div>
             </div>
-
-            {/* Server Error Float (Toast) */}
-            <AnimatePresence>
-              {serverError && (
-                <motion.div
-                  initial={{ opacity: 0, y: -50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  role="alert" className="border border-rose-500/25 bg-rose-500/10 p-4 rounded-xl text-sm"
-                >
-                  <p className="text-sm font-medium text-kindra-950 text-center">
-                    {serverError}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             <div className="pt-2">
               <Button type="submit" className="w-full h-12 text-[15px] rounded-xl font-bold bg-teal-400 text-kindra-base border-0 hover:bg-teal-300" isLoading={isSubmitting}>

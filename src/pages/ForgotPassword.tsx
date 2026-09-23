@@ -9,8 +9,9 @@ import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { OtpInput } from '../components/ui/OtpInput';
-import { ArrowLeft, KeyRound, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { z } from 'zod';
+import './forgot-password.css';
 
 // Schemas locais para os passos
 const step1Schema = z.object({ email: z.string().email("E-mail inválido.") });
@@ -105,171 +106,178 @@ export function ForgotPassword() {
   };
 
   return (
-    <AuthLayout>
+    <div className="forgot-password-page">
+      <AuthLayout>
+        <div className="forgot-password-flow">
+          <Link to="/login" className="forgot-password-back">
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Voltar para o login
+          </Link>
 
+          <Card>
+            <AnimatePresence mode="wait">
 
-      <div className="w-full max-w-md relative z-10">
-        <Link to="/login" className="inline-flex items-center text-sm font-bold text-kindra-500 hover:text-kindra-900 transition-colors mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar para login
-        </Link>
-
-        <Card className="relative overflow-hidden">
-          <AnimatePresence mode="wait">
-
-            {/* STEP 1: Solicitar Código */}
-            {step === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="w-full"
-              >
-                <div className="mb-8 text-center flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-kindra-100 text-kindra-900 flex items-center justify-center mb-4">
-                    <KeyRound className="w-6 h-6" />
+              {/* STEP 1: Solicitar Código */}
+              {step === 1 && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="w-full"
+                >
+                  <div className="forgot-password-heading">
+                    <p className="forgot-password-step">Etapa 1 de 3</p>
+                    <h1 className="font-display font-bold text-kindra-950">
+                      Recuperar senha
+                    </h1>
+                    <p className="text-kindra-500 text-sm font-medium">
+                      Informe o e-mail da sua conta para receber um código de 6 dígitos.
+                    </p>
                   </div>
-                  <h1 className="text-2xl font-display font-bold uppercase tracking-[0.1em] text-kindra-950 mb-2">
-                    Recuperar Senha
-                  </h1>
-                  <p className="text-kindra-500 text-sm font-medium">
-                    Informe seu e-mail para receber um código de 6 dígitos.
-                  </p>
-                </div>
 
-                <form onSubmit={hand1(onStep1)} className="space-y-5">
-                  <Input
-                    type="email"
-                    placeholder="Seu e-mail cadastrado"
-                    {...reg1('email')}
-                    error={err1.email?.message}
-                  />
-                  {serverError && (
-                    <div className="text-rose-400 text-sm text-center font-medium bg-rose-500/10 py-3 rounded-xl border border-rose-500/20">
-                      {serverError}
-                    </div>
-                  )}
-                  <Button type="submit" className="w-full" isLoading={sub1}>
-                    ENVIAR CÓDIGO
-                  </Button>
-                </form>
-              </motion.div>
-            )}
-
-            {/* STEP 2: Validar Código */}
-            {step === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="w-full"
-              >
-                <div className="mb-8 text-center">
-                  <h1 className="text-2xl font-display font-bold uppercase tracking-[0.1em] text-kindra-950 mb-2">
-                    Verificação
-                  </h1>
-                  <p className="text-kindra-500 text-sm font-medium">
-                    Insira o código de segurança que enviamos para <br/><strong className="text-kindra-900">{email}</strong>
-                  </p>
-                </div>
-
-                <form onSubmit={hand2(onStep2)} className="space-y-5">
-                  <div className="mb-6">
-                    <OtpInput
-                      value={tokenValue}
-                      onChange={(val) => setVal2('token', val, { shouldValidate: true })}
+                  <form onSubmit={hand1(onStep1)} className="space-y-5">
+                    <Input
+                      title="E-mail cadastrado"
+                      type="email"
+                      placeholder="voce@exemplo.com"
+                      {...reg1('email')}
+                      error={err1.email?.message}
                     />
-                    {err2.token?.message && (
-                      <p className="text-rose-400 text-sm mt-3 text-center font-medium">{err2.token.message}</p>
+                    {serverError && (
+                      <div role="alert" className="forgot-password-error">
+                        {serverError}
+                      </div>
                     )}
+                    <Button type="submit" className="w-full" isLoading={sub1}>
+                      Enviar código
+                    </Button>
+                  </form>
+                </motion.div>
+              )}
+
+              {/* STEP 2: Validar Código */}
+              {step === 2 && (
+                <motion.div
+                  key="step2"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="w-full"
+                >
+                  <div className="forgot-password-heading">
+                    <p className="forgot-password-step">Etapa 2 de 3</p>
+                    <h1 className="font-display font-bold text-kindra-950">
+                      Confira seu e-mail
+                    </h1>
+                    <p className="text-kindra-500 text-sm font-medium">
+                      Digite o código de 6 dígitos enviado para
+                      <strong className="forgot-password-email">{email}</strong>
+                    </p>
                   </div>
 
-                  {serverError && (
-                    <div className="text-rose-400 text-sm text-center font-medium bg-rose-500/10 py-3 rounded-xl border border-rose-500/20">
-                      {serverError}
+                  <form onSubmit={hand2(onStep2)} className="space-y-5">
+                    <div role="group" aria-label="Código de 6 dígitos" aria-describedby={err2.token ? 'reset-code-error' : undefined}>
+                      <OtpInput
+                        value={tokenValue}
+                        onChange={(val) => setVal2('token', val, { shouldValidate: true })}
+                      />
+                      {err2.token?.message && (
+                        <p id="reset-code-error" role="alert" className="text-rose-400 text-sm mt-3">{err2.token.message}</p>
+                      )}
                     </div>
-                  )}
-                  <Button type="submit" className="w-full" isLoading={sub2}>
-                    VALIDAR CÓDIGO
-                  </Button>
-                </form>
-              </motion.div>
-            )}
 
-            {/* STEP 3: Nova Senha */}
-            {step === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="w-full"
-              >
-                <div className="mb-8 text-center flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-kindra-100 text-kindra-900 flex items-center justify-center mb-4">
-                    <Lock className="w-6 h-6" />
+                    {serverError && (
+                      <div role="alert" className="forgot-password-error">
+                        {serverError}
+                      </div>
+                    )}
+                    <Button type="submit" className="w-full" isLoading={sub2}>
+                      Validar código
+                    </Button>
+                  </form>
+                </motion.div>
+              )}
+
+              {/* STEP 3: Nova Senha */}
+              {step === 3 && (
+                <motion.div
+                  key="step3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="w-full"
+                >
+                  <div className="forgot-password-heading">
+                    <p className="forgot-password-step">Etapa 3 de 3</p>
+                    <h1 className="font-display font-bold text-kindra-950">
+                      Crie sua nova senha
+                    </h1>
+                    <p className="text-kindra-500 text-sm font-medium">
+                      Escolha uma nova senha para acessar sua conta.
+                    </p>
                   </div>
-                  <h1 className="text-2xl font-display font-bold uppercase tracking-[0.1em] text-kindra-950 mb-2">
-                    Nova Senha
-                  </h1>
-                  <p className="text-kindra-500 text-sm font-medium">
-                    Crie uma senha forte e segura.
-                  </p>
-                </div>
 
-                <form onSubmit={hand3(onStep3)} className="space-y-5">
-                  <Input
-                    type="password"
-                    placeholder="Nova senha"
-                    {...reg3('password')}
-                    error={err3.password?.message}
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Confirmar nova senha"
-                    {...reg3('confirmPassword')}
-                    error={err3.confirmPassword?.message}
-                  />
-                  {serverError && (
-                    <div className="text-rose-400 text-sm text-center font-medium bg-rose-500/10 py-3 rounded-xl border border-rose-500/20">
-                      {serverError}
+                  <form onSubmit={hand3(onStep3)} className="space-y-5">
+                    <Input
+                      title="Nova senha"
+                      type="password"
+                      aria-describedby="reset-password-requirements"
+                      placeholder="Digite sua nova senha"
+                      {...reg3('password')}
+                      error={err3.password?.message}
+                    />
+                    <p id="reset-password-requirements" className="forgot-password-requirements">
+                      Use pelo menos 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.
+                    </p>
+                    <Input
+                      title="Confirmar nova senha"
+                      type="password"
+                      placeholder="Repita sua nova senha"
+                      {...reg3('confirmPassword')}
+                      error={err3.confirmPassword?.message}
+                    />
+                    {serverError && (
+                      <div role="alert" className="forgot-password-error">
+                        {serverError}
+                      </div>
+                    )}
+                    <Button type="submit" className="w-full" isLoading={sub3}>
+                      Redefinir senha
+                    </Button>
+                  </form>
+                </motion.div>
+              )}
+
+              {/* STEP 4: Sucesso */}
+              {step === 4 && (
+                <motion.div
+                  key="step4"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="w-full"
+                >
+                  <div role="status" className="forgot-password-heading">
+                    <div className="forgot-password-success-icon">
+                      <CheckCircle2 className="w-7 h-7" aria-hidden="true" />
                     </div>
-                  )}
-                  <Button type="submit" className="w-full" isLoading={sub3}>
-                    REDEFINIR SENHA
+                    <h1 className="font-display font-bold text-kindra-950">
+                      Senha redefinida
+                    </h1>
+                    <p className="text-kindra-500 text-sm font-medium">
+                      Sua senha foi redefinida com sucesso. Você já pode acessar sua conta.
+                    </p>
+                  </div>
+                  <Button onClick={() => navigate('/login')} className="w-full">
+                    Ir para o login
                   </Button>
-                </form>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
 
-            {/* STEP 4: Sucesso */}
-            {step === 4 && (
-              <motion.div
-                key="step4"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full text-center py-6"
-              >
-                <div className="w-16 h-16 rounded-full bg-teal-500/10 text-teal-300 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h1 className="text-2xl font-display font-bold uppercase tracking-[0.1em] text-kindra-950 mb-4">
-                  Senha Alterada!
-                </h1>
-                <p className="text-kindra-500 text-sm font-medium mb-8">
-                  Sua senha foi redefinida com sucesso. Você já pode acessar sua conta.
-                </p>
-                <Button onClick={() => navigate('/login')} className="w-full">
-                  IR PARA O LOGIN
-                </Button>
-              </motion.div>
-            )}
-
-          </AnimatePresence>
-        </Card>
-      </div>
-    </AuthLayout>
+            </AnimatePresence>
+          </Card>
+        </div>
+      </AuthLayout>
+    </div>
   );
 }

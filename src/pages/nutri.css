@@ -1,0 +1,41 @@
+/* Presentation scoped to Nutrition; all component dimensions remain unchanged. */
+.nutri-page :is(.nutrition-goal-card, .nutrition-water-card) {
+  background: var(--color-kindra-100);
+  border-color: var(--color-kindra-300);
+  box-shadow: inset 3px 0 var(--color-teal-400);
+}
+.nutri-page :is(.nutrition-weight-card, .nutrition-meal-card, .streak-card) {
+  background: var(--color-kindra-100);
+  border-color: var(--color-kindra-300);
+  box-shadow: none;
+}
+.nutri-page :is(.nutrition-goal-card, .nutrition-water-card, .nutrition-weight-card) h2,
+.nutri-page .nutrition-meal-card h3 {
+  color: var(--color-kindra-950);
+  font-weight: 700;
+}
+.nutri-page .nutrition-goal-card .metric-number,
+.nutri-page .nutrition-water-card [aria-label^="Consumo de hoje"] .text-3xl {
+  color: var(--color-teal-300);
+}
+.nutri-page .nutrition-goal-card .macro-grid strong {
+  color: var(--color-kindra-950);
+}
+.nutri-page .nutrition-goal-card .macro-grid p {
+  color: var(--color-kindra-700);
+}
+.nutri-page .nutrition-meal-card > .border-b {
+  background: var(--color-kindra-200);
+  border-color: var(--color-kindra-300);
+}
+.nutri-page .nutrition-meal-card > .border-b button {
+  color: var(--color-teal-300);
+  border-color: var(--color-kindra-300);
+}
+.nutri-page .nutrition-meal-card > .border-b button:hover {
+  border-color: var(--color-teal-400);
+}
+.nutri-page .nutrition-meal-card > .border-b button:focus-visible {
+  outline: 2px solid var(--color-teal-300);
+  outline-offset: 3px;
+}
