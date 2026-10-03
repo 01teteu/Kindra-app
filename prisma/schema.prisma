@@ -12,8 +12,10 @@ model User {
   email                     String                   @unique
   password                  String?
   provider                  String                   @default("LOCAL")
+  googleSub                 String?                  @unique
   role                      String                   @default("USER")
   emailVerified             Boolean                  @default(false)
+  sessionVersion            Int                      @default(0)
   resendAttempts            Int                      @default(0)
   lastResendAt              DateTime?
   resetResendAttempts       Int                      @default(0)
@@ -27,10 +29,13 @@ model User {
   emailVerificationTokens   EmailVerificationToken[]
   customExercises           Exercise[]
   customFoods               Food[]
+  ownedAllergies             Allergy[]                @relation("AllergyOwner")
+  ownedPhysicalLimitations   PhysicalLimitation[]     @relation("PhysicalLimitationOwner")
   nutritionHistory          HistoryUserNutri[]
   meals                     Meal[]
   nutritionGoals            NutritionGoal[]
   passwordResetTokens       PasswordResetToken[]
+  revokedSessionTokens      RevokedSessionToken[]
   profile                   Profile?
   routines                  Routine[]
   weeklyTrainingPlans       WeeklyTrainingPlan[]
@@ -42,27 +47,42 @@ model User {
 }
 
 model EmailVerificationToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  token         String   @unique
+  userId        String
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  attempts      Int      @default(0)
+  issuedToEmail String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("email_verification_tokens")
 }
 
 model PasswordResetToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  used      Boolean  @default(false)
-  attempts  Int      @default(0)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(uuid())
+  token        String   @unique
+  userId       String
+  used         Boolean  @default(false)
+  resetGrantId String?
+  attempts     Int      @default(0)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_reset_tokens")
+}
+
+model RevokedSessionToken {
+  tokenHash String   @id @db.VarChar(64)
+  userId    String
+  expiresAt DateTime?
+  revokedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("revoked_session_tokens")
 }
 
 model Profile {
@@ -88,10 +108,13 @@ model Profile {
 
 model Allergy {
   id       String           @id @default(uuid())
-  name     String           @unique
+  name     String
   isCustom Boolean          @default(false)
+  ownerId  String?
+  owner    User?            @relation("AllergyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   profiles ProfileAllergy[]
 
+  @@unique([ownerId, name])
   @@map("allergies")
 }
 
@@ -107,10 +130,13 @@ model ProfileAllergy {
 
 model PhysicalLimitation {
   id       String                      @id @default(uuid())
-  name     String                      @unique
+  name     String
   isCustom Boolean                     @default(false)
+  ownerId  String?
+  owner    User?                       @relation("PhysicalLimitationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   profiles ProfilePhysicalLimitation[]
 
+  @@unique([ownerId, name])
   @@map("physical_limitations")
 }
 

@@ -29,6 +29,8 @@
 .weekly-section-heading h2 { font: 700 23px/1.3 var(--font-display); letter-spacing: -.025em; }
 .weekly-section-heading p { color: var(--color-kindra-500); font-size: 14px; line-height: 1.6; margin-top: 6px; }
 .weekly-section-heading > .kindra-button { flex-shrink: 0; }
+.weekly-section-heading > .weekly-new-plan { background: var(--color-kindra-100); border-color: var(--color-teal-400); color: var(--color-teal-300); font-weight: 600; }
+.weekly-section-heading > .weekly-new-plan:hover { background: var(--color-teal-400); color: var(--color-kindra-base); }
 .weekly-empty { padding: 20px 0; }
 .weekly-empty p { margin-bottom: 16px; }
 .weekly-empty-actions { display: flex; flex-wrap: wrap; gap: 12px; }

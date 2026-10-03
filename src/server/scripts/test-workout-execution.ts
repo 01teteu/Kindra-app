@@ -92,7 +92,7 @@ try {
     await tx.dropSetSegment.updateMany({ where: { workoutSetId: drop.id }, data: { completedAt: now } });
   });
   await sqlFails(Prisma.sql`UPDATE drop_set_segments SET "completedAt"=NULL WHERE id=${stage.id}`);
-  await sqlFails(Prisma.sql`UPDATE drop_set_segments SET "completedAt"=${new Date(later.getTime()+1000)} WHERE id=${stage.id}`);
+  await sqlFails(Prisma.sql`UPDATE drop_set_segments SET "completedAt"=(SELECT "completedAt" + interval '1 second' FROM workout_sets WHERE id=${drop.id}) WHERE id=${stage.id}`);
   await sqlFails(Prisma.sql`DELETE FROM drop_set_segments WHERE "workoutSetId"=${drop.id}`);
   const history = await db.workoutSet.findUniqueOrThrow({ where: { id: drop.id }, include: { segments: { orderBy: { order: 'asc' } } } });
   assert.deepEqual(history.segments.map(s => [s.weight,s.reps]), [[34,8],[28,6],[22,5]]);

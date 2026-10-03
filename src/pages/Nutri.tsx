@@ -1,62 +1,83 @@
 import { useState, useEffect, useRef } from 'react';
-import { NutritionOverview, type ConsumedTotals } from '../components/nutri/NutritionOverview';
+import { Link } from 'react-router-dom';
+import { NutritionOverview } from '../components/nutri/NutritionOverview';
 import { WaterTracker } from '../components/nutri/WaterTracker';
 import { WeightTracker } from '../components/nutri/WeightTracker';
+import { Card } from '../components/ui/Card';
 import { StreakPanel } from '../components/nutri/StreakPanel';
 import { MealTracker } from '../components/nutri/MealTracker';
 import { AreaWelcome } from '../components/nutri/AreaWelcome';
 import './nutri.css';
-import { MoreVertical, RefreshCw, Calendar, Droplet, Beef, Wheat, Flame } from 'lucide-react';
+import { ArrowRight, Target, Calendar, Droplet, Beef, Wheat, Flame } from 'lucide-react';
 import * as nutritionApi from '../lib/nutrition';
+import { calculateConsumedTotals, calculateWaterTotal } from '../lib/nutritionTotals';
 import type { NutritionGoal, WaterIntakeLog, WeightLog, NutritionHistoryResponse, Meal } from '../lib/nutrition';
 
 export function Nutri() {
   const [activeTab, setActiveTab] = useState<'diario' | 'hidratacao'>('diario');
   const [goal, setGoal] = useState<NutritionGoal | null>(null);
   const [waterLogs, setWaterLogs] = useState<WaterIntakeLog[]>([]);
-  const [weightLogs, setWeightLogs] = useState<WeightLog[]>([]);
   const [streakData, setStreakData] = useState<NutritionHistoryResponse | null>(null);
   const [meals, setMeals] = useState<Meal[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
-  const [actionError, setActionError] = useState('');
-  const [isRecalculating, setIsRecalculating] = useState(false);
   const [isAddingWater, setIsAddingWater] = useState(false);
   const [removingWaterId, setRemovingWaterId] = useState<string | null>(null);
   const [isRefreshingWater, setIsRefreshingWater] = useState(false);
   const [waterError, setWaterError] = useState('');
   const [waterNotice, setWaterNotice] = useState('');
   const waterBusy = useRef(false);
+
+  const [weightLogs, setWeightLogs] = useState<WeightLog[]>([]);
+  const [isWeightLoading, setIsWeightLoading] = useState(true);
+  const [weightLoadError, setWeightLoadError] = useState('');
+  const [weightActionError, setWeightActionError] = useState('');
   const [isAddingWeight, setIsAddingWeight] = useState(false);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const loadWeightLogs = async () => {
+    setWeightLoadError('');
+    setIsWeightLoading(true);
+    try {
+      setWeightLogs(await nutritionApi.getWeightLogs());
+    } catch (error) {
+      console.error('Failed to fetch weight logs:', error);
+      setWeightLoadError('Não foi possível carregar seus registros de peso. Tente novamente.');
+    } finally {
+      setIsWeightLoading(false);
+    }
+  };
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    void loadWeightLogs();
   }, []);
+
+  const handleAddWeight = async (kg: number) => {
+    setIsAddingWeight(true);
+    setWeightActionError('');
+    try {
+      const newLog = await nutritionApi.addWeightLog(kg);
+      setWeightLogs([newLog, ...weightLogs]);
+    } catch (error) {
+      console.error('Failed to add weight:', error);
+      setWeightActionError('Não foi possível registrar o peso. Tente novamente.');
+    } finally {
+      setIsAddingWeight(false);
+    }
+  };
 
   const fetchDashboardData = async () => {
     setLoadError('');
     try {
-      const [currentGoal, water, weight, historyRes, mealsData] = await Promise.all([
+      const [currentGoal, water, historyRes, mealsData] = await Promise.all([
         nutritionApi.getCurrentGoal(),
         nutritionApi.getWaterLogs(),
-        nutritionApi.getWeightLogs(),
-        nutritionApi.getNutritionHistory(),
+        nutritionApi.consolidateNutritionHistory(),
         nutritionApi.getMeals()
       ]);
 
       setGoal(currentGoal);
       setWaterLogs(water);
-      setWeightLogs(weight);
       setStreakData(historyRes);
       setMeals(mealsData);
     } catch (error) {
@@ -71,33 +92,7 @@ export function Nutri() {
     fetchDashboardData();
   }, []);
 
-  const calculateConsumedTotals = (): ConsumedTotals => {
-    return meals.reduce((acc, meal) => {
-      meal.entries.forEach(entry => {
-        const multiplier = entry.amountGrams / 100;
-        acc.kcal += entry.food.kcal * multiplier;
-        acc.proteinG += entry.food.proteinG * multiplier;
-        acc.carbsG += entry.food.carbsG * multiplier;
-        acc.fatG += entry.food.fatG * multiplier;
-      });
-      return acc;
-    }, { kcal: 0, proteinG: 0, carbsG: 0, fatG: 0 });
-  };
-
-  const consumedTotals = calculateConsumedTotals();
-
-  const handleRecalculate = async () => {
-    setIsRecalculating(true);
-    try {
-      const newGoal = await nutritionApi.recalculateGoal();
-      setGoal(newGoal);
-    } catch (error) {
-      console.error('Failed to recalculate:', error);
-      alert('Não foi possível recalcular. Verifique se seu perfil (incluindo o Sexo Biológico) está completo.');
-    } finally {
-      setIsRecalculating(false);
-    }
-  };
+  const consumedTotals = calculateConsumedTotals(meals);
 
   const handleAddWater = async (ml: number) => {
     if (waterBusy.current) return false;
@@ -167,21 +162,7 @@ export function Nutri() {
     }
   };
 
-  const handleAddWeight = async (kg: number) => {
-    setIsAddingWeight(true);
-    setActionError('');
-    try {
-      const newLog = await nutritionApi.addWeightLog(kg);
-      setWeightLogs([newLog, ...weightLogs]);
-    } catch (error) {
-      console.error('Failed to add weight:', error);
-      setActionError('Não foi possível registrar o peso. Tente novamente.');
-    } finally {
-      setIsAddingWeight(false);
-    }
-  };
-
-  const currentWaterMl = waterLogs.reduce((sum, log) => sum + log.amountMl, 0);
+  const currentWaterMl = calculateWaterTotal(waterLogs);
   const targetWaterMl = goal?.targetWaterMl || 2000;
 
   // Verifica se o usuário bateu as tolerâncias exigidas das metas
@@ -219,33 +200,11 @@ export function Nutri() {
               Pequenos hábitos. Todos os dias.
             </p>
           </div>
-
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="icon-button"
-              title="Opções" aria-label="Opções de nutrição" aria-expanded={isMenuOpen}
-            >
-              <MoreVertical className="h-5 w-5" />
-            </button>
-
-            {isMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-kindra-100 rounded-xl shadow-sm shadow-black/20 border border-kindra-200/50 z-50 overflow-hidden py-1">
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    handleRecalculate();
-                  }}
-                  disabled={isRecalculating}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-kindra-700 hover:bg-kindra-200/50 transition-colors disabled:opacity-50"
-                >
-                  <RefreshCw className={`h-4 w-4 shrink-0 ${isRecalculating ? 'animate-spin' : ''}`} />
-                  Recalcular Metas
-                </button>
-              </div>
-            )}
-          </div>
         </div>
+
+        {!isLoading && !loadError && (
+          <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} />
+        )}
 
         <div className="segmented-tabs" role="tablist" aria-label="Acompanhamento nutricional">
           {(['diario', 'hidratacao'] as const).map((tab, index) => <button key={tab} id={`tab-${tab}`} role="tab"
@@ -259,7 +218,6 @@ export function Nutri() {
             }}>{tab === 'diario' ? 'Diário' : 'Hidratação'}</button>)}
         </div>
 
-        {actionError && <p role="alert" className="mb-4 p-4 rounded-xl bg-rose-500/10 text-rose-400 text-sm">{actionError}</p>}
         {loadError ? <div role="alert" className="kindra-card p-6 text-center"><p className="text-sm text-kindra-600 mb-4">{loadError}</p><button onClick={fetchDashboardData} className="kindra-button button-outline">Tentar novamente</button></div> : isLoading ? (
           <div className="animate-pulse space-y-4">
             <div className="h-48 bg-kindra-100 rounded-2xl"></div>
@@ -270,14 +228,37 @@ export function Nutri() {
           <>
             {activeTab === 'diario' && (
               <AreaWelcome area="diario" userId={goal?.userId}>
-              <div className="nutrition-layout">
-                <div className="nutrition-primary">
-                  <NutritionOverview goal={goal} consumed={consumedTotals} />
-                  <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} />
-                  <WeightTracker logs={weightLogs} onAddWeight={handleAddWeight} isAdding={isAddingWeight} />
-                </div>
-                <div className="nutrition-secondary"><MealTracker meals={meals} isLoading={isLoading} onUpdate={fetchDashboardData} /></div>
-              </div>
+                <>
+                  <div className="nutrition-layout nutrition-diary-layout">
+                    <div className="nutrition-primary"><NutritionOverview goal={goal} consumed={consumedTotals} /></div>
+                    <div className="nutrition-secondary"><MealTracker meals={meals} isLoading={isLoading} onUpdate={fetchDashboardData} /></div>
+                  </div>
+                  <div className="nutrition-utilities">
+                    <Card className="nutrition-settings-card p-5 sm:p-8">
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-kindra-200 text-teal-300"><Target className="h-6 w-6" aria-hidden="true" /></div>
+                        <div>
+                          <h2 className="text-xl font-display font-semibold text-kindra-950">Metas nutricionais</h2>
+                          <p className="mt-2 text-sm leading-relaxed text-kindra-500">Seu corpo, sua rotina e seus objetivos podem mudar. Revise as respostas do seu perfil para manter as metas de alimentação e água alinhadas ao seu momento.</p>
+                        </div>
+                      </div>
+                      <Link to="/settings/nutrition" className="kindra-button button-primary mt-6 w-full sm:w-auto">Editar metas nutricionais<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+                    </Card>
+                    <section className="nutrition-weight-section" aria-label="Acompanhamento do peso">
+                      {weightActionError && <p role="alert" className="mb-4 rounded-xl bg-rose-500/10 p-4 text-sm text-rose-400">{weightActionError}</p>}
+                      {weightLoadError ? (
+                        <Card className="p-6 text-center">
+                          <p role="alert" className="mb-4 text-sm text-kindra-600">{weightLoadError}</p>
+                          <button type="button" onClick={loadWeightLogs} className="kindra-button button-outline">Tentar novamente</button>
+                        </Card>
+                      ) : isWeightLoading ? (
+                        <Card className="h-48 animate-pulse" aria-label="Carregando peso" />
+                      ) : (
+                        <WeightTracker logs={weightLogs} onAddWeight={handleAddWeight} isAdding={isAddingWeight} />
+                      )}
+                    </section>
+                  </div>
+                </>
               </AreaWelcome>
             )}
 

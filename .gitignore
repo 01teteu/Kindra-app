@@ -1,6 +1,7 @@
 node_modules/
 build/
 dist/
+server-dist/
 coverage/
 
 .env*
@@ -9,6 +10,34 @@ coverage/
 *.db
 *.sqlite
 *.sqlite3
+*.dump
+*.pgdump
+*.backup
+*.bak
+*.dump.gz
+*.pgdump.gz
+*.backup.gz
+*.sql.gz
+*.sql.xz
+*.sql.zst
+*.sql.bz2
+dumps/
+backups/
+
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+*.cer
+*.der
+id_rsa*
+id_ed25519*
+credentials.json
+service-account*.json
 
 agentsDoc/
 docs/

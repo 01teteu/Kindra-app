@@ -76,7 +76,9 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
             weightKg: String(profile.weightKg), heightCm: String(profile.heightCm),
             activityLevel: profile.activityLevel, goal: profile.goal, isPCD: profile.isPCD,
             allergies: selectedAllergies.map(option => option.id),
-            limitations: selectedLimitations.map(option => option.id),
+            limitations: selectedLimitations.length
+              ? selectedLimitations.map(option => option.id)
+              : options.limitations.filter((option: CatalogOption) => option.name.toLowerCase() === 'nenhuma').map((option: CatalogOption) => option.id),
             hasOtherAllergy: false, otherAllergyText: '', hasOtherLimitation: false, otherLimitationText: '',
           });
           setIsInitializing(false);

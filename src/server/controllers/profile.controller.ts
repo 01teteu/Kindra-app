@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { profileSchema, updateProfileSchema, updateProfileQuerySchema } from '../schemas/profile.schema.js';
-import { validatePlausibility } from '../utils/timezone.js';
+import { validateCurrentReferenceDate, validatePlausibility } from '../utils/timezone.js';
 import * as profileService from '../services/profile.service.js';
 import { calculateAndSaveNutritionGoal } from '../services/nutrition.service.js';
 
@@ -49,6 +49,9 @@ export async function createProfileController(req: FastifyRequest, reply: Fastif
     if (error.message === 'PROFILE_ALREADY_EXISTS') {
       return reply.status(409).send({ error: 'O perfil deste usuário já foi criado.' });
     }
+    if (error instanceof profileService.ProfileUpdateError) {
+      return reply.status(error.status).send({ error: error.message });
+    }
     
     console.error('[CreateProfile Error]', error);
     return reply.status(500).send({ error: 'Erro interno no servidor' });
@@ -79,8 +82,7 @@ export async function updateProfileController(req: FastifyRequest, reply: Fastif
   const { referenceDate, timezoneOffset } = context.data;
   try {
     validatePlausibility(referenceDate, timezoneOffset);
-    const localToday = new Date(Date.now() - timezoneOffset * 60000).toISOString().slice(0, 10);
-    if (referenceDate !== localToday) throw new Error('Not today');
+    validateCurrentReferenceDate(referenceDate, timezoneOffset);
   } catch {
     return reply.status(400).send({ error: 'A atualização deve usar a data de hoje. Atualize a página e tente novamente.' });
   }

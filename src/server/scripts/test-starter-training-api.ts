@@ -47,7 +47,7 @@ try {
   assert.deepEqual(await counts(), empty);
   const missing = await user('starter-no-profile', false);
   await req('POST', '/plans/generate', input, 409, token(missing.id));
-  const limitation = await db.physicalLimitation.create({ data: { name: 'Limitação cadastrada', isCustom: true } });
+  const limitation = await db.physicalLimitation.create({ data: { name: 'Limitação cadastrada', isCustom: true, ownerId: b.id } });
   await db.profile.update({ where: { userId: b.id }, data: { physicalLimitations: { create: { physicalLimitationId: limitation.id } } } });
   const blocked = await req('POST', '/plans/generate', input, 422, token(b.id));
   assert.match(blocked.error, /limitações físicas cadastradas/);

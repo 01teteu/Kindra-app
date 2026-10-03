@@ -51,25 +51,20 @@ export function Login() {
         navigate('/home');
       }
     } catch (err: any) {
-      if (err.data?.needsVerification && err.data?.pendingToken) {
-        sessionStorage.setItem('pendingToken', err.data.pendingToken);
-        navigate('/verify-email', { state: { email: data.email } });
-      } else {
-        if (err.status) {
+      if (err.status) {
           showToast({
             id: LOGIN_ERROR_TOAST_ID,
             type: 'error',
             title: 'Não foi possível entrar',
             message: err.message,
           });
-        } else {
+      } else {
           showToast({
             id: LOGIN_ERROR_TOAST_ID,
             type: 'error',
             title: 'Não foi possível entrar',
             message: 'Erro de rede: não foi possível conectar ao servidor.',
           });
-        }
       }
     }
   };

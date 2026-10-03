@@ -103,7 +103,7 @@ try {
   assert.equal(created.statusCode, 201);
   const routine = created.json();
   for (const exerciseId of [customOther.id, randomUUID()]) {
-    assert.equal((await app.inject({ method: 'POST', url: '/api/workouts/routines', headers, payload: { ...payload, exercises: [{ exerciseId, order: 0 }] } })).statusCode, 400);
+    assert.equal((await app.inject({ method: 'POST', url: '/api/workouts/routines', headers, payload: { ...payload, exercises: [{ exerciseId, order: 0 }] } })).statusCode, 404);
   }
   console.log('PASS globais únicos; custom equivalentes por usuário; ownership obrigatório/imutável; acesso HTTP e JWT preservados.');
 
@@ -138,7 +138,7 @@ try {
   assert.deepEqual(await db.exercise.findUniqueOrThrow({ where: { id: custom.id } }), archivedCustom);
   assert.ok(await db.routineExercise.findUnique({ where: { id: routine.exercises[0].id } }));
   assert.deepEqual(await db.workoutExercise.findUniqueOrThrow({ where: { id: executedCustom.id } }), executedCustom);
-  assert.equal((await app.inject({ method: 'POST', url: '/api/workouts/routines', headers, payload })).statusCode, 400);
+  assert.equal((await app.inject({ method: 'POST', url: '/api/workouts/routines', headers, payload })).statusCode, 404);
   console.log('PASS sincronização mantém ID; rotina editada e catálogo atualizado/arquivado preservam snapshots, séries e FKs; custom arquivado intocado.');
 
   const cardio = first.cardio[0];

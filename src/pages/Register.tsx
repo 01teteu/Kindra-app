@@ -1,11 +1,10 @@
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, X, Flame } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
+import { Check } from 'lucide-react';
+import { motion } from 'motion/react';
 import { apiFetch } from '../lib/api';
 import { registerSchema, type RegisterInput } from '../lib/validations';
 import { Card } from '../components/ui/Card';
@@ -21,6 +20,8 @@ export function Register() {
   const navigate = useNavigate();
   const { showToast, dismissToast } = useToast();
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const sendingRef = useRef(false);
 
   useEffect(() => {
     // Se o usuário já estiver logado, redireciona
@@ -34,7 +35,6 @@ export function Register() {
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
@@ -42,44 +42,37 @@ export function Register() {
     mode: 'onChange',
   });
 
-  const passwordValue = watch('password', '');
-
-  const rules = [
-    { label: 'Mínimo de 8 caracteres', fulfilled: passwordValue.length >= 8 },
-    { label: 'Letra maiúscula', fulfilled: /[A-Z]/.test(passwordValue) },
-    { label: 'Letra minúscula', fulfilled: /[a-z]/.test(passwordValue) },
-    { label: 'Número', fulfilled: /[0-9]/.test(passwordValue) },
-    { label: 'Caractere especial', fulfilled: /[^A-Za-z0-9]/.test(passwordValue) },
-  ];
-
   const onSubmit = async (data: RegisterInput) => {
+    if (sendingRef.current) return;
+    sendingRef.current = true;
+    setIsSending(true);
     try {
       dismissToast(REGISTER_ERROR_TOAST_ID);
-      const { confirmPassword, acceptTerms, ...submitData } = data;
-      const res = await apiFetch('/users/register', { data: submitData });
-
-      if (res?.pendingToken) {
-        sessionStorage.setItem('pendingToken', res.pendingToken);
-      }
+      await apiFetch('/users/register', { data: { email: data.email } });
+      sessionStorage.removeItem('pendingToken');
+      sessionStorage.removeItem('pendingEmail');
 
       // Go to verify email prompt view
       navigate('/verify-email', { state: { email: data.email } });
     } catch (err: any) {
-      if (err.status) {
+      if (err.status === 429) {
         showToast({
           id: REGISTER_ERROR_TOAST_ID,
           type: 'error',
-          title: 'Não foi possível criar sua conta',
-          message: err.message,
+          title: 'Aguarde um pouco',
+          message: 'Espere alguns minutos antes de tentar novamente.',
         });
       } else {
         showToast({
           id: REGISTER_ERROR_TOAST_ID,
           type: 'error',
-          title: 'Não foi possível criar sua conta',
-          message: 'Erro de rede: não foi possível conectar ao servidor.',
+          title: 'Não foi possível enviar agora',
+          message: 'Tente novamente em instantes.',
         });
       }
+    } finally {
+      sendingRef.current = false;
+      setIsSending(false);
     }
   };
 
@@ -112,58 +105,7 @@ export function Register() {
               error={errors.email?.message}
             />
 
-            <div className="space-y-4">
-              <Input
-                title="Senha"
-                type="password"
-                placeholder="••••••••"
-                {...register('password')}
-              />
-
-              <AnimatePresence>
-                {passwordValue.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                    animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
-                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="bg-kindra-50 border border-kindra-200 rounded-2xl p-4 space-y-2.5">
-                      {rules.map((rule, idx) => (
-                        <div key={idx} className="flex items-center gap-3 text-sm">
-                          <div className={cn(
-                            "flex items-center justify-center w-5 h-5 rounded-full transition-colors duration-300",
-                            rule.fulfilled ? "bg-kindra-950" : "bg-kindra-200"
-                          )}>
-                            {rule.fulfilled ? (
-                              <Check className="w-3 h-3 text-kindra-50 stroke-[3]" />
-                            ) : (
-                              <X className="w-3 h-3 text-kindra-400 stroke-[3]" />
-                            )}
-                          </div>
-                          <span
-                            className={cn(
-                              'transition-colors duration-300 font-medium',
-                              rule.fulfilled ? 'text-kindra-950' : 'text-kindra-400'
-                            )}
-                          >
-                            {rule.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <Input
-                title="Confirme a Senha"
-                type="password"
-                placeholder="••••••••"
-                {...register('confirmPassword')}
-                error={errors.confirmPassword?.message}
-              />
-            </div>
+            <p className="text-sm text-kindra-500">Depois de confirmar seu e-mail, você poderá definir sua senha.</p>
 
             <div className="flex flex-col gap-1 pt-2">
               <label className="flex items-center gap-3 cursor-pointer group">
@@ -195,7 +137,7 @@ export function Register() {
             </div>
 
             <div className="pt-2">
-              <Button type="submit" className="w-full h-12 text-[15px] rounded-xl font-bold bg-teal-400 text-kindra-base border-0 hover:bg-teal-300" isLoading={isSubmitting}>
+              <Button type="submit" className="w-full h-12 text-[15px] rounded-xl font-bold bg-teal-400 text-kindra-base border-0 hover:bg-teal-300" isLoading={isSubmitting || isSending}>
                 Cadastrar
               </Button>
             </div>

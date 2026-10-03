@@ -5,10 +5,20 @@ export const loginSchema = z.object({
   password: z.string().min(1, "A senha é obrigatória.").max(100, "Senha muito longa."),
 });
 
-export const resendVerificationSchema = z.object({});
+export const resendVerificationSchema = z.object({
+  email: z.string().trim().toLowerCase().email("E-mail inválido.").max(255, "E-mail muito longo."),
+});
 
 export const confirmVerificationSchema = z.object({
   token: z.string().min(1, "O token de verificação é obrigatório.").max(255, "Token muito longo."),
+  password: z.string().min(8, "Mínimo de 8 caracteres.").max(100, "Senha muito longa.")
+    .regex(/[A-Z]/, "Pelo menos uma letra maiúscula.")
+    .regex(/[a-z]/, "Pelo menos uma letra minúscula.")
+    .regex(/[0-9]/, "Pelo menos um número.")
+    .regex(/[^A-Za-z0-9]/, "Pelo menos um caractere especial."),
+  confirmPassword: z.string().min(1, "Confirme sua senha.").max(100, "Senha muito longa."),
+}).refine(data => data.password === data.confirmPassword, {
+  message: 'As senhas não coincidem.', path: ['confirmPassword'],
 });
 
 export const forgotPasswordSchema = z.object({

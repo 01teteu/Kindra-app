@@ -96,6 +96,15 @@ export async function getNutritionHistory(): Promise<NutritionHistoryResponse> {
   return data;
 }
 
+export async function consolidateNutritionHistory(): Promise<NutritionHistoryResponse> {
+  const ctx = getTimeContext();
+  return apiFetch('/nutrition/history/consolidate', {
+    method: 'POST',
+    headers: { 'X-Kindra-Request': 'nutrition-history-consolidation' },
+    data: ctx,
+  });
+}
+
 export async function getCurrentGoal(): Promise<NutritionGoal | null> {
   try {
     const ctx = getTimeContext();

@@ -78,10 +78,10 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
 
   return (
     <>
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-kindra-900 px-1">Suas refeições</h2>
+      <div className="nutrition-meals">
+        <h2 className="nutrition-meals-title">Suas refeições</h2>
 
-        <div className="space-y-3">
+        <div className="nutrition-meals-grid">
           {categories.map(category => {
             const config = CATEGORY_CONFIG[category];
             const Icon = config.icon;
@@ -92,56 +92,51 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
             return (
               <Card
                 key={category}
-                className="nutrition-meal-card p-0 overflow-hidden relative transition-all duration-300 hover:border-kindra-300"
+                className={`nutrition-meal-card ${hasEntries ? 'is-filled' : 'is-empty'}`}
               >
                 {/* Header */}
-                <div className="p-4 flex items-center justify-between gap-2 border-b border-kindra-200/50">
-                  <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center shadow-sm shadow-black/5 border ${config.color}`}>
-                      <Icon className="h-6 w-6" />
+                <div className="nutrition-meal-header">
+                  <div className="nutrition-meal-heading">
+                    <div className={`nutrition-meal-icon ${config.color}`}>
+                      <Icon size={21} aria-hidden="true" />
                     </div>
-                    <div className="flex flex-col">
-                      <h3 className="text-base font-semibold text-kindra-950 tracking-tight leading-tight">{config.label}</h3>
-                      <p className="text-sm font-medium text-kindra-500 mt-0.5">
-                        {totals.kcal.toFixed(0)} kcal consumidas
+                    <div className="nutrition-meal-heading-copy">
+                      <h3 className="nutrition-meal-title text-base font-semibold text-kindra-950 tracking-tight leading-tight">{config.label}</h3>
+                      <p className="nutrition-meal-calories text-sm font-medium text-kindra-500 mt-0.5">
+                        <strong>{totals.kcal.toFixed(0)}</strong> kcal consumidas
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setActiveCategory(category)}
                     aria-label={`Adicionar alimento em ${config.label}`}
-                    className="h-11 w-11 shrink-0 rounded-xl bg-kindra-100 border border-kindra-200 flex items-center justify-center text-kindra-600 hover:bg-kindra-50 hover:text-kindra-900 transition-colors group shadow-sm"
+                    className="nutrition-meal-add"
                   >
-                    <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                    <Plus size={20} aria-hidden="true" />
                   </button>
                 </div>
 
                 {/* Content */}
-                <div className="px-4 py-3 bg-kindra-50/30">
+                <div className="nutrition-meal-content">
                   {hasEntries ? (
-                    <div className="space-y-6">
-                      <div className="flex flex-col gap-4">
+                    <div className="nutrition-meal-filled">
+                      <div className="nutrition-meal-entries">
                         {meal.entries.map(entry => {
                           const multiplier = entry.amountGrams / 100;
                           return (
-                            <div key={entry.id} className="flex justify-between items-center gap-2">
-                              <div>
-                                <p className="text-sm font-medium text-kindra-900 break-words">{entry.food.name}</p>
-                                <p className="text-sm text-kindra-500">{entry.amountGrams}g</p>
-                              </div>
-                              <div className="flex items-center gap-1 shrink-0">
-                                <div className="text-right">
-                                  <p className="text-base font-bold text-kindra-950">{(entry.food.kcal * multiplier).toFixed(0)} <span className="text-sm font-medium text-kindra-500">kcal</span></p>
-                                </div>
+                            <div key={entry.id} className="nutrition-meal-entry">
+                              <div className="nutrition-meal-entry-head">
+                                <p className="nutrition-meal-entry-name">{entry.food.name}</p>
                                 <button
                                   onClick={() => handleDeleteEntry(entry.id)}
                                   disabled={isDeleting === entry.id}
-                                  className={`h-9 min-w-9 rounded-lg flex items-center justify-center transition-colors px-2 disabled:opacity-50 ${
+                                  className={`nutrition-meal-remove rounded-lg flex items-center justify-center transition-colors px-2 disabled:opacity-50 ${
                                     confirmDeleteId === entry.id
                                       ? 'bg-rose-500 text-white shadow-sm'
                                       : 'bg-transparent text-rose-400 hover:bg-rose-500/10 hover:text-rose-400'
                                   }`}
                                   title="Remover alimento"
+                                  aria-label={`${confirmDeleteId === entry.id ? 'Confirmar remoção de' : 'Remover'} ${entry.food.name}`}
                                 >
                                   {isDeleting === entry.id ? (
                                     <div className="h-4 w-4 border-2 border-rose-400 border-t-transparent rounded-full animate-spin" />
@@ -152,30 +147,39 @@ export function MealTracker({ meals, onUpdate, isLoading = false }: MealTrackerP
                                   )}
                                 </button>
                               </div>
+                              <div className="nutrition-meal-entry-meta">
+                                <p className="nutrition-meal-entry-amount"><strong>{entry.amountGrams}</strong><span>g</span></p>
+                                <p className="nutrition-meal-entry-kcal"><strong>{(entry.food.kcal * multiplier).toFixed(0)}</strong><span>kcal</span></p>
+                              </div>
+                              <dl className="nutrition-meal-entry-nutrients" aria-label={`Nutrientes de ${entry.food.name} em ${entry.amountGrams} g`}>
+                                <div><dt>Proteínas</dt><dd>{(entry.food.proteinG * multiplier).toFixed(1)}<span>g</span></dd></div>
+                                <div><dt>Carboidratos</dt><dd>{(entry.food.carbsG * multiplier).toFixed(1)}<span>g</span></dd></div>
+                                <div><dt>Gorduras</dt><dd>{(entry.food.fatG * multiplier).toFixed(1)}<span>g</span></dd></div>
+                              </dl>
                             </div>
                           );
                         })}
                       </div>
 
                       {/* Sub-macros summary */}
-                      <div className="grid grid-cols-3 gap-3 pt-6 mt-2 border-t border-kindra-200/50">
-                        <div className="bg-kindra-50/50 rounded-xl p-3 border border-kindra-100/50 flex flex-col items-center text-center">
+                      <div className="nutrition-meal-macros">
+                        <div className="nutrition-meal-macro">
                           <div className="text-xs font-medium text-kindra-500 mb-1">Proteínas</div>
-                          <div className="text-sm font-semibold text-kindra-900">{totals.protein.toFixed(1)}g</div>
+                          <strong>{totals.protein.toFixed(1)}<span>g</span></strong>
                         </div>
-                        <div className="bg-kindra-50/50 rounded-xl p-3 border border-kindra-100/50 flex flex-col items-center text-center">
+                        <div className="nutrition-meal-macro">
                           <div className="text-xs font-medium text-kindra-500 mb-1">Carbos</div>
-                          <div className="text-sm font-semibold text-kindra-900">{totals.carbs.toFixed(1)}g</div>
+                          <strong>{totals.carbs.toFixed(1)}<span>g</span></strong>
                         </div>
-                        <div className="bg-kindra-50/50 rounded-xl p-3 border border-kindra-100/50 flex flex-col items-center text-center">
+                        <div className="nutrition-meal-macro">
                           <div className="text-xs font-medium text-kindra-500 mb-1">Gorduras</div>
-                          <div className="text-sm font-semibold text-kindra-900">{totals.fat.toFixed(1)}g</div>
+                          <strong>{totals.fat.toFixed(1)}<span>g</span></strong>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="py-2">
-                      <p className="text-sm font-medium text-kindra-400">Nenhum alimento registrado.</p>
+                    <div className="nutrition-meal-empty-wrap">
+                      <p className="nutrition-meal-empty text-sm font-medium text-kindra-400">Nenhum alimento registrado.</p>
                     </div>
                   )}
                 </div>

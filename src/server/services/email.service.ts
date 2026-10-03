@@ -1,252 +1,78 @@
-import crypto from 'crypto';
-import fetch from 'node-fetch'; // O Node v18+ possui fetch nativo, mas podemos usar o global
+import crypto from 'node:crypto';
 import prisma from '../db.js';
+import type { Prisma } from '@prisma/client';
+import { hashAuthCode } from '../security/auth-code.js';
+import { getEmailAppUrl, sendTransactionalEmail } from './transactional-email.provider.js';
+import { verificationEmail, passwordResetEmail, registrationAttemptEmail, passwordChangedEmail } from './email-templates.js';
 
-/**
- * Gera um token seguro, salva o hash no banco e envia o token em texto puro via e-mail.
- */
-export async function sendVerificationEmail(userId: string, email: string) {
-  // 1. Gera token numérico de 6 dígitos
-  const token = crypto.randomInt(100000, 999999).toString();
-  
-  // 2. Cria o Hash
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-  
-  // 3. Salva no banco (validade 20 min)
+export type SignVerificationContext = (userId: string, challengeId: string, email: string) => Promise<string>;
+
+/** The caller holds the user row lock while replacing the challenge. */
+export async function createVerificationChallenge(db: Prisma.TransactionClient, userId: string, email: string) {
+  const code = crypto.randomInt(100000, 999999).toString();
+  const hashedToken = hashAuthCode('email-verification', code);
   const expiresAt = new Date(Date.now() + 20 * 60 * 1000);
-  
-  // Se já existir um token para o usuário, podemos deletar antes de criar outro
-  await prisma.emailVerificationToken.deleteMany({
-    where: { userId }
+  await db.emailVerificationToken.deleteMany({ where: { userId } });
+  const challenge = await db.emailVerificationToken.create({
+    data: { token: hashedToken, userId, expiresAt, issuedToEmail: email, attempts: 0 },
   });
+  return { code, challengeId: challenge.id };
+}
 
-  await prisma.emailVerificationToken.create({
-    data: {
-      token: hashedToken,
-      userId,
-      expiresAt,
+export async function sendVerificationEmail(userId: string, email: string, signContext: SignVerificationContext) {
+  const issued = await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM users WHERE id = ${userId} FOR UPDATE`;
+    const user = await tx.user.findUnique({ where: { id: userId }, select: { email: true, emailVerified: true } });
+    if (!user || user.emailVerified || user.email !== email) throw new Error('VERIFICATION_ACCOUNT_CHANGED');
+    return createVerificationChallenge(tx, userId, email);
+  });
+  const pendingToken = await signContext(userId, issued.challengeId, email);
+  await deliverVerificationEmail(email, issued.code, pendingToken);
+}
+
+function mockDetailsAllowed() {
+  return process.env.NODE_ENV === 'test' ||
+    (process.env.NODE_ENV !== 'production' && process.env.EMAIL_MOCK_DEBUG === '1');
+}
+
+export async function deliverVerificationEmail(email: string, code: string, pendingToken: string) {
+  const appUrl = getEmailAppUrl();
+  const link = `${appUrl}/verificar-email#token=${encodeURIComponent(pendingToken)}`;
+  if (process.env.NODE_ENV !== 'production') {
+    if (mockDetailsAllowed()) {
+      // Existing test fixtures read these two lines; never print them in production.
+      console.log(`[MOCK EMAIL] Código de Verificação para ${email}: ${code}`);
+      console.log(`[MOCK EMAIL] Link de Verificação para ${email}: ${link}`);
+    } else {
+      console.log('[MOCK EMAIL] Verificação simulada.');
     }
-  });
-
-  // 4. Envia via Brevo (Comentado temporariamente para ambiente de dev)
-  // const apiKey = process.env.BREVO_API_KEY;
-  // if (!apiKey) {
-  //   throw new Error('A chave de API do Brevo não está configurada no servidor.');
-  // }
-
-  const htmlTemplate = `
-  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f7f9; padding: 40px 20px; text-align: center;">
-    <div style="max-w-md: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px 30px; box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
-      <h1 style="color: #09090b; font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 12px; letter-spacing: -0.02em;">
-        Verifique seu E-mail
-      </h1>
-      <p style="color: #71717a; font-size: 16px; line-height: 1.5; margin-bottom: 32px;">
-        Use o código de segurança abaixo para ativar sua conta no Kindra.
-      </p>
-      
-      <div style="background-color: #f4f4f5; border-radius: 12px; padding: 24px; margin-bottom: 32px; letter-spacing: 0.25em;">
-        <span style="font-size: 36px; font-weight: 800; color: #09090b;">
-          ${token}
-        </span>
-      </div>
-      
-      <p style="color: #a1a1aa; font-size: 14px; margin-bottom: 0;">
-        Este código é válido por 20 minutos.<br/>Se você não solicitou este e-mail, pode ignorá-lo com segurança.
-      </p>
-    </div>
-  </div>
-  `;
-
-  // MOCK TEMPORÁRIO PARA DESENVOLVIMENTO
-  console.log('\n=============================================');
-  console.log(`[MOCK EMAIL] Código de Verificação para ${email}: ${token}`);
-  console.log('=============================================\n');
-
-  /*
-  const response = await globalThis.fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: {
-      'accept': 'application/json',
-      'api-key': apiKey,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      sender: { email: process.env.BREVO_SENDER_EMAIL || 'kindra.app01@gmail.com', name: 'Kindra App' },
-      to: [{ email }],
-      subject: 'Seu código de verificação - Kindra',
-      htmlContent: htmlTemplate
-    })
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Falha ao enviar e-mail via Brevo', errorText);
-    throw new Error(`Erro do provedor de e-mail: ${errorText}`);
   }
-  */
+  await sendTransactionalEmail(verificationEmail(email, code, link));
 }
 
 export async function sendPasswordResetEmail(userId: string, email: string) {
-  // 1. Gera token numérico de 6 dígitos
-  const token = crypto.randomInt(100000, 999999).toString();
-  
-  // 2. Cria o Hash
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-  
-  // 3. Salva no banco (validade 10 min)
+  const code = crypto.randomInt(100000, 999999).toString();
+  const hashedToken = hashAuthCode('password-reset', code);
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-  
-  // Se já existir um token para o usuário, podemos deletar antes de criar outro
-  await prisma.passwordResetToken.deleteMany({
-    where: { userId }
-  });
 
-  await prisma.passwordResetToken.create({
-    data: {
-      token: hashedToken,
-      userId,
-      expiresAt,
+  // Preserve the existing replacement and expiry semantics of reset challenges.
+  await prisma.passwordResetToken.deleteMany({ where: { userId } });
+  await prisma.passwordResetToken.create({ data: { token: hashedToken, userId, expiresAt } });
+
+  if (process.env.NODE_ENV !== 'production') {
+    if (mockDetailsAllowed()) {
+      console.log(`[MOCK EMAIL] Código de Redefinição para ${email}: ${code}`);
+    } else {
+      console.log('[MOCK EMAIL] Recuperação simulada.');
     }
-  });
-
-  // 4. Envia via Brevo (Comentado temporariamente para ambiente de dev)
-  // const apiKey = process.env.BREVO_API_KEY;
-  // if (!apiKey) {
-  //   throw new Error('A chave de API do Brevo não está configurada no servidor.');
-  // }
-
-  const htmlTemplate = `
-  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f7f9; padding: 40px 20px; text-align: center;">
-    <div style="max-w-md: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px 30px; box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
-      <h1 style="color: #09090b; font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 12px; letter-spacing: -0.02em;">
-        Redefinição de Senha
-      </h1>
-      <p style="color: #71717a; font-size: 16px; line-height: 1.5; margin-bottom: 32px;">
-        Recebemos um pedido para redefinir sua senha no Kindra. Use o código de segurança abaixo para prosseguir.
-      </p>
-      
-      <div style="background-color: #f4f4f5; border-radius: 12px; padding: 24px; margin-bottom: 32px; letter-spacing: 0.25em;">
-        <span style="font-size: 36px; font-weight: 800; color: #09090b;">
-          ${token}
-        </span>
-      </div>
-      
-      <p style="color: #a1a1aa; font-size: 14px; margin-bottom: 0;">
-        Este código é válido por 10 minutos.<br/>Se você não solicitou a redefinição de senha, você pode ignorar este e-mail com segurança.
-      </p>
-    </div>
-  </div>
-  `;
-
-  // MOCK TEMPORÁRIO PARA DESENVOLVIMENTO
-  console.log('\n=============================================');
-  console.log(`[MOCK EMAIL] Código de Redefinição para ${email}: ${token}`);
-  console.log('=============================================\n');
-
-  /*
-  const response = await globalThis.fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: {
-      'accept': 'application/json',
-      'api-key': apiKey,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      sender: { email: process.env.BREVO_SENDER_EMAIL || 'kindra.app01@gmail.com', name: 'Kindra App' },
-      to: [{ email }],
-      subject: 'Código de redefinição de senha - Kindra',
-      htmlContent: htmlTemplate
-    })
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Falha ao enviar e-mail de redefinição via Brevo', errorText);
-    throw new Error(`Erro do provedor de e-mail: ${errorText}`);
   }
-  */
+  await sendTransactionalEmail(passwordResetEmail(email, code, getEmailAppUrl()));
 }
 
 export async function sendRegistrationAttemptEmail(email: string) {
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) return;
-  
-  const htmlTemplate = `
-  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f7f9; padding: 40px 20px; text-align: center;">
-    <div style="max-w-md: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px 30px; box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
-      <h1 style="color: #09090b; font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 12px; letter-spacing: -0.02em;">
-        Tentativa de Cadastro
-      </h1>
-      <p style="color: #71717a; font-size: 16px; line-height: 1.5; margin-bottom: 32px;">
-        Alguém acabou de tentar criar uma conta no Kindra usando este endereço de e-mail, mas você já possui uma conta ativa.
-      </p>
-      <p style="color: #71717a; font-size: 16px; line-height: 1.5; margin-bottom: 32px;">
-        Se foi você, não é necessário criar uma nova conta. Faça login com suas credenciais ou utilize a opção "Esqueci minha senha" se não conseguir acessar.
-      </p>
-      <p style="color: #a1a1aa; font-size: 14px; margin-bottom: 0;">
-        Se você não fez essa tentativa, pode ignorar este e-mail com segurança.
-      </p>
-    </div>
-  </div>
-  `;
-  
-  try {
-    await globalThis.fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'api-key': apiKey,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        sender: { email: process.env.BREVO_SENDER_EMAIL || 'kindra.app01@gmail.com', name: 'Kindra App' },
-        to: [{ email }],
-        subject: 'Tentativa de cadastro com seu e-mail - Kindra',
-        htmlContent: htmlTemplate
-      })
-    });
-  } catch (err) {
-    console.error('Falha ao enviar e-mail de tentativa de cadastro', err);
-  }
+  await sendTransactionalEmail(registrationAttemptEmail(email, getEmailAppUrl()));
 }
 
 export async function sendPasswordChangedNotification(email: string) {
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) return;
-
-  const htmlTemplate = `
-  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f7f9; padding: 40px 20px; text-align: center;">
-    <div style="max-w-md: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px 30px; box-shadow: 0 4px 24px rgba(0,0,0,0.04);">
-      <h1 style="color: #09090b; font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 12px; letter-spacing: -0.02em;">
-        Senha Alterada com Sucesso
-      </h1>
-      <p style="color: #71717a; font-size: 16px; line-height: 1.5; margin-bottom: 32px;">
-        Informamos que a senha da sua conta no Kindra foi alterada recentemente.
-      </p>
-      <p style="color: #a1a1aa; font-size: 14px; margin-bottom: 0;">
-        Se você não fez essa alteração, por favor, entre em contato com nosso suporte imediatamente.
-      </p>
-    </div>
-  </div>
-  `;
-
-  try {
-    await globalThis.fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'api-key': apiKey,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        sender: { email: process.env.BREVO_SENDER_EMAIL || 'kindra.app01@gmail.com', name: 'Kindra App' },
-        to: [{ email }],
-        subject: 'Sua senha foi alterada - Kindra',
-        htmlContent: htmlTemplate
-      })
-    });
-  } catch (err) {
-    console.error('Falha ao enviar notificação de senha alterada', err);
-  }
+  await sendTransactionalEmail(passwordChangedEmail(email, getEmailAppUrl()));
 }
-

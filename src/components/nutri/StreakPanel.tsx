@@ -49,34 +49,41 @@ export function StreakPanel({ streak, history, todayAchieved }: StreakPanelProps
 
   return (
     <Card className="streak-card">
-      <div className="shrink-0">
-        <div className="flex items-center gap-2">
-          <Flame size={18} className={isFireActive ? 'text-teal-300' : 'text-kindra-500'} />
-          <strong className="text-2xl font-semibold tabular-nums">{displayStreak}</strong>
-          <span className="text-xs text-kindra-500">dias</span>
-        </div>
-        <p className="text-[10px] text-kindra-500 mt-1">Sua constância</p>
-      </div>
-      <div className="streak-week">
-        {weekDays.map((day, idx) => (
-          <div
-            key={idx}
-            className="streak-day"
-            aria-label={`${day.date.toLocaleDateString('pt-BR')}: ${day.isCompleted ? 'meta atingida' : day.isFutureDate ? 'dia futuro' : 'meta não atingida'}`}
-          >
-            <span>{day.label}</span>
-            <span
-              className={`streak-dot${day.isCompleted ? ' complete' : ''}${day.isDateToday ? ' today' : ''}`}
-              aria-current={day.isDateToday ? 'date' : undefined}
-            >
-              {day.isCompleted ? (
-                <Check size={11} />
-              ) : (
-                <span className="text-[8px]">{day.date.getDate()}</span>
-              )}
-            </span>
+      <div className="streak-identity">
+        <span className="streak-symbol" aria-hidden="true">
+          <Flame className={isFireActive ? 'text-teal-300' : 'text-kindra-500'} />
+        </span>
+        <div className="streak-identity-copy">
+          <p className="streak-heading">Sua ofensiva nutricional</p>
+          <div className="streak-count">
+            <strong>{displayStreak}</strong>
+            <span>dias de constância</span>
           </div>
-        ))}
+        </div>
+      </div>
+      <div className="streak-week-block">
+        <p className="streak-week-heading">Esta semana</p>
+        <div className="streak-week">
+          {weekDays.map((day, idx) => (
+            <div
+              key={idx}
+              className="streak-day"
+              aria-label={`${day.date.toLocaleDateString('pt-BR')}: ${day.isCompleted ? 'meta atingida' : day.isFutureDate ? 'dia futuro' : 'meta não atingida'}`}
+            >
+              <span>{day.label}</span>
+              <span
+                className={`streak-dot${day.isCompleted ? ' complete' : ''}${day.isDateToday ? ' today' : ''}`}
+                aria-current={day.isDateToday ? 'date' : undefined}
+              >
+                {day.isCompleted ? (
+                  <Check size={11} />
+                ) : (
+                  <span className="text-[8px]">{day.date.getDate()}</span>
+                )}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </Card>
   );

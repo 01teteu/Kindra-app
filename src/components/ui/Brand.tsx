@@ -1,10 +1,8 @@
-import { Flame } from 'lucide-react';
-
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="kindra-brand" aria-label="Kindra">
       <span className="kindra-brand-mark">
-        <Flame size={21} strokeWidth={1.7} aria-hidden="true" />
+        <img src="/favicon-32x32.png" srcSet="/favicon-32x32.png 1x, /android-chrome-192x192.png 2x" width={28} height={28} alt="" aria-hidden="true" />
       </span>
       {!compact && (
         <span>

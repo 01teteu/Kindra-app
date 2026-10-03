@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { getDayBounds, getLocalDateRangeBounds } from './timezone.js';
+import { getDayBounds, getLocalDateRangeBounds, validateCurrentReferenceDate } from './timezone.js';
 
 function bounds(start: string, end: string, zone: string, expectedStart: string, expectedEnd: string) {
   const result = getLocalDateRangeBounds(start, end, zone);
@@ -72,4 +72,14 @@ test('legacy fixed-offset bounds retain their inclusive end and 24-hour semantic
   const result = getDayBounds('2024-03-10', 300);
   assert.equal(result.startOfDayUTC.toISOString(), '2024-03-10T05:00:00.000Z');
   assert.equal(result.endOfDayUTC.toISOString(), '2024-03-11T04:59:59.999Z');
+});
+
+test('nutrition consolidation accepts only today for the declared fixed offset', () => {
+  const now = new Date('2026-09-26T02:30:00.000Z');
+  assert.doesNotThrow(() => validateCurrentReferenceDate('2026-09-25', 180, now));
+  assert.throws(() => validateCurrentReferenceDate('2026-09-24', 180, now), /data local atual/);
+  assert.throws(() => validateCurrentReferenceDate('2026-09-26', 180, now), /data local atual/);
+
+  assert.doesNotThrow(() => validateCurrentReferenceDate('2026-09-26', -720, now));
+  assert.doesNotThrow(() => validateCurrentReferenceDate('2026-09-25', 840, now));
 });

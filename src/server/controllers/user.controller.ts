@@ -15,19 +15,11 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
 
   // 2. Envia dados validados para o Service
   try {
-    const user = await userService.createUser(parsed.data);
-    
-    // Gerar um token temporário com escopo para o fluxo de verificação
-    const pendingToken = await reply.jwtSign({
-      id: user.id,
-      scope: 'pending_verification'
-    }, { expiresIn: '1h' });
-    
-    // 3. Responde com sucesso
-    return reply.status(201).send({
-      message: 'Usuário criado com sucesso',
-      user,
-      pendingToken
+    await userService.createUser(parsed.data, (id, challengeId, email) => reply.jwtSign({
+      id, scope: 'pending_verification', challengeId, email,
+    }, { expiresIn: '20m' }));
+    return reply.status(202).send({
+      message: 'Se este endereço puder ser cadastrado, enviaremos instruções para continuar.',
     });
   } catch (error: any) {
     if (error.message === 'MAX_ATTEMPTS_REACHED') {

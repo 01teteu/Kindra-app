@@ -6,6 +6,7 @@ import { Search, X, Plus, Loader2, Info, ChevronRight, CircleAlert, Check } from
 import * as nutritionApi from '../../lib/nutrition';
 import type { Food, Meal } from '../../lib/nutrition';
 import { CreateFoodModal } from './CreateFoodModal';
+import './food-search.css';
 
 interface AddFoodModalProps {
   isOpen: boolean;
@@ -94,9 +95,9 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
   return (
     <>
       <Sheet open={isOpen} onClose={onClose} label="Adicionar alimento">
-        <div className="sheet-panel relative flex flex-col overflow-hidden">
+        <div className="sheet-panel food-search-panel relative flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex shrink-0 items-start justify-between gap-3 border-b border-kindra-200 px-5 py-5 sm:px-6">
+          <div className="food-search-header">
             <div className="min-w-0">
               <h2 className="font-display text-xl font-semibold leading-tight tracking-tight text-kindra-950">
                 Adicionar em {category ? CATEGORY_NAMES[category] : ''}
@@ -118,10 +119,10 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
           </div>
 
           {/* Body */}
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain custom-scrollbar">
+          <div className="food-search-body min-h-0 flex-1 overflow-y-auto overscroll-contain custom-scrollbar">
             {!selectedFood ? (
               <div>
-                <div className="sticky top-0 z-10 space-y-3 border-b border-kindra-200 bg-kindra-100 px-5 pt-5 pb-3 sm:px-6">
+                <div className="food-search-tools sticky top-0 z-10">
                   <label htmlFor="add-food-search" className="block text-sm font-medium text-kindra-700">
                     Buscar alimento
                   </label>
@@ -134,10 +135,10 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
                       value={searchTerm}
                       onChange={handleSearchChange}
                       placeholder="Digite o nome do alimento"
-                      className="pl-11"
+                      className="food-search-input pl-11"
                     />
                   </div>
-                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                  <div className="food-search-list-heading">
                     <span className="text-sm font-medium text-kindra-900">{searchTerm ? 'Resultados da busca' : 'Alimentos disponíveis'}</span>
                     <Button type="button" variant="ghost" size="sm" onClick={() => setIsCreateModalOpen(true)}>
                       <Plus className="h-4 w-4" aria-hidden="true" />
@@ -146,9 +147,9 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
                   </div>
                 </div>
 
-                <div className="px-5 py-5 sm:px-6" aria-busy={isLoading}>
+                <div className="food-search-results" aria-busy={isLoading}>
                   {searchError ? (
-                    <div role="alert" className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5">
+                    <div role="alert" className="food-search-error">
                       <div className="flex items-start gap-3">
                         <CircleAlert className="mt-0.5 h-5 w-5 shrink-0 text-rose-400" aria-hidden="true" />
                         <div>
@@ -161,12 +162,12 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
                       </Button>
                     </div>
                   ) : isLoading ? (
-                    <div role="status" className="flex flex-col items-center gap-3 py-12 text-sm text-kindra-500">
+                    <div role="status" className="food-search-status text-sm text-kindra-500">
                       <Loader2 className="h-6 w-6 animate-spin motion-reduce:animate-none text-teal-400" aria-hidden="true" />
                       Buscando alimentos…
                     </div>
                   ) : foods.length === 0 ? (
-                    <div role="status" className="flex flex-col items-center rounded-2xl border border-kindra-200 bg-kindra-50 px-5 py-10 text-center">
+                    <div role="status" className="food-search-status food-search-empty">
                       <Search className="mb-4 h-6 w-6 text-kindra-400" aria-hidden="true" />
                       <p className="text-base font-semibold text-kindra-950">Nenhum alimento encontrado</p>
                       <p className="mt-2 max-w-sm text-sm leading-relaxed text-kindra-500">
@@ -174,24 +175,24 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <p className="text-xs text-kindra-500">Valores nutricionais por 100 g</p>
-                      <ul className="space-y-2" aria-label="Alimentos encontrados">
+                    <div className="food-search-result-list">
+                      <p className="food-search-base">Valores nutricionais por 100 g</p>
+                      <ul className="food-search-list" aria-label="Alimentos encontrados">
                         {foods.map(food => (
                           <li key={food.id}>
                             <button
                               type="button"
                               onClick={() => setSelectedFood(food)}
-                              className="group flex w-full items-center gap-3 rounded-2xl border border-kindra-200 bg-kindra-50 p-4 text-left transition-colors hover:border-kindra-300 hover:bg-kindra-200/30 focus-visible:border-teal-400 active:bg-kindra-200"
+                              className="food-search-result group"
                             >
-                              <span className="min-w-0 flex-1 space-y-3">
-                                <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <span className="food-search-result-copy">
+                                <span className="food-search-result-name">
                                   <span className="break-words text-sm font-semibold leading-relaxed text-kindra-950">{food.name}</span>
                                   {food.isCustom && (
-                                    <span className="rounded-md border border-kindra-300 px-2 py-0.5 text-xs font-medium text-kindra-500">Personalizado</span>
+                                    <span className="food-search-custom">Personalizado</span>
                                   )}
                                 </span>
-                                <span className="flex flex-wrap items-baseline gap-x-4 gap-y-2 text-xs text-kindra-500 tabular-nums">
+                                <span className="food-search-result-nutrients">
                                   <span className="text-sm font-semibold text-kindra-900">{Number(food.kcal).toFixed(0)} <span className="text-xs font-normal text-kindra-500">kcal</span></span>
                                   <span>Prot. <span className="text-kindra-700">{Number(food.proteinG).toFixed(1)} g</span></span>
                                   <span>Carb. <span className="text-kindra-700">{Number(food.carbsG).toFixed(1)} g</span></span>
@@ -208,38 +209,19 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 px-5 py-5 sm:px-6">
-                <div className="bg-kindra-50 p-4 sm:p-5 rounded-2xl border border-kindra-200">
+              <div className="food-search-selection">
+                <div className="food-search-selected">
                   <p className="mb-3 flex items-center gap-2 text-xs font-medium text-teal-300"><Check className="h-4 w-4" aria-hidden="true" />Alimento selecionado</p>
-                  <div className="flex items-start justify-between gap-3 mb-5">
+                  <div className="food-search-selected-heading">
                     <h3 className="min-w-0 break-words font-display font-semibold text-kindra-950 text-lg leading-relaxed">{selectedFood.name}</h3>
                     <Button type="button" variant="outline" size="sm" onClick={() => setSelectedFood(null)} className="shrink-0">
                       Trocar
                     </Button>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center mb-6 tabular-nums">
-                    <div className="bg-teal-500/10 rounded-xl p-3 border border-teal-500/20">
-                      <div className="text-xs font-medium text-teal-300 mb-1">Kcal</div>
-                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.kcal / 100) * Number(amount || 0)).toFixed(0)}</div>
-                    </div>
-                    <div className="bg-kindra-100 rounded-xl p-3 border border-kindra-200">
-                      <div className="text-xs font-medium text-kindra-500 mb-1">Prot</div>
-                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.proteinG / 100) * Number(amount || 0)).toFixed(1)}g</div>
-                    </div>
-                    <div className="bg-kindra-100 rounded-xl p-3 border border-kindra-200">
-                      <div className="text-xs font-medium text-kindra-500 mb-1">Carb</div>
-                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.carbsG / 100) * Number(amount || 0)).toFixed(1)}g</div>
-                    </div>
-                    <div className="bg-kindra-100 rounded-xl p-3 border border-kindra-200">
-                      <div className="text-xs font-medium text-kindra-500 mb-1">Gord</div>
-                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.fatG / 100) * Number(amount || 0)).toFixed(1)}g</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <label htmlFor="add-food-amount" className="block text-center text-sm font-medium text-kindra-700">Quantidade consumida</label>
-                    <div className="flex items-center justify-center gap-3">
+                  <div className="food-search-amount">
+                    <label htmlFor="add-food-amount" className="block text-sm font-medium text-kindra-700">Quantidade consumida</label>
+                    <div className="food-search-amount-input">
                       <input
                         id="add-food-amount"
                         type="number" inputMode="decimal" aria-label="Quantidade consumida em gramas"
@@ -252,9 +234,31 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
                       <span className="text-kindra-500 text-sm">g</span>
                     </div>
                   </div>
+
+                  <p className="food-search-portion-label">Valores para a quantidade informada</p>
+                  <div className="food-search-portion tabular-nums">
+                    <div className="food-search-portion-kcal">
+                      <div className="text-xs font-medium text-teal-300 mb-1">Kcal</div>
+                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.kcal / 100) * Number(amount || 0)).toFixed(0)}</div>
+                    </div>
+                    <div className="food-search-portion-macro">
+                      <div className="text-xs font-medium text-kindra-500 mb-1">Prot</div>
+                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.proteinG / 100) * Number(amount || 0)).toFixed(1)}g</div>
+                    </div>
+                    <div className="food-search-portion-macro">
+                      <div className="text-xs font-medium text-kindra-500 mb-1">Carb</div>
+                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.carbsG / 100) * Number(amount || 0)).toFixed(1)}g</div>
+                    </div>
+                    <div className="food-search-portion-macro">
+                      <div className="text-xs font-medium text-kindra-500 mb-1">Gord</div>
+                      <div className="font-semibold text-kindra-950 text-lg break-words">{((selectedFood.fatG / 100) * Number(amount || 0)).toFixed(1)}g</div>
+                    </div>
+                  </div>
+
+
                 </div>
 
-                <div className="flex items-start gap-3 px-1">
+                <div className="food-search-help">
                   <Info className="h-4 w-4 text-kindra-500 shrink-0 mt-0.5" />
                   <p className="text-sm text-kindra-500 leading-relaxed">
                     Ajuste a quantidade em gramas. Os valores nutricionais acima serão recalculados automaticamente com base na proporção.
@@ -266,7 +270,7 @@ export function AddFoodModal({ isOpen, onClose, category, onSuccess }: AddFoodMo
 
           {/* Footer */}
           {selectedFood && (
-            <div className="px-5 sm:px-6 pb-6 pt-4 border-t border-kindra-200 bg-kindra-100 shrink-0">
+            <div className="food-search-footer shrink-0">
               <Button
                 type="button"
                 isLoading={isSubmitting}

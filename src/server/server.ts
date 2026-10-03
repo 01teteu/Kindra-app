@@ -13,13 +13,31 @@ import { workoutRoutes } from './routes/workout.routes.js';
 import { nutritionRoutes } from './routes/nutrition.routes.js';
 import { foodRoutes } from './routes/food.routes.js';
 import { mealRoutes } from './routes/meal.routes.js';
+import { resolveJwtSecret } from './security/jwt-secret.js';
+import { resolveTrustedProxies } from './security/trusted-proxies.js';
+import { resolveGoogleClientId } from './security/google-client-id.js';
+import { resolveTransactionalEmailConfig } from './services/transactional-email.provider.js';
 
 const projectRoot = process.cwd();
+const spaRoutes = new Set([
+  '/', '/register', '/login', '/forgot-password', '/verify-email', '/verificar-email', '/onboarding',
+  '/home', '/nutri', '/settings', '/settings/nutrition', '/workout', '/workout/progress',
+  '/routines/new', '/workout/live', '/workout/exercises',
+]);
+
+function isKnownSpaRoute(pathname: string) {
+  const normalized = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+  return spaRoutes.has(normalized) || /^\/routines\/[^/]+\/edit$/.test(normalized);
+}
 
 async function startServer() {
+  resolveGoogleClientId();
+  resolveTransactionalEmailConfig();
+  const jwtSecret = resolveJwtSecret(process.env.JWT_SECRET, process.env.NODE_ENV);
+  const trustedProxies = resolveTrustedProxies(process.env.TRUSTED_PROXIES);
   const fastify = Fastify({ 
     logger: true,
-    trustProxy: true
+    trustProxy: trustedProxies
   });
 
   const PORT = 3000;
@@ -30,7 +48,7 @@ async function startServer() {
 
   // 0. Autenticação JWT
   await fastify.register(fastifyJwt, {
-    secret: process.env.JWT_SECRET || 'super_secret_fallback',
+    secret: jwtSecret,
     cookie: {
       cookieName: 'token',
       signed: false
@@ -78,7 +96,16 @@ async function startServer() {
     });
 
     fastify.setNotFoundHandler((request, reply) => {
-      reply.sendFile('index.html');
+      let pathname = '';
+      try {
+        pathname = decodeURIComponent(new URL(request.raw.url ?? request.url, 'http://kindra.local').pathname);
+      } catch {
+        return reply.status(404).send({ error: 'Not Found' });
+      }
+      const acceptsHtml = request.headers.accept?.split(',').some(value => value.trim().split(';')[0] === 'text/html');
+      const isSpaNavigation = request.method === 'GET' && acceptsHtml && isKnownSpaRoute(pathname);
+      if (isSpaNavigation) return reply.sendFile('index.html');
+      return reply.status(404).send({ error: 'Not Found' });
     });
   }
 

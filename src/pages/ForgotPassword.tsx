@@ -1,5 +1,5 @@
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,6 +40,17 @@ export function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [jwtToken, setJwtToken] = useState('');
   const [serverError, setServerError] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendNotice, setResendNotice] = useState('');
+  const requestingRef = useRef(false);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = window.setTimeout(() => setResendCooldown(value => Math.max(0, value - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resendCooldown]);
 
   // Step 1 Form
   const { register: reg1, handleSubmit: hand1, formState: { errors: err1, isSubmitting: sub1 } } = useForm<Step1Data>({ resolver: zodResolver(step1Schema) });
@@ -52,19 +63,44 @@ export function ForgotPassword() {
   const { register: reg3, handleSubmit: hand3, formState: { errors: err3, isSubmitting: sub3 } } = useForm<Step3Data>({ resolver: zodResolver(step3Schema) });
 
   const onStep1 = async (data: Step1Data) => {
+    if (requestingRef.current) return;
+    requestingRef.current = true;
+    setIsRequesting(true);
     try {
       setServerError('');
       await apiFetch('/auth/forgot-password', { data: { email: data.email } });
       setEmail(data.email);
+      setResendCooldown(60);
       setStep(2);
     } catch (err: any) {
-      if (err.message === 'GOOGLE_USER_NO_PASSWORD') {
-        setServerError('Esta conta utiliza o login do Google. Por favor, volte e clique em "Continuar com o Google".');
-      } else if (err.status) {
-        setServerError(err.message);
+      if (err.status === 429) {
+        setServerError('Aguarde alguns minutos antes de solicitar outro código.');
       } else {
-        setServerError('Erro de rede: falha na conexão.');
+        setServerError('Não foi possível solicitar agora. Tente novamente em instantes.');
       }
+    } finally {
+      requestingRef.current = false;
+      setIsRequesting(false);
+    }
+  };
+
+  const onResend = async () => {
+    if (requestingRef.current || resendCooldown > 0 || !email) return;
+    requestingRef.current = true;
+    setIsResending(true);
+    setServerError('');
+    setResendNotice('');
+    try {
+      await apiFetch('/auth/forgot-password', { data: { email } });
+      setResendNotice('Confira seu e-mail. Se este endereço puder ser recuperado, você receberá um novo código.');
+      setResendCooldown(60);
+    } catch (err: any) {
+      setServerError(err.status === 429
+        ? 'Aguarde alguns minutos antes de solicitar outro código.'
+        : 'Não foi possível solicitar agora. Tente novamente em instantes.');
+    } finally {
+      requestingRef.current = false;
+      setIsResending(false);
     }
   };
 
@@ -149,7 +185,7 @@ export function ForgotPassword() {
                         {serverError}
                       </div>
                     )}
-                    <Button type="submit" className="w-full" isLoading={sub1}>
+                    <Button type="submit" className="w-full" isLoading={sub1 || isRequesting}>
                       Enviar código
                     </Button>
                   </form>
@@ -171,7 +207,7 @@ export function ForgotPassword() {
                       Confira seu e-mail
                     </h1>
                     <p className="text-kindra-500 text-sm font-medium">
-                      Digite o código de 6 dígitos enviado para
+                      Se este endereço puder ser recuperado, você receberá um código de 6 dígitos em
                       <strong className="forgot-password-email">{email}</strong>
                     </p>
                   </div>
@@ -194,6 +230,11 @@ export function ForgotPassword() {
                     )}
                     <Button type="submit" className="w-full" isLoading={sub2}>
                       Validar código
+                    </Button>
+                    {resendNotice && <p role="status" className="text-sm text-kindra-500">{resendNotice}</p>}
+                    <Button type="button" variant="ghost" className="w-full" onClick={onResend}
+                      isLoading={isResending} disabled={resendCooldown > 0 || sub2}>
+                      {resendCooldown > 0 ? `Pedir outro código em ${resendCooldown} s` : 'Pedir outro código'}
                     </Button>
                   </form>
                 </motion.div>

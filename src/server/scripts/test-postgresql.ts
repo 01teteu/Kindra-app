@@ -1,7 +1,7 @@
 /** Real route/database regression and reconstruction test; no database/auth mocks. */
 import 'dotenv/config';
 import assert from 'node:assert/strict';
-import { randomBytes, randomUUID, createHash } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
 import { once } from 'node:events';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -28,6 +28,9 @@ if (process.argv.includes('--verify-main-seed')) {
   console.log(`PASS segundo seed principal: ${catalogBefore.length} alimentos, 0 inserções; IDs, macros e timestamps idênticos.`);
 }
 const database = await createTestDatabase();
+const authCodeSecret = randomBytes(32).toString('base64');
+process.env.AUTH_CODE_HMAC_SECRET = authCodeSecret;
+const { hashAuthCode } = await import('../security/auth-code.js');
 const { default: prisma } = await import('../db.js');
 const { userRoutes } = await import('../routes/user.routes.js');
 const { authRoutes } = await import('../routes/auth.routes.js');
@@ -35,7 +38,7 @@ const { profileRoutes } = await import('../routes/profile.routes.js');
 const { nutritionRoutes } = await import('../routes/nutrition.routes.js');
 const { mealRoutes } = await import('../routes/meal.routes.js');
 const { checkAndConsolidateNutriHistory } = await import('../services/nutrition.service.js');
-const secret = randomBytes(32).toString('hex');
+const secret = randomBytes(32).toString('base64');
 const app = Fastify({ logger: false });
 await app.register(cookie);
 await app.register(jwt, { secret, cookie: { cookieName: 'token', signed: false } });
@@ -59,8 +62,10 @@ async function stopServer() {
   server = undefined;
 }
 async function startServer() {
-  server = spawn(process.execPath, ['dist/server.cjs'], {
-    env: { ...process.env, NODE_ENV: 'production', JWT_SECRET: secret }, stdio: ['ignore', 'pipe', 'pipe'],
+  server = spawn(process.execPath, ['server-dist/server.cjs'], {
+    env: { ...process.env, NODE_ENV: 'production', JWT_SECRET: secret, AUTH_CODE_HMAC_SECRET: authCodeSecret,
+      BREVO_API_KEY: 'xkeysib-postgresql-test-only', EMAIL_FROM: 'Kindra <no-reply@mail.kindrafit.com>',
+      APP_URL: 'https://kindra.example.test' }, stdio: ['ignore', 'pipe', 'pipe'],
   });
   // Capture startup only; never print API logs or tokens.
   let ready = false;
@@ -93,27 +98,31 @@ try {
     // Observe the pre-existing development email output without replacing any service.
     const log = console.log;
     let verificationCode = '';
+    let pendingToken = '';
     console.log = (...args: unknown[]) => {
       const line = args.join(' ');
       if (line.includes(`[MOCK EMAIL] Código de Verificação para ${email}:`)) {
         verificationCode = line.match(/: (\d{6})$/)?.[1] ?? '';
       }
+      if (line.includes(`[MOCK EMAIL] Link de Verificação para ${email}:`)) pendingToken = line.split('#token=')[1] ?? '';
     };
     let response;
     try {
-      response = await app.inject({ method: 'POST', url: '/api/users/register', payload: { email, password } });
+      response = await app.inject({ method: 'POST', url: '/api/users/register', payload: { email } });
     } finally { console.log = log; }
-    assert.equal(response.statusCode, 201);
+    assert.equal(response.statusCode, 202);
     assert.match(verificationCode, /^\d{6}$/);
     const user = await prisma.user.findUniqueOrThrow({ where: { email } });
-    assert.notEqual(user.password, password);
-    assert.ok(await bcrypt.compare(password, user.password!));
+    assert.equal(user.password, null);
     const stored = await prisma.emailVerificationToken.findFirstOrThrow({ where: { userId: user.id } });
-    assert.equal(stored.token, createHash('sha256').update(verificationCode).digest('hex'));
-    assert.equal((await app.inject({ url: `/api/meals?${query}`, headers: headers(response.json().pendingToken) })).statusCode, 403);
-    assert.equal((await app.inject({ method: 'POST', url: '/api/auth/verify-email/confirm', payload: { token: verificationCode } })).statusCode, 200);
+    assert.equal(stored.token, hashAuthCode('email-verification', verificationCode));
+    assert.equal((await app.inject({ url: `/api/meals?${query}`, headers: headers(pendingToken) })).statusCode, 403);
+    assert.equal((await app.inject({ method: 'POST', url: '/api/auth/verify-email/confirm',
+      headers: headers(pendingToken), payload: { token: verificationCode, password, confirmPassword: password } })).statusCode, 200);
+    assert.ok(await bcrypt.compare(password, (await prisma.user.findUniqueOrThrow({ where: { id: user.id } })).password!));
     assert.equal(await prisma.emailVerificationToken.count({ where: { userId: user.id } }), 0);
-    assert.equal((await app.inject({ method: 'POST', url: '/api/auth/verify-email/confirm', payload: { token: verificationCode } })).statusCode, 400);
+    assert.equal((await app.inject({ method: 'POST', url: '/api/auth/verify-email/confirm',
+      headers: headers(pendingToken), payload: { token: verificationCode, password, confirmPassword: password } })).statusCode, 400);
     const login = await app.inject({ method: 'POST', url: '/api/auth/login', payload: { email, password } });
     assert.equal(login.statusCode, 200);
     const sessionCookie = login.cookies.find(c => c.name === 'token');
@@ -126,7 +135,7 @@ try {
   }
   const owner = await register('postgres-owner@example.test');
   const other = await register('postgres-other@example.test');
-  console.log('PASS cadastro → hash bcrypt/token SHA-256 → verificação de uso único → login real → cookie/JWT de sessão. E-mail usa saída dev existente.');
+  console.log('PASS cadastro → hash bcrypt/código HMAC → verificação de uso único → login real → cookie/JWT de sessão. E-mail usa saída dev existente.');
   const profile = {
     firstName: 'Marina', lastName: 'Teste', birthDate: '1994-03-12', weightKg: 65, heightCm: 168,
     biologicalSex: 'FEMALE', goal: 'Manutencao', activityLevel: 'Moderado', isPCD: false,
@@ -239,7 +248,8 @@ try {
 
   await assert.rejects(prisma.waterIntakeLog.create({ data: { userId: randomUUID(), amountMl: 250 } }), { code: 'P2003' });
   await assert.rejects(prisma.user.create({ data: { email: owner.email } }), { code: 'P2002' });
-  await assert.rejects(prisma.food.delete({ where: { id: catalog[0].id } }), { code: 'P2003' });
+  await assert.rejects(prisma.food.delete({ where: { id: catalog[0].id } }));
+  assert.ok(await prisma.food.findUnique({ where: { id: catalog[0].id } }));
   // Only delete the synthetic owner in this run's private schema.
   await prisma.user.delete({ where: { id: owner.id } });
   assert.equal(await prisma.profile.count({ where: { userId: owner.id } }), 0);

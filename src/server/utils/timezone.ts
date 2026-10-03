@@ -17,6 +17,22 @@ export function validatePlausibility(referenceDate: string, timezoneOffset: numb
   }
 }
 
+/**
+ * Mutations that close a nutrition day must use the current civil date for the
+ * supplied browser offset. Unlike validatePlausibility, adjacent days are not
+ * accepted. The offset remains client-provided by the V1 contract.
+ */
+export function validateCurrentReferenceDate(
+  referenceDate: string,
+  timezoneOffset: number,
+  now: Date = new Date(),
+) {
+  const localToday = new Date(now.getTime() - timezoneOffset * 60000).toISOString().slice(0, 10);
+  if (referenceDate !== localToday) {
+    throw new Error('A consolidação deve usar a data local atual.');
+  }
+}
+
 export function getDayBounds(referenceDate: string, timezoneOffset: number) {
   // Cria uma data representando meia-noite abstrata na string
   const localMidnightUTC = new Date(`${referenceDate}T00:00:00Z`);

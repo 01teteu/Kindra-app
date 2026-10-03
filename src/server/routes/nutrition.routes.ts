@@ -1,12 +1,31 @@
 import { FastifyPluginAsync } from 'fastify';
 import prisma from '../db.js';
-import { weightLogSchema, waterIntakeLogSchema, timeContextQuerySchema } from '../schemas/nutrition.schema.js';
+import { weightLogSchema, waterIntakeLogSchema, timeContextQuerySchema, timeContextSchema } from '../schemas/nutrition.schema.js';
 import { requireScope } from '../middlewares/auth.js';
 import { calculateAndSaveNutritionGoal, checkAndConsolidateNutriHistory } from '../services/nutrition.service.js';
-import { validatePlausibility, getDayBounds } from '../utils/timezone.js';
+import { validateCurrentReferenceDate, validatePlausibility, getDayBounds } from '../utils/timezone.js';
 import { removeWater } from '../controllers/water.controller.js';
 
 export const nutritionRoutes: FastifyPluginAsync = async (fastify) => {
+  const configuredFrontendUrl = process.env.FRONTEND_URL;
+  let trustedFrontendOrigin: string;
+  try {
+    if (!configuredFrontendUrl) throw new Error('missing');
+    const parsed = new URL(configuredFrontendUrl);
+    if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('protocol');
+    trustedFrontendOrigin = parsed.origin;
+  } catch {
+    throw new Error('FRONTEND_URL deve conter a origem pública completa do Kindra.');
+  }
+
+  const readNutritionHistory = async (userId: string) => {
+    const [user, history] = await Promise.all([
+      prisma.user.findUnique({ where: { id: userId }, select: { currentStreak: true } }),
+      prisma.historyUserNutri.findMany({ where: { userId }, orderBy: { date: 'desc' }, take: 30 }),
+    ]);
+    return { currentStreak: user?.currentStreak || 0, history };
+  };
+
   // Middleware de autenticação obrigatório: garante que apenas tokens de sessão completa acessem
   fastify.addHook('onRequest', requireScope('session'));
 
@@ -14,19 +33,13 @@ export const nutritionRoutes: FastifyPluginAsync = async (fastify) => {
   // METAS NUTRICIONAIS (NUTRITION GOALS)
   // ==========================================
 
-  // GET /api/nutrition/goals/current -> Traz a meta vigente e ativa o Gatilho Lazy de Consolidação
+  // GET /api/nutrition/goals/current -> Leitura da meta vigente, sem efeitos persistentes.
   fastify.get('/goals/current', async (request, reply) => {
     try {
       const userId = (request as any).user.id;
       
       const { referenceDate, timezoneOffset } = timeContextQuerySchema.parse(request.query);
       validatePlausibility(referenceDate, timezoneOffset);
-
-      // DISPARO DO GATILHO LAZY: Verifica virada do dia, calcula streaks e limpa logs velhos silenciosamente
-      await checkAndConsolidateNutriHistory(userId, referenceDate, timezoneOffset).catch(err => { 
-         console.error('[Consolidação Nutri Error]', err); 
-         // Não bloqueamos a request se a consolidação falhar
-      });
 
       const goal = await prisma.nutritionGoal.findFirst({
         where: { userId },
@@ -67,25 +80,52 @@ export const nutritionRoutes: FastifyPluginAsync = async (fastify) => {
   // ==========================================
   // HISTÓRICO CONSOLIDADO (DAILY HISTORY)
   // ==========================================
+  fastify.post('/history/consolidate', {
+    config: {
+      rateLimit: {
+        hook: 'preHandler',
+        max: 20,
+        timeWindow: '1 minute',
+        keyGenerator: request => `nutrition-consolidate:${(request.user as { id: string }).id}`,
+      },
+    },
+    preValidation: async (request, reply) => {
+      const origin = request.headers.origin;
+      let requestOrigin = '';
+      try {
+        if (!origin) throw new Error('missing');
+        requestOrigin = new URL(origin).origin;
+      } catch {
+        return reply.status(403).send({ error: 'Origem da requisição não permitida.' });
+      }
+      if (requestOrigin !== trustedFrontendOrigin ||
+          request.headers['sec-fetch-site'] === 'cross-site' ||
+          request.headers['x-kindra-request'] !== 'nutrition-history-consolidation') {
+        return reply.status(403).send({ error: 'Origem da requisição não permitida.' });
+      }
+    },
+  }, async (request, reply) => {
+    const parsed = timeContextSchema.strict().safeParse(request.body);
+    if (!parsed.success) return reply.status(400).send({ error: parsed.error.issues[0].message });
+    const { referenceDate, timezoneOffset } = parsed.data;
+    try {
+      validateCurrentReferenceDate(referenceDate, timezoneOffset);
+      const userId = (request.user as { id: string }).id;
+      await checkAndConsolidateNutriHistory(userId, referenceDate, timezoneOffset);
+      return reply.send(await readNutritionHistory(userId));
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('data local atual')) {
+        return reply.status(400).send({ error: error.message });
+      }
+      request.log.error({ err: error }, 'Nutrition history consolidation failed');
+      return reply.status(500).send({ error: 'Não foi possível atualizar o histórico nutricional.' });
+    }
+  });
+
   fastify.get('/history', async (request, reply) => {
     try {
       const userId = (request as any).user.id;
-      
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { currentStreak: true }
-      });
-
-      const history = await prisma.historyUserNutri.findMany({
-        where: { userId },
-        orderBy: { date: 'desc' },
-        take: 30 // Últimos 30 dias
-      });
-
-      return reply.send({
-        currentStreak: user?.currentStreak || 0,
-        history
-      });
+      return reply.send(await readNutritionHistory(userId));
     } catch (error) {
       return reply.status(500).send({ error: 'Erro ao buscar histórico consolidado.' });
     }

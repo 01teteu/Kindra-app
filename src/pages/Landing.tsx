@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowUpRight, Check } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Dumbbell, Droplet, Flame, Utensils } from 'lucide-react';
 import { Brand } from '../components/ui/Brand';
 import './public.css';
+
+const heroPhoto = new URL('../assets/landing/kindra-training.png', import.meta.url).href;
 
 export function Landing() {
   useEffect(() => {
@@ -24,130 +26,66 @@ export function Landing() {
       </header>
 
       <main id="conteudo" tabIndex={-1}>
-        <section className="public-hero public-container" aria-labelledby="hero-title">
-          <div className="public-hero-copy">
-            <p className="public-context">Treino e nutrição em um só lugar</p>
-            <h1 id="hero-title">Organize seu treino.<br />Acompanhe sua alimentação.</h1>
-            <p className="public-lead">Monte sua semana, registre séries, refeições e água e consulte seus registros para acompanhar sua evolução.</p>
-            <div className="public-actions">
+        <section className="landing-hero public-container" aria-labelledby="hero-title">
+          <div className="landing-hero-photo" aria-hidden="true"><img src={heroPhoto} alt="" width="1672" height="941" fetchPriority="high" /></div>
+          <div className="landing-intro">
+            <p className="landing-context">Treino e nutrição em um só lugar</p>
+            <h1 id="hero-title">Uma versão<br />mais forte<br /><span>de você.</span></h1>
+            <p className="landing-lead">Organize seus treinos, registre alimentação e água e acompanhe sua evolução.</p>
+            <div className="landing-actions">
               <Link to="/register" className="kindra-button button-primary button-lg">Criar conta <ArrowUpRight size={18} aria-hidden="true" /></Link>
-              <a href="#seu-dia" className="kindra-button button-ghost">Conhecer o Kindra <ArrowDown size={16} aria-hidden="true" /></a>
+              <a href="#seu-dia" className="landing-explore">Conhecer o Kindra <ArrowDown size={15} aria-hidden="true" /></a>
             </div>
           </div>
 
-          <figure className="kindra-card public-week" aria-labelledby="week-title" aria-describedby="week-caption">
-            <figcaption id="week-caption" className="public-demo-caption">Exemplo de uso · dados demonstrativos</figcaption>
-            <div className="public-week-heading">
-              <h2 id="week-title">Minha semana</h2>
-              <p>Um lugar para cada treino.<br />Espaço para descansar também.</p>
+          <figure className="landing-product" aria-labelledby="product-caption">
+            <div className="landing-app-preview">
+              <div className="landing-preview-header"><Brand /><span>Início</span></div>
+              <div className="landing-preview-greeting"><span>Seu espaço</span><h2>Seu dia, no Kindra.</h2></div>
+              <div className="landing-preview-streak">
+                <p>Consistência nutricional</p><h3>Sua<br />ofensiva.</h3>
+                <Flame className="landing-preview-flame" size={112} strokeWidth={1.1} aria-hidden="true" />
+                <p className="landing-preview-note">Acompanhe sua constância em alimentação e água.</p>
+              </div>
+              <div className="landing-preview-today"><Dumbbell size={19} aria-hidden="true" /><div><h3>Treino de hoje</h3><p>Organize sua semana de treinos.</p></div></div>
+              <div className="landing-preview-care">
+                <div><Utensils size={17} aria-hidden="true" /><h3>Alimentação</h3><p>Suas refeições do dia</p></div>
+                <div><Droplet size={18} aria-hidden="true" /><h3>Hidratação</h3><p>Seus registros de água</p></div>
+              </div>
+              <div className="landing-preview-nav" aria-hidden="true"><span>Início</span><span>Treino</span><span>Nutrição</span></div>
             </div>
-            <ol className="public-week-days">
-              {[
-                { day: 'Seg', name: 'Treino A', detail: '4 exercícios' },
-                { day: 'Ter', name: 'Descanso' },
-                { day: 'Qua', name: 'Treino B', detail: '4 exercícios', today: true },
-                { day: 'Qui', name: 'Descanso' },
-                { day: 'Sex', name: 'Treino A', detail: '4 exercícios' },
-                { day: 'Sáb', name: 'Descanso' },
-                { day: 'Dom', name: 'Descanso' },
-              ].map(({ day, name, detail, today }) => (
-                <li key={day} className={today ? 'public-week-current' : undefined}>
-                  <span className="public-week-day">{day}{today && <small>Hoje</small>}</span>
-                  <span className={detail ? 'public-week-routine' : 'public-week-rest'}>{name}</span>
-                  {detail && <span className="public-week-count">{detail}</span>}
-                </li>
-              ))}
-            </ol>
-            <p className="public-week-note">Você escolhe os dias e organiza suas rotinas.</p>
+            <div className="landing-preview-companion"><span>Acompanhe</span><strong>Sua evolução<ArrowUpRight size={22} aria-hidden="true" /></strong><p>Da primeira série<br />às suas melhores marcas.</p></div>
+            <figcaption id="product-caption">Prévia da interface · sem dados pessoais</figcaption>
           </figure>
+          <div className="landing-hero-foot"><span>Planejar. Registrar. Acompanhar.</span><a href="#seu-dia" aria-label="Explore o que você pode fazer no Kindra"><ArrowDown size={18} aria-hidden="true" /></a></div>
         </section>
 
-        <section id="seu-dia" className="public-benefits public-container" aria-labelledby="benefits-title">
-          <div className="public-section-heading">
-            <h2 id="benefits-title">Da semana planejada<br />ao treino registrado.</h2>
-            <p>Organize suas rotinas, encontre exercícios e registre o que fez em cada série.</p>
-          </div>
-          <div className="public-feature-row">
-            <div className="public-feature-copy">
-              <p className="public-context">Durante o treino</p>
-              <h3>Cada série tem seu registro.</h3>
-              <p>Anote carga e repetições e marque as séries concluídas. Seus registros ajudam a acompanhar a execução dos treinos.</p>
+        <section id="seu-dia" className="landing-daily public-container" aria-labelledby="daily-title">
+          <div className="landing-section-heading"><p className="landing-context">Uma rotina, conectada.</p><h2 id="daily-title">Organize o dia.<br /><span>Registre o que fez.</span></h2><p>Menos registros espalhados. Mais clareza sobre seu treino, sua alimentação e sua água.</p></div>
+          <div className="landing-daily-grid">
+            <article className="landing-training-feature">
+              <div className="landing-feature-title"><Dumbbell size={22} aria-hidden="true" /><h3>Um lugar para cada treino.</h3></div>
+              <p>Monte suas rotinas e distribua os treinos pela semana. Durante a sessão, registre carga, repetições e séries concluídas.</p>
+              <div className="landing-training-type" aria-hidden="true"><span>Minha</span><strong>semana<span>.</span></strong></div>
+              <p className="landing-feature-foot">Planejamento e execução, no mesmo lugar.</p>
+            </article>
+            <div className="landing-care-features">
+              <article><Utensils size={22} aria-hidden="true" /><h3>Alimentação<br />com contexto.</h3><p>Reúna suas refeições e acompanhe calorias e nutrientes em relação às suas metas.</p></article>
+              <article><Droplet size={23} aria-hidden="true" /><h3>Água também<br />faz parte.</h3><p>Registre a água ao longo do dia e consulte o que já foi registrado.</p></article>
             </div>
-            <figure className="public-example" aria-labelledby="sets-title" aria-describedby="sets-caption">
-              <figcaption id="sets-caption" className="public-demo-caption">Exemplo de uso · dados demonstrativos</figcaption>
-              <h3 id="sets-title">Supino reto</h3>
-              <table className="public-set-table">
-                <caption className="sr-only">Registro demonstrativo de três séries de supino reto</caption>
-                <thead><tr><th scope="col">Série</th><th scope="col">Carga</th><th scope="col">Reps</th><th scope="col">Estado</th></tr></thead>
-                <tbody>
-                  {[1, 2, 3].map(series => (
-                    <tr key={series}>
-                      <th scope="row">{series}</th><td>20 kg</td><td>10</td>
-                      <td><span className="public-set-done"><Check size={16} aria-hidden="true" /><span className="public-set-status">Concluída</span></span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </figure>
           </div>
         </section>
 
-        <section className="public-feature-row public-container public-nutrition" aria-labelledby="nutrition-title">
-          <div className="public-feature-copy">
-            <p className="public-context">Alimentação e hidratação</p>
-            <h2 id="nutrition-title">Entenda os registros<br />do seu dia.</h2>
-            <p>Reúna suas refeições e acompanhe calorias e nutrientes em relação às suas metas. Registre a água ao longo do dia.</p>
+        <section className="landing-evolution public-container" aria-labelledby="evolution-title">
+          <div className="landing-evolution-title"><p className="landing-context">Seus registros têm continuidade.</p><h2 id="evolution-title">Cada<br />treino<br /><span>conta.</span></h2></div>
+          <div className="landing-evolution-copy"><h3>Veja o caminho<br />que você está construindo.</h3><p>Consulte sua progressão por exercício, a carga movimentada e suas melhores marcas a partir dos treinos registrados.</p>
+            <dl><div><dt>Sua força, sessão a sessão</dt><dd>Acompanhe a estimativa de força por exercício ao longo do tempo.</dd></div><div><dt>Suas melhores marcas</dt><dd>Consulte maior carga e melhor estimativa de força, no período e no histórico.</dd></div><div><dt>Consistência além do treino</dt><dd>A ofensiva nutricional acompanha os dias consolidados conforme suas metas de alimentação e água.</dd></div></dl>
           </div>
-          <figure className="kindra-card public-nutrition-example" aria-labelledby="balance-title" aria-describedby="nutrition-caption">
-            <figcaption id="nutrition-caption" className="public-demo-caption">Exemplo de uso · dados demonstrativos</figcaption>
-            <h3 id="balance-title">Balanço do dia</h3>
-            <p className="public-balance"><strong className="metric-number">800</strong><span>kcal restantes</span></p>
-            <div className="public-balance-labels"><span>1.200 consumidas</span><span>Meta: 2.000 kcal</span></div>
-            <div className="metric-rail" aria-hidden="true"><span style={{ width: '60%' }} /></div>
-            <dl className="public-macros">
-              <div><dt>Proteínas</dt><dd>50 g <span>restantes</span></dd></div>
-              <div><dt>Carboidratos</dt><dd>105 g <span>restantes</span></dd></div>
-              <div><dt>Gorduras</dt><dd>20 g <span>restantes</span></dd></div>
-            </dl>
-            <dl className="public-meals">
-              <div><dt>Café da manhã</dt><dd>400 kcal</dd></div>
-              <div><dt>Almoço</dt><dd>800 kcal</dd></div>
-              <div><dt>Água registrada</dt><dd>1.500 ml <span>de 2.500 ml</span></dd></div>
-            </dl>
-          </figure>
         </section>
 
-        <section className="public-feature-row public-container public-history" aria-labelledby="history-title">
-          <div className="public-feature-copy">
-            <p className="public-context">Acompanhamento</p>
-            <h2 id="history-title">Seus registros<br />não ficam para trás.</h2>
-            <p>Consulte o histórico diário de alimentação e hidratação. Registre seu peso e veja a data da última atualização.</p>
-          </div>
-          <figure className="public-example" aria-labelledby="history-example-title" aria-describedby="history-caption">
-            <figcaption id="history-caption" className="public-demo-caption">Exemplo de uso · dados demonstrativos</figcaption>
-            <h3 id="history-example-title">Histórico diário</h3>
-            <ol className="public-history-days">
-              <li><time dateTime="2026-09-16">16 de setembro</time><span>1.920 kcal <span aria-hidden="true">·</span> 2.300 ml de água</span></li>
-              <li><time dateTime="2026-09-15">15 de setembro</time><span>2.040 kcal <span aria-hidden="true">·</span> 2.500 ml de água</span></li>
-            </ol>
-            <dl className="public-weight"><div><dt>Peso atual</dt><dd>75,5 <span>kg</span></dd></div><div><dt>Último registro</dt><dd><time dateTime="2026-09-16">16 de setembro</time></dd></div></dl>
-          </figure>
-        </section>
-
-        <section className="public-start public-container" aria-labelledby="start-title">
-          <div><h2 id="start-title">Comece pela sua rotina.</h2><p>Crie sua conta para organizar treino e alimentação no Kindra.</p></div>
-          <Link to="/register" className="kindra-button button-primary button-lg">Criar conta <ArrowUpRight size={18} aria-hidden="true" /></Link>
-        </section>
+        <section className="landing-start public-container" aria-labelledby="start-title"><div><p className="landing-context">Seu próximo passo</p><h2 id="start-title">Comece pela<br />sua rotina<span>.</span></h2></div><div><Link to="/register" className="kindra-button button-primary button-lg">Criar conta <ArrowUpRight size={18} aria-hidden="true" /></Link><p>Já usa o Kindra? <Link to="/login">Entrar</Link></p></div></section>
       </main>
-
-      <footer className="public-footer public-container">
-        <Link to="/" aria-label="Kindra — página inicial"><Brand /></Link>
-        <nav aria-label="Links do rodapé" className="public-footer-links">
-          <Link to="/register">Criar conta</Link>
-          <Link to="/login">Já tenho conta</Link>
-          <a href="#conteudo">Voltar ao início ↑</a>
-        </nav>
-      </footer>
+      <footer className="public-footer public-container"><Link to="/" aria-label="Kindra — página inicial"><Brand /></Link><nav aria-label="Links do rodapé" className="landing-footer-links"><Link to="/register">Criar conta</Link><Link to="/login">Já tenho conta</Link><a href="#conteudo">Voltar ao início ↑</a></nav></footer>
     </div>
   );
 }

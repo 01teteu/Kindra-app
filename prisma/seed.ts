@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type Prisma } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadActivityCatalogs, CatalogValidationError } from './activity-validation.js';
@@ -123,7 +123,7 @@ async function main() {
     const existingKeys = new Set(existing.map(food => foodKey(food.name)));
     const customKeys = new Set(existing.filter(food => food.isCustom || food.userId !== null)
       .map(food => foodKey(food.name)));
-    let inserted = 0;
+    const toInsert: Prisma.FoodCreateManyInput[] = [];
     let preserved = 0;
     let customCollisions = 0;
 
@@ -133,19 +133,17 @@ async function main() {
         if (customKeys.has(key)) customCollisions++;
         continue;
       }
-      await tx.food.create({
-        data: {
-          name: item.description.normalize('NFC').trim().replace(/\s+/gu, ' ').toLocaleLowerCase('pt-BR'),
-          isCustom: false,
-          kcal: item.energy_kcal,
-          proteinG: item.protein_g,
-          carbsG: item.carbohydrate_g,
-          fatG: item.lipid_g,
-        },
+      toInsert.push({
+        name: item.description.normalize('NFC').trim().replace(/\s+/gu, ' ').toLocaleLowerCase('pt-BR'),
+        isCustom: false,
+        kcal: item.energy_kcal,
+        proteinG: item.protein_g,
+        carbsG: item.carbohydrate_g,
+        fatG: item.lipid_g,
       });
       existingKeys.add(key);
-      inserted++;
     }
+    const inserted = toInsert.length ? (await tx.food.createMany({ data: toInsert })).count : 0;
     return { inserted, preserved, customCollisions };
   }, { timeout: 60000 });
 

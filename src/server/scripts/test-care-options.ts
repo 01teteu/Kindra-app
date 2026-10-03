@@ -17,8 +17,9 @@ async function snapshot() {
   return { allergies: await db.allergy.findMany({ orderBy: { id: 'asc' } }), limitations: await db.physicalLimitation.findMany({ orderBy: { id: 'asc' } }) };
 }
 try {
-  const custom = await db.allergy.create({ data: { name: 'Restrição privada de teste', isCustom: true } });
-  const customLimitation = await db.physicalLimitation.create({ data: { name: 'Limitação privada de teste', isCustom: true } });
+  const customOwner = await db.user.create({ data: { email: 'care-custom-owner@example.test' } });
+  const custom = await db.allergy.create({ data: { name: 'Restrição privada de teste', isCustom: true, ownerId: customOwner.id } });
+  const customLimitation = await db.physicalLimitation.create({ data: { name: 'Limitação privada de teste', isCustom: true, ownerId: customOwner.id } });
   const unrelatedOfficial = await db.physicalLimitation.create({ data: { name: 'Oficial preexistente de teste', isCustom: false } });
   const before = await snapshot();
   // Collisions in the second group must not partially import the first.
@@ -42,8 +43,8 @@ try {
   assert.deepEqual(await snapshot(), first);
   assert.equal(await db.allergy.count({ where: { isCustom: false } }), 8);
   assert.equal(await db.physicalLimitation.count({ where: { isCustom: false } }), 9);
-  for (const row of source.allergies) assert.deepEqual(await db.allergy.findUnique({ where: { id: row.id } }), row);
-  for (const row of source.limitations) assert.deepEqual(await db.physicalLimitation.findUnique({ where: { id: row.id } }), row);
+  for (const row of source.allergies) assert.deepEqual(await db.allergy.findUnique({ where: { id: row.id } }), { ...row, ownerId: null });
+  for (const row of source.limitations) assert.deepEqual(await db.physicalLimitation.findUnique({ where: { id: row.id } }), { ...row, ownerId: null });
   assert.deepEqual(await db.allergy.findUnique({ where: { id: custom.id } }), custom);
   assert.deepEqual(await db.physicalLimitation.findUnique({ where: { id: customLimitation.id } }), customLimitation);
   const user = await db.user.create({ data: { email: 'care-options@example.test' } });

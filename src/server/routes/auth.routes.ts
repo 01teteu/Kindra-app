@@ -1,4 +1,3 @@
-import { sessionCookieOptions } from '../session-cookie.js';
 import { FastifyInstance } from 'fastify';
 import { 
   loginController, 
@@ -9,7 +8,8 @@ import {
   verifyResetCodeController, 
   resetPasswordController,
   changeUnverifiedEmailController,
-  googleAuthController
+  googleAuthController,
+  logoutController
 } from '../controllers/auth.controller.js';
 import { requireScope } from '../middlewares/auth.js';
 
@@ -34,11 +34,8 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   }, loginController);
 
-  // Logout - Limpa o cookie de forma totalmente segura (seguindo as mesmas flags da criação)
-  fastify.post('/logout', async (request, reply) => {
-    reply.clearCookie('token', sessionCookieOptions());
-    return reply.send({ message: 'Logout realizado com sucesso' });
-  });
+  // Logout revoga o JWT apresentado e limpa o cookie com as flags originais.
+  fastify.post('/logout', logoutController);
 
   // Me - Retorna o usuário logado
   fastify.get('/me', {
@@ -47,7 +44,6 @@ export async function authRoutes(fastify: FastifyInstance) {
 
   // Rota para reenviar o e-mail (3 requests a cada 15 min)
   fastify.post('/verify-email/send', {
-    preHandler: requireScope('pending_verification'),
     config: {
       rateLimit: {
         max: 3,
@@ -58,6 +54,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 
   // Rota para validar o token
   fastify.post('/verify-email/confirm', {
+    preHandler: requireScope('pending_verification'),
     config: {
       rateLimit: {
         max: 5,

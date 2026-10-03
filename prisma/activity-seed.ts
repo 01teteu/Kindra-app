@@ -18,26 +18,37 @@ export async function seedActivityCatalogs(prisma: PrismaClient, input: unknown)
       cardio: { created: 0, updated: 0, unchanged: 0, archived: 0 },
       sports: { created: 0, updated: 0, unchanged: 0, archived: 0 },
     };
-    const profileIds = new Map<string, string>();
-    for (const row of source.profiles) {
+    const existingProfiles = new Map((await tx.energyProfile.findMany({ where: { slug: { in: source.profiles.map(x => x.slug) } } })).map(x => [x.slug, x]));
+    const profileIds = new Map([...existingProfiles].map(([slug, profile]) => [slug, profile.id]));
+    const profileRows = source.profiles.map(row => {
       const { met, source: citation, ...base } = row;
       const data = { ...base, metLight: met.LIGHT, metModerate: met.MODERATE, metVigorous: met.VIGOROUS, sourceName: citation.name, sourceMode: citation.mode, sourceNote: citation.note };
-      const existing = await tx.energyProfile.findUnique({ where: { slug: row.slug } });
-      if (!existing) {
-        const created = await tx.energyProfile.create({ data });
-        profileIds.set(row.slug, created.id); summary.profiles.created++;
-      } else {
-        if (changed(existing, data)) { await tx.energyProfile.update({ where: { id: existing.id }, data }); summary.profiles.updated++; }
-        else summary.profiles.unchanged++;
-        profileIds.set(row.slug, existing.id);
-      }
+      return { slug: row.slug, data };
+    });
+    const newProfiles = profileRows.filter(({ slug }) => !existingProfiles.has(slug)).map(({ data }) => data);
+    if (newProfiles.length) {
+      summary.profiles.created = (await tx.energyProfile.createMany({ data: newProfiles })).count;
+      const created = await tx.energyProfile.findMany({ where: { slug: { in: newProfiles.map(x => x.slug) } }, select: { slug: true, id: true } });
+      for (const profile of created) profileIds.set(profile.slug, profile.id);
     }
-    for (const row of source.exercises) {
+    for (const { slug, data } of profileRows) {
+      const existing = existingProfiles.get(slug);
+      if (!existing) continue;
+      if (changed(existing, data)) { await tx.energyProfile.update({ where: { id: existing.id }, data }); summary.profiles.updated++; }
+      else summary.profiles.unchanged++;
+    }
+    const existingExercises = new Map((await tx.exercise.findMany({ where: { origin: 'GLOBAL', userId: null, slug: { in: source.exercises.map(x => x.slug) } } })).map(x => [x.slug, x]));
+    const exerciseRows = source.exercises.map(row => {
       const { media, ...fields } = row;
       const data = { ...fields, ...media, origin: 'GLOBAL' as const, userId: null };
-      const existing = await tx.exercise.findFirst({ where: { origin: 'GLOBAL', userId: null, slug: row.slug } });
-      if (!existing) { await tx.exercise.create({ data }); summary.exercises.created++; }
-      else if (changed(existing, data)) { await tx.exercise.update({ where: { id: existing.id }, data }); summary.exercises.updated++; }
+      return { slug: row.slug, data };
+    });
+    const newExercises = exerciseRows.filter(({ slug }) => !existingExercises.has(slug)).map(({ data }) => data);
+    if (newExercises.length) summary.exercises.created = (await tx.exercise.createMany({ data: newExercises })).count;
+    for (const { slug, data } of exerciseRows) {
+      const existing = existingExercises.get(slug);
+      if (!existing) continue;
+      if (changed(existing, data)) { await tx.exercise.update({ where: { id: existing.id }, data }); summary.exercises.updated++; }
       else summary.exercises.unchanged++;
     }
     function profileId(slug: string): string {
@@ -45,20 +56,32 @@ export async function seedActivityCatalogs(prisma: PrismaClient, input: unknown)
       if (!id) throw new CatalogValidationError(`EnergyProfile não resolvido: ${slug}`);
       return id;
     }
-    for (const row of source.cardio) {
+    const existingCardio = new Map((await tx.cardioActivity.findMany({ where: { slug: { in: source.cardio.map(x => x.slug) } } })).map(x => [x.slug, x]));
+    const cardioRows = source.cardio.map(row => {
       const { media, supportedMetrics: m, energyProfileSlug, ...fields } = row;
       const data = { ...fields, ...media, energyProfileId: profileId(energyProfileSlug), supportsDuration: m.duration, supportsDistance: m.distance, supportsPace: m.pace, supportsSpeed: m.speed, supportsHeartRate: m.heartRate, supportsIncline: m.incline, supportsResistance: m.resistance, supportsReps: m.reps };
-      const existing = await tx.cardioActivity.findUnique({ where: { slug: row.slug } });
-      if (!existing) { await tx.cardioActivity.create({ data }); summary.cardio.created++; }
-      else if (changed(existing, data)) { await tx.cardioActivity.update({ where: { id: existing.id }, data }); summary.cardio.updated++; }
+      return { slug: row.slug, data };
+    });
+    const newCardio = cardioRows.filter(({ slug }) => !existingCardio.has(slug)).map(({ data }) => data);
+    if (newCardio.length) summary.cardio.created = (await tx.cardioActivity.createMany({ data: newCardio })).count;
+    for (const { slug, data } of cardioRows) {
+      const existing = existingCardio.get(slug);
+      if (!existing) continue;
+      if (changed(existing, data)) { await tx.cardioActivity.update({ where: { id: existing.id }, data }); summary.cardio.updated++; }
       else summary.cardio.unchanged++;
     }
-    for (const row of source.sports) {
+    const existingSports = new Map((await tx.sport.findMany({ where: { slug: { in: source.sports.map(x => x.slug) } } })).map(x => [x.slug, x]));
+    const sportRows = source.sports.map(row => {
       const { media, supportedMetrics: m, energyProfileSlug, ...fields } = row;
       const data = { ...fields, ...media, energyProfileId: profileId(energyProfileSlug), supportsDuration: m.duration, supportsDistance: m.distance, supportsHeartRate: m.heartRate, supportsRounds: m.rounds, supportsScore: m.score };
-      const existing = await tx.sport.findUnique({ where: { slug: row.slug } });
-      if (!existing) { await tx.sport.create({ data }); summary.sports.created++; }
-      else if (changed(existing, data)) { await tx.sport.update({ where: { id: existing.id }, data }); summary.sports.updated++; }
+      return { slug: row.slug, data };
+    });
+    const newSports = sportRows.filter(({ slug }) => !existingSports.has(slug)).map(({ data }) => data);
+    if (newSports.length) summary.sports.created = (await tx.sport.createMany({ data: newSports })).count;
+    for (const { slug, data } of sportRows) {
+      const existing = existingSports.get(slug);
+      if (!existing) continue;
+      if (changed(existing, data)) { await tx.sport.update({ where: { id: existing.id }, data }); summary.sports.updated++; }
       else summary.sports.unchanged++;
     }
     summary.exercises.archived = (await tx.exercise.updateMany({ where: { origin: 'GLOBAL', userId: null, isActive: true, slug: { notIn: source.exercises.map(x => x.slug) } }, data: { isActive: false } })).count;

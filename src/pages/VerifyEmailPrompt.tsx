@@ -1,7 +1,7 @@
 import './verify-email.css';
 import { Sheet } from '../components/ui/Sheet';
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, X, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Card } from '../components/ui/Card';
@@ -14,32 +14,48 @@ import { AnimatePresence, motion } from 'motion/react';
 
 // Reusing same logic from backend schema
 const emailSchema = z.string().email("E-mail inválido.");
+const passwordSchema = z.string().min(8, 'Mínimo de 8 caracteres.').max(100, 'Senha muito longa.')
+  .regex(/[A-Z]/, 'Pelo menos uma letra maiúscula.')
+  .regex(/[a-z]/, 'Pelo menos uma letra minúscula.')
+  .regex(/[0-9]/, 'Pelo menos um número.')
+  .regex(/[^A-Za-z0-9]/, 'Pelo menos um caractere especial.');
+
+function hasPendingContext() {
+  const token = sessionStorage.getItem('pendingToken');
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (payload.scope === 'pending_verification' && typeof payload.challengeId === 'string' && payload.challengeId && payload.exp > Date.now() / 1000) return true;
+  } catch { /* Link antigo ou inválido: o servidor é a autoridade final. */ }
+  sessionStorage.removeItem('pendingToken');
+  sessionStorage.removeItem('pendingEmail');
+  return false;
+}
 
 export function VerifyEmailPrompt() {
   const location = useLocation();
   const navigate = useNavigate();
-  const originalEmail = location.state?.email || '';
+  const originalEmail = location.state?.email || sessionStorage.getItem('pendingEmail') || '';
 
   // States
   const [currentEmail, setCurrentEmail] = useState<string>(originalEmail);
   const [otp, setOtp] = useState<string>('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [hasContext, setHasContext] = useState(hasPendingContext);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [cooldown, setCooldown] = useState(0);
+  const verifyInFlight = useRef(false);
+  const resendInFlight = useRef(false);
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStep, setModalStep] = useState<1 | 2>(1);
   const [newEmailInput, setNewEmailInput] = useState('');
   const [modalError, setModalError] = useState('');
-
-  useEffect(() => {
-    if (!originalEmail) {
-      navigate('/login');
-    }
-  }, [originalEmail, navigate]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval>;
@@ -52,21 +68,46 @@ export function VerifyEmailPrompt() {
   }, [cooldown]);
 
   const handleVerify = async () => {
+    if (verifyInFlight.current || resendInFlight.current) return;
+    if (!hasContext) {
+      setFeedback({ type: 'error', text: 'Abra o link enviado ao seu e-mail antes de confirmar.' });
+      return;
+    }
     if (otp.length < 6) {
       setFeedback({ type: 'error', text: 'Por favor, digite os 6 dígitos do código.' });
       return;
     }
+    const passwordResult = passwordSchema.safeParse(password);
+    if (!passwordResult.success) {
+      setFeedback({ type: 'error', text: passwordResult.error.issues[0].message });
+      return;
+    }
+    if (password !== confirmPassword) {
+      setFeedback({ type: 'error', text: 'As senhas não coincidem.' });
+      return;
+    }
 
+    verifyInFlight.current = true;
     setIsVerifying(true);
     setFeedback(null);
 
     try {
-      const res = await apiFetch('/auth/verify-email/confirm', { data: { token: otp } });
+      const pendingToken = sessionStorage.getItem('pendingToken');
+      if (!pendingToken) {
+        setHasContext(false);
+        setFeedback({ type: 'error', text: 'Sua confirmação expirou. Solicite um novo código para continuar.' });
+        return;
+      }
+      const res = await apiFetch('/auth/verify-email/confirm', {
+        data: { token: otp, password, confirmPassword }, headers: { Authorization: `Bearer ${pendingToken}` },
+      });
 
       // Se sucesso, muda o estado de sucesso para disparar a animação (não seta mensagem de feedback)
       setIsSuccess(true);
 
       sessionStorage.removeItem('pendingToken');
+      sessionStorage.removeItem('pendingEmail');
+      setHasContext(false);
 
       setTimeout(() => {
         if (!res.user.hasProfile) {
@@ -76,8 +117,16 @@ export function VerifyEmailPrompt() {
         }
       }, 2000);
     } catch (err: any) {
-      setFeedback({ type: 'error', text: err.message || 'Código inválido ou expirado.' });
+      if (err.status === 401 || err.status === 403) {
+        sessionStorage.removeItem('pendingToken');
+        sessionStorage.removeItem('pendingEmail');
+        setHasContext(false);
+      }
+      setFeedback({ type: 'error', text: err.status === 401 || err.status === 403
+        ? 'Sua confirmação expirou. Solicite um novo código para continuar.'
+        : err.message || 'Código inválido ou expirado.' });
     } finally {
+      verifyInFlight.current = false;
       setIsVerifying(false);
     }
   };
@@ -106,23 +155,27 @@ export function VerifyEmailPrompt() {
   };
 
   const executeNormalResend = async () => {
-    if (cooldown > 0) return;
+    if (cooldown > 0 || resendInFlight.current || verifyInFlight.current || isResending || isVerifying) return;
+    resendInFlight.current = true;
     setFeedback(null);
     setIsResending(true);
     try {
-      const token = sessionStorage.getItem('pendingToken');
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
-      await apiFetch('/auth/verify-email/send', { data: {}, headers });
-      setFeedback({ type: 'success', text: 'Novo código enviado com sucesso.' });
+      const parsed = emailSchema.safeParse(currentEmail.trim().toLowerCase());
+      if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+      await apiFetch('/auth/verify-email/send', { data: { email: parsed.data } });
+      setFeedback({ type: 'success', text: 'Confira seu e-mail. Se este endereço puder ser verificado, você receberá novas instruções.' });
       setCooldown(30);
     } catch (err: any) {
       handleResendErrors(err);
     } finally {
+      resendInFlight.current = false;
       setIsResending(false);
     }
   };
 
   const executeChangeEmailAndResend = async () => {
+    if (resendInFlight.current || verifyInFlight.current || isResending || isVerifying) return;
+    resendInFlight.current = true;
     setIsResending(true);
     setIsModalOpen(false); // close modal
 
@@ -134,8 +187,12 @@ export function VerifyEmailPrompt() {
         headers
       });
 
+      sessionStorage.removeItem('pendingToken');
+      sessionStorage.removeItem('pendingEmail');
+      setHasContext(false);
+
       setCurrentEmail(newEmailInput);
-      setFeedback({ type: 'success', text: 'E-mail atualizado e código enviado com sucesso!' });
+      setFeedback({ type: 'success', text: 'Se a alteração puder prosseguir, confira o novo endereço de e-mail.' });
 
       // Update location state so page reload retains the new email
       navigate('.', { replace: true, state: { email: newEmailInput } });
@@ -144,6 +201,7 @@ export function VerifyEmailPrompt() {
     } catch (err: any) {
       handleResendErrors(err);
     } finally {
+      resendInFlight.current = false;
       setIsResending(false);
     }
   };
@@ -157,7 +215,7 @@ export function VerifyEmailPrompt() {
     } else if (err.message.includes('429') || err.message.toLowerCase().includes('rate limit')) {
       setFeedback({ type: 'error', text: 'Aguarde alguns minutos antes de solicitar um novo código.' });
     } else {
-      setFeedback({ type: 'error', text: err.message || 'Erro ao reenviar o código.' });
+      setFeedback({ type: 'error', text: 'Não foi possível solicitar agora. Tente novamente em instantes.' });
     }
   };
 
@@ -177,21 +235,25 @@ export function VerifyEmailPrompt() {
                 <div className="verify-email-heading">
                   <p className="verify-email-context">Falta confirmar seu e-mail</p>
                   <h1>Confira seu e-mail</h1>
-                  <p>Enviamos um código de 6 dígitos para:</p>
-                  <strong className="verify-email-address">{currentEmail}</strong>
-                  <button
-                    onClick={handleOpenEditModal}
-                    disabled={isVerifying || isResending}
-                    className="verify-email-edit"
-                  >
-                    Alterar e-mail
-                  </button>
-                  <p id="verify-email-code-help">Digite o código abaixo para confirmar seu e-mail e continuar no Kindra.</p>
+                  <p>Se o cadastro puder prosseguir, você receberá um link e um código no endereço informado.</p>
+                  {hasContext ? <strong className="verify-email-address">{currentEmail}</strong> : (
+                    <div className="mt-4 text-left">
+                      <Input title="E-mail" type="email" value={currentEmail} onChange={event => setCurrentEmail(event.target.value)} />
+                    </div>
+                  )}
+                  {hasContext && <button onClick={handleOpenEditModal} disabled={isVerifying || isResending} className="verify-email-edit">Alterar e-mail</button>}
+                  <p id="verify-email-code-help">Abra o link recebido por e-mail. Depois, digite o código e defina sua senha.</p>
                 </div>
 
-                <div className="mb-6" role="group" aria-label="Código de 6 dígitos" aria-describedby="verify-email-code-help">
-                  <OtpInput value={otp} onChange={setOtp} />
-                </div>
+                {hasContext && <>
+                  <div className="mb-6" role="group" aria-label="Código de 6 dígitos" aria-describedby="verify-email-code-help">
+                    <OtpInput value={otp} onChange={setOtp} />
+                  </div>
+                  <div className="space-y-4 mb-6">
+                    <Input title="Nova senha" type="password" value={password} onChange={event => setPassword(event.target.value)} />
+                    <Input title="Confirme a nova senha" type="password" value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} />
+                  </div>
+                </>}
 
                 {feedback && (
                   <div role={feedback.type === 'error' ? 'alert' : 'status'} className={`verify-email-feedback verify-email-feedback-${feedback.type}`}>
@@ -200,14 +262,14 @@ export function VerifyEmailPrompt() {
                 )}
 
                 <div className="space-y-4">
-                  <Button
+                  {hasContext && <Button
                     className="w-full"
                     onClick={handleVerify}
                     isLoading={isVerifying}
                     disabled={isResending}
                   >
                     Confirmar e-mail
-                  </Button>
+                  </Button>}
                   <Button
                     variant="ghost"
                     className="w-full"
@@ -217,7 +279,7 @@ export function VerifyEmailPrompt() {
                   >
                     {cooldown > 0 ? `Reenviar em ${cooldown} s` : 'Reenviar código'}
                   </Button>
-                  <Link to="/login" className="verify-email-login">
+                  <Link to="/login" onClick={() => { sessionStorage.removeItem('pendingToken'); sessionStorage.removeItem('pendingEmail'); }} className="verify-email-login">
                     Ir para o login <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </Link>
                 </div>

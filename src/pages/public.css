@@ -37,113 +37,135 @@
 }
 
 /* Landing only: shared public/404 rules and design tokens stay unchanged. */
-.kindra-landing .public-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  align-items: center;
-  gap: 64px;
-  padding-block: 64px 80px;
-}
-.kindra-landing .public-context { color: var(--color-kindra-500); font-size: 13px; margin-bottom: 16px; }
-.kindra-landing .public-hero h1 { font-size: clamp(36px, 4vw, 56px); line-height: 1.12; letter-spacing: -0.045em; text-wrap: initial; }
-.kindra-landing .public-lead { max-width: 440px; margin-top: 24px; color: var(--color-kindra-500); font-size: 16px; line-height: 1.8; }
-.kindra-landing .public-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
-.kindra-landing .public-demo-caption { color: var(--color-kindra-500); font-size: 12px; line-height: 1.6; margin-bottom: 20px; }
-.kindra-landing .public-week { padding: 28px; }
-.kindra-landing .public-week-heading h2 { font-size: 26px; letter-spacing: -0.035em; }
-.kindra-landing .public-week-heading p { margin-top: 8px; font-size: 14px; line-height: 1.7; color: var(--color-kindra-500); }
-.kindra-landing .public-week-days { margin-top: 24px; }
-.kindra-landing .public-week-days li { display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 12px 0; border-top: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-week-day { flex: 0 0 36px; font-size: 12px; font-weight: 600; color: var(--color-kindra-500); }
-.kindra-landing .public-week-day small { display: block; font-size: 11px; font-weight: 400; margin-top: 2px; }
-.kindra-landing .public-week-current .public-week-day { color: var(--color-teal-300); }
-.kindra-landing .public-week-routine { font-size: 14px; font-weight: 600; }
-.kindra-landing .public-week-rest { font-size: 14px; color: var(--color-kindra-500); }
-.kindra-landing .public-week-count { margin-left: auto; color: var(--color-kindra-500); font-size: 12px; }
-.kindra-landing .public-week-note { padding-top: 16px; border-top: 1px solid var(--color-kindra-200); font-size: 12px; line-height: 1.7; color: var(--color-kindra-500); }
-.kindra-landing .public-benefits { padding-block: 48px 64px; border-top: 1px solid var(--color-kindra-200); scroll-margin-top: 24px; }
-.kindra-landing .public-section-heading { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: end; margin-bottom: 48px; }
-.kindra-landing .public-section-heading h2,
-.kindra-landing .public-feature-copy h2,
-.kindra-landing .public-start h2 { font-size: clamp(28px, 3vw, 36px); line-height: 1.2; letter-spacing: -0.035em; }
-.kindra-landing .public-section-heading > p,
-.kindra-landing .public-feature-copy > p:not(.public-context),
-.kindra-landing .public-start p { font-size: 16px; line-height: 1.8; color: var(--color-kindra-500); max-width: 440px; }
-.kindra-landing .public-feature-row { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 64px; align-items: center; }
-.kindra-landing .public-feature-copy h3 { font-size: 26px; line-height: 1.25; letter-spacing: -0.035em; }
-.kindra-landing .public-feature-copy > p:last-child { margin-top: 20px; }
-.kindra-landing .public-example { min-width: 0; padding-block: 8px; }
-.kindra-landing .public-example h3,
-.kindra-landing .public-nutrition-example h3 { font-size: 21px; letter-spacing: -0.025em; }
-.kindra-landing .public-set-table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; font-size: 14px; font-variant-numeric: tabular-nums; }
-.kindra-landing .public-set-table th,
-.kindra-landing .public-set-table td { padding: 16px 8px; border-bottom: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-set-table th:first-child,
-.kindra-landing .public-set-table td:first-child { padding-left: 0; }
-.kindra-landing .public-set-table thead { font-size: 12px; color: var(--color-kindra-500); }
-.kindra-landing .public-set-table th { font-weight: 500; }
-.kindra-landing .public-set-done { display: inline-flex; align-items: center; gap: 6px; color: var(--color-teal-300); font-size: 12px; }
-.kindra-landing .public-nutrition,
-.kindra-landing .public-history { padding-block: 64px; border-top: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-nutrition-example { padding: 28px; }
-.kindra-landing .public-balance { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
-.kindra-landing .public-balance > span { color: var(--color-kindra-500); font-size: 14px; }
-.kindra-landing .public-balance-labels { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--color-kindra-500); margin-block: 20px 12px; }
-.kindra-landing .public-macros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
-.kindra-landing .public-macros dt { font-size: 12px; color: var(--color-kindra-500); }
-.kindra-landing .public-macros dd { font-size: 17px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; }
-.kindra-landing .public-macros dd span { display: block; font-size: 11px; font-weight: 400; color: var(--color-kindra-500); margin-top: 4px; }
-.kindra-landing .public-meals { margin-top: 24px; font-size: 13px; }
-.kindra-landing .public-meals > div { display: flex; justify-content: space-between; gap: 16px; padding-block: 16px; border-top: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-meals > div:last-child { padding-bottom: 0; }
-.kindra-landing .public-meals dd { text-align: right; font-variant-numeric: tabular-nums; }
-.kindra-landing .public-meals dd span { display: block; font-size: 12px; color: var(--color-kindra-500); margin-top: 4px; }
-.kindra-landing .public-history-days { margin-top: 20px; }
-.kindra-landing .public-history-days li { display: flex; flex-direction: column; gap: 8px; padding-block: 20px; border-top: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-history-days time { font-size: 14px; font-weight: 600; }
-.kindra-landing .public-history-days li > span { color: var(--color-kindra-500); font-size: 14px; font-variant-numeric: tabular-nums; }
-.kindra-landing .public-weight { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 20px; padding-top: 24px; border-top: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-weight dt { font-size: 12px; color: var(--color-kindra-500); margin-bottom: 8px; }
-.kindra-landing .public-weight dd { font-size: 14px; }
-.kindra-landing .public-weight > div:first-child dd { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.kindra-landing .public-weight dd > span { font-size: 14px; font-weight: 400; color: var(--color-kindra-500); }
-.kindra-landing .public-start { display: flex; justify-content: space-between; align-items: center; gap: 32px; padding-block: 48px; border-top: 1px solid var(--color-kindra-200); }
-.kindra-landing .public-start p { margin-top: 12px; }
-.kindra-landing .public-start > a { flex-shrink: 0; }
-.kindra-landing .public-footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; }
-.kindra-landing .public-footer-links a { display: inline-flex; align-items: center; min-height: 44px; }
-@media (min-width: 768px) and (max-width: 1023px) {
-  .kindra-landing .public-hero,
-  .kindra-landing .public-section-heading,
-  .kindra-landing .public-feature-row { gap: 32px; }
-  .kindra-landing .public-week,
-  .kindra-landing .public-nutrition-example { padding: 20px; }
+.kindra-landing .public-container { width: min(100% - 80px, 1280px); }
+.kindra-landing .public-header { position: relative; z-index: 3; border-bottom: 0; }
+.kindra-landing .landing-hero { position: relative; isolation: isolate; display: grid; grid-template-columns: 1fr 1fr; column-gap: 80px; padding-top: 64px; }
+.kindra-landing .landing-hero-photo { position: absolute; z-index: -1; top: -100px; left: calc((100% - 100vw) / 2); width: 100vw; height: 960px; pointer-events: none; }
+.kindra-landing .landing-hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 53% top; }
+.kindra-landing .landing-hero-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #0c0e0ee8 0%, #0c0e0eb8 25%, #0c0e0e20 52%, #0c0e0e50 100%), linear-gradient(0deg, var(--color-kindra-base) 0%, #0c0e0e00 42%); }
+.kindra-landing .landing-intro { position: relative; z-index: 2; padding-top: 20px; align-self: start; padding-bottom: 32px; }
+.kindra-landing .landing-context { font-size: 12px; font-weight: 500; color: var(--color-teal-300); line-height: 1.6; margin-bottom: 20px; }
+.kindra-landing .landing-intro h1 { font-size: clamp(48px, 5.4vw, 76px); line-height: 1.02; letter-spacing: -0.045em; }
+.kindra-landing .landing-intro h1 span { color: var(--color-teal-300); }
+.kindra-landing .landing-lead { max-width: 380px; color: var(--color-kindra-500); font-size: 15px; line-height: 1.85; margin-top: 24px; }
+.kindra-landing .landing-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 28px; }
+.kindra-landing .landing-explore { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; min-height: 44px; color: var(--color-kindra-700); }
+.kindra-landing .landing-explore:hover { color: var(--color-teal-300); }
+.kindra-landing .landing-product { position: relative; width: 100%; max-width: 400px; justify-self: end; margin-top: 245px; padding-right: 0; z-index: 1; }
+.kindra-landing .landing-app-preview { position: relative; background: var(--color-kindra-100); border: 1px solid var(--color-kindra-300); border-radius: 22px; padding: 24px 24px 0; box-shadow: 0 24px 64px #00000040; }
+.kindra-landing .landing-preview-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-kindra-200); padding-bottom: 18px; }
+.kindra-landing .landing-preview-header .kindra-brand { font-size: 20px; }
+.kindra-landing .landing-preview-header > span { font-size: 11px; color: var(--color-kindra-500); }
+.kindra-landing .landing-preview-greeting { padding-block: 20px; }
+.kindra-landing .landing-preview-greeting > span { font-size: 11px; color: var(--color-kindra-500); }
+.kindra-landing .landing-preview-greeting h2 { margin-top: 5px; font-size: 21px; letter-spacing: -0.04em; }
+.kindra-landing .landing-preview-streak { position: relative; padding: 22px; background: var(--color-kindra-base); border: 1px solid var(--color-kindra-300); border-top: 2px solid var(--color-teal-400); border-radius: 12px; }
+.kindra-landing .landing-preview-streak > p:first-child { font-size: 11px; color: var(--color-teal-300); }
+.kindra-landing .landing-preview-streak h3 { position: relative; z-index: 1; margin-top: 14px; font-size: 40px; line-height: 1; letter-spacing: -0.06em; }
+.kindra-landing .landing-preview-flame { position: absolute; right: 12px; top: 42px; color: var(--color-teal-400); opacity: 0.3; }
+.kindra-landing .landing-preview-note { position: relative; max-width: 240px; font-size: 11px; color: var(--color-kindra-500); line-height: 1.7; margin-top: 20px; }
+.kindra-landing .landing-preview-today { display: flex; gap: 12px; align-items: center; padding-block: 22px; }
+.kindra-landing .landing-preview-today > svg { color: var(--color-teal-300); flex-shrink: 0; }
+.kindra-landing .landing-preview-today h3, .kindra-landing .landing-preview-care h3 { font: 600 12px var(--font-sans); }
+.kindra-landing .landing-preview-today p, .kindra-landing .landing-preview-care p { font-size: 10px; line-height: 1.6; color: var(--color-kindra-500); margin-top: 5px; }
+.kindra-landing .landing-preview-care { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--color-kindra-200); padding-block: 18px; gap: 18px; }
+.kindra-landing .landing-preview-care svg { color: var(--color-teal-300); margin-bottom: 10px; }
+.kindra-landing .landing-preview-nav { display: flex; justify-content: space-around; border-top: 1px solid var(--color-kindra-200); padding-block: 16px; font-size: 10px; color: var(--color-kindra-500); }
+.kindra-landing .landing-preview-nav span:first-child { color: var(--color-teal-300); }
+.kindra-landing .landing-preview-companion { position: relative; margin: 12px 0 0 auto; width: 244px; padding: 22px; border: 1px solid var(--color-teal-400); background: var(--color-kindra-base); border-radius: 12px; box-shadow: 0 12px 32px #00000040; }
+.kindra-landing .landing-preview-companion > span { color: var(--color-teal-300); font-size: 11px; }
+.kindra-landing .landing-preview-companion strong { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 700 23px var(--font-display); letter-spacing: -0.05em; margin-top: 10px; }
+.kindra-landing .landing-preview-companion p { color: var(--color-kindra-500); font-size: 12px; line-height: 1.7; margin-top: 12px; }
+.kindra-landing .landing-product figcaption { font-size: 10px; color: var(--color-kindra-500); margin-top: 16px; text-align: center; }
+.kindra-landing .landing-hero-foot { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-top: 42px; padding-bottom: 24px; border-bottom: 1px solid var(--color-kindra-200); font-size: 12px; color: var(--color-kindra-500); }
+.kindra-landing .landing-hero-foot a { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-teal-300); }
+.kindra-landing .landing-daily { padding-block: 96px; scroll-margin-top: 24px; }
+.kindra-landing .landing-section-heading h2 { font-size: clamp(36px, 4.5vw, 62px); line-height: 1.08; letter-spacing: -0.055em; }
+.kindra-landing .landing-section-heading h2 span { color: var(--color-kindra-500); }
+.kindra-landing .landing-section-heading > p:last-child { max-width: 420px; margin-top: 22px; font-size: 15px; line-height: 1.8; color: var(--color-kindra-500); }
+.kindra-landing .landing-daily-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; margin-top: 44px; }
+.kindra-landing .landing-training-feature { display: flex; flex-direction: column; padding: 36px; background: var(--color-kindra-100); border: 1px solid var(--color-kindra-200); border-radius: var(--surface-radius); }
+.kindra-landing .landing-feature-title { display: flex; align-items: center; gap: 12px; }
+.kindra-landing .landing-feature-title svg, .kindra-landing .landing-care-features svg { color: var(--color-teal-300); flex-shrink: 0; }
+.kindra-landing .landing-feature-title h3 { font-size: 22px; letter-spacing: -0.04em; }
+.kindra-landing .landing-training-feature > p, .kindra-landing .landing-care-features p { color: var(--color-kindra-500); font-size: 14px; line-height: 1.8; margin-top: 20px; max-width: 440px; }
+.kindra-landing .landing-training-type { display: flex; flex-direction: column; padding-block: 36px; font-family: var(--font-display); line-height: 1; letter-spacing: -0.06em; }
+.kindra-landing .landing-training-type > span { font-size: 36px; color: var(--color-kindra-500); }
+.kindra-landing .landing-training-type strong { font-size: clamp(44px, 6vw, 80px); }
+.kindra-landing .landing-training-type strong span { color: var(--color-teal-400); }
+.kindra-landing .landing-training-feature .landing-feature-foot { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--color-kindra-300); font-size: 12px; }
+.kindra-landing .landing-care-features { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-content: center; }
+.kindra-landing .landing-care-features article { border-top: 1px solid var(--color-kindra-300); padding-top: 24px; }
+.kindra-landing .landing-care-features h3 { font-size: 25px; letter-spacing: -0.04em; line-height: 1.2; margin-top: 24px; }
+.kindra-landing .landing-evolution { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding-block: 80px; border-top: 1px solid var(--color-kindra-200); }
+.kindra-landing .landing-evolution-title h2 { font-size: clamp(72px, 9vw, 126px); line-height: 0.95; letter-spacing: -0.065em; }
+.kindra-landing .landing-evolution-title h2 span { color: var(--color-teal-300); }
+.kindra-landing .landing-evolution-copy h3 { font-size: 32px; line-height: 1.2; letter-spacing: -0.04em; }
+.kindra-landing .landing-evolution-copy > p { font-size: 15px; line-height: 1.8; color: var(--color-kindra-500); margin-top: 24px; }
+.kindra-landing .landing-evolution-copy dl { margin-top: 24px; }
+.kindra-landing .landing-evolution-copy dl > div { border-top: 1px solid var(--color-kindra-200); padding-block: 18px; }
+.kindra-landing .landing-evolution-copy dt { font-size: 14px; font-weight: 600; }
+.kindra-landing .landing-evolution-copy dd { font-size: 13px; color: var(--color-kindra-500); line-height: 1.7; margin-top: 6px; }
+.kindra-landing .landing-start { display: flex; justify-content: space-between; align-items: center; gap: 32px; border-top: 1px solid var(--color-kindra-200); padding-block: 72px; }
+.kindra-landing .landing-start h2 { font-size: clamp(38px, 5vw, 64px); line-height: 1.08; letter-spacing: -0.05em; }
+.kindra-landing .landing-start h2 span { color: var(--color-teal-400); }
+.kindra-landing .landing-start > div:last-child { min-width: 220px; }
+.kindra-landing .landing-start .kindra-button { width: 100%; }
+.kindra-landing .landing-start > div > p:last-child { font-size: 12px; color: var(--color-kindra-500); margin-top: 16px; text-align: center; }
+.kindra-landing .landing-start p a { color: var(--color-kindra-900); text-decoration: underline; text-underline-offset: 4px; }
+.kindra-landing .landing-footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.kindra-landing .landing-footer-links a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (min-width: 768px) and (max-width: 1100px) {
+  .kindra-landing .public-container { width: calc(100% - 64px); }
+  .kindra-landing .landing-hero { gap: 32px; padding-top: 56px; }
+  .kindra-landing .landing-hero-photo { height: 880px; }
+  .kindra-landing .landing-product { max-width: 340px; padding-right: 0; margin-top: 270px; }
+  .kindra-landing .landing-preview-companion { margin-right: 0; width: 244px; }
+  .kindra-landing .landing-daily-grid { gap: 28px; }
+  .kindra-landing .landing-care-features { grid-template-columns: 1fr; gap: 20px; }
+  .kindra-landing .landing-care-features h3 br { display: none; }
+  .kindra-landing .landing-care-features h3 { margin-top: 12px; }
+  .kindra-landing .landing-evolution { gap: 40px; }
 }
 @media (max-width: 767px) {
-  .kindra-landing .public-hero,
-  .kindra-landing .public-section-heading,
-  .kindra-landing .public-feature-row { grid-template-columns: minmax(0, 1fr); gap: 32px; }
-  .kindra-landing .public-hero { padding-block: 40px 48px; }
-  .kindra-landing .public-hero h1 { font-size: clamp(32px, 7vw, 40px); }
-  .kindra-landing .public-actions { align-items: stretch; flex-direction: column; margin-top: 24px; }
-  .kindra-landing .public-week,
-  .kindra-landing .public-nutrition-example { padding: 20px; }
-  .kindra-landing .public-benefits,
-  .kindra-landing .public-nutrition,
-  .kindra-landing .public-history { padding-block: 40px; }
-  .kindra-landing .public-section-heading { gap: 16px; margin-bottom: 32px; }
-  .kindra-landing .public-feature-copy > p:last-child { margin-top: 16px; }
-  .kindra-landing .public-start { align-items: stretch; flex-direction: column; gap: 24px; padding-block: 40px; }
-  .kindra-landing .public-footer-links { gap: 8px 20px; }
+  .kindra-landing .public-container { width: calc(100% - 40px); }
+  .kindra-landing .public-header { padding-block: 16px; }
+  .kindra-landing .public-header .kindra-brand { font-size: 22px; }
+  .kindra-landing .public-nav .kindra-button { padding-inline: 10px; }
+  .kindra-landing .landing-hero { display: flex; flex-direction: column; padding-top: 0; gap: 0; }
+  .kindra-landing .landing-hero-photo { top: -76px; height: 710px; }
+  .kindra-landing .landing-hero-photo img { object-position: 57% top; }
+  .kindra-landing .landing-hero-photo::after { background: linear-gradient(0deg, var(--color-kindra-base) 0%, #0c0e0ef5 25%, #0c0e0ec4 50%, #0c0e0e00 76%), linear-gradient(180deg, #0c0e0e80, #0c0e0e00 22%); }
+  .kindra-landing .landing-intro { padding-top: 250px; padding-bottom: 0; align-self: stretch; }
+  .kindra-landing .landing-context { margin-bottom: 14px; font-size: 11px; }
+  .kindra-landing .landing-intro h1 { font-size: clamp(40px, 11.5vw, 58px); }
+  .kindra-landing .landing-lead { font-size: 14px; line-height: 1.75; margin-top: 18px; max-width: 440px; }
+  .kindra-landing .landing-actions { margin-top: 22px; gap: 12px; }
+  .kindra-landing .landing-actions > .kindra-button { flex: 1; }
+  .kindra-landing .landing-explore { font-size: 12px; }
+  .kindra-landing .landing-product { align-self: center; margin-top: 42px; max-width: 390px; padding-right: 0; }
+  .kindra-landing .landing-app-preview { margin-right: 18px; padding: 20px 20px 0; }
+  .kindra-landing .landing-preview-companion { position: relative; top: auto; right: auto; margin: 12px 0 0 auto; width: 240px; }
+  .kindra-landing .landing-product figcaption { margin-top: 14px; }
+  .kindra-landing .landing-hero-foot { align-self: stretch; margin-top: 24px; font-size: 11px; }
+  .kindra-landing .landing-daily { padding-block: 56px; }
+  .kindra-landing .landing-section-heading h2 { font-size: 36px; }
+  .kindra-landing .landing-daily-grid { grid-template-columns: 1fr; gap: 32px; margin-top: 28px; }
+  .kindra-landing .landing-training-feature { padding: 24px; }
+  .kindra-landing .landing-feature-title h3 { font-size: 21px; }
+  .kindra-landing .landing-training-type strong { font-size: clamp(48px, 15vw, 76px); }
+  .kindra-landing .landing-care-features { gap: 20px; }
+  .kindra-landing .landing-care-features h3 { font-size: 22px; }
+  .kindra-landing .landing-care-features p { font-size: 13px; }
+  .kindra-landing .landing-evolution { grid-template-columns: 1fr; gap: 36px; padding-block: 56px; }
+  .kindra-landing .landing-evolution-title h2 { font-size: clamp(72px, 21vw, 112px); }
+  .kindra-landing .landing-evolution-copy h3 { font-size: 29px; }
+  .kindra-landing .landing-start { align-items: stretch; flex-direction: column; padding-block: 48px; }
+  .kindra-landing .landing-footer-links { gap: 8px 20px; }
 }
-@media (max-width: 380px) {
-  .kindra-landing .public-week,
-  .kindra-landing .public-nutrition-example { padding: 16px; }
-  .kindra-landing .public-week-days li { gap: 12px; }
-  .kindra-landing .public-macros { grid-template-columns: 1fr; gap: 12px; }
-  .kindra-landing .public-macros > div { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-  .kindra-landing .public-macros dd { margin: 0; font-size: 14px; }
-  .kindra-landing .public-macros dd span { display: inline; margin-left: 4px; }
-  .kindra-landing .public-set-table th,
-  .kindra-landing .public-set-table td { padding-inline: 4px; }
+@media (max-width: 359px) {
+  .kindra-landing .public-container { width: calc(100% - 32px); }
+  .kindra-landing .public-header .kindra-brand-mark { display: none; }
+  .kindra-landing .landing-actions { flex-direction: column; align-items: stretch; }
+  .kindra-landing .landing-explore { justify-content: center; }
 }
