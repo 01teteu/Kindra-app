@@ -40,7 +40,11 @@ async function startServer() {
     trustProxy: trustedProxies
   });
 
-  const PORT = 3000;
+  const configuredPort = process.env.PORT ?? '3000';
+  const PORT = Number(configuredPort);
+  if (!/^\d+$/.test(configuredPort) || !Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
+    throw new Error('PORT deve ser um número entre 1 e 65535.');
+  }
 
   await fastify.register(fastifyCookie, {
     secret: process.env.COOKIE_SECRET || 'super_secret_cookie_fallback',
@@ -111,7 +115,7 @@ async function startServer() {
 
   // 4. Inicializa o servidor
   try {
-    await fastify.listen({ port: PORT, host: '0.0.0.0' });
+    await fastify.listen({ port: PORT, host: '::' });
     console.log(`[Fastify] Servidor rodando em http://localhost:${PORT}`);
   } catch (err) {
     fastify.log.error(err);
