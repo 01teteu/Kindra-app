@@ -1,12 +1,25 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowUpRight, Dumbbell, Droplet, Flame, Utensils } from 'lucide-react';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Brand } from '../components/ui/Brand';
 import './public.css';
 
-const heroPhoto = new URL('../assets/landing/kindra-training.png', import.meta.url).href;
+const guardianMain = new URL('../assets/brand/totem/guardian-main.webp', import.meta.url).href;
+const guardianFocused = new URL('../assets/brand/totem/guardian-focused.webp', import.meta.url).href;
+const guardianSad = new URL('../assets/brand/totem/guardian-sad.webp', import.meta.url).href;
+const guardianCelebrating = new URL('../assets/brand/totem/guardian-celebrating.webp', import.meta.url).href;
+const productInterface = new URL('../assets/landing/kindra-interface.webp', import.meta.url).href;
+
+const pillars = [
+  { number: '01', name: 'Treino', description: 'Planeje a semana. Registre séries, cargas e repetições quando for a hora de treinar.' },
+  { number: '02', name: 'Nutrição', description: 'Reúna refeições, água e metas em um lugar que acompanha o seu dia.' },
+  { number: '03', name: 'Evolução', description: 'Volte aos seus registros para entender o caminho que está construindo.' },
+];
 
 export function Landing() {
+  const reduceMotion = useReducedMotion();
+
   useEffect(() => {
     const previousTitle = document.title;
     document.title = 'Kindra — Treino e nutrição em um só lugar';
@@ -19,7 +32,7 @@ export function Landing() {
       <header className="public-header public-container">
         <Link to="/" aria-label="Kindra — página inicial"><Brand /></Link>
         <nav aria-label="Navegação principal" className="public-nav">
-          <a href="#seu-dia" className="public-nav-detail">Conheça o Kindra</a>
+          <a href="#sistema" className="landing-nav-detail">O Kindra</a>
           <Link to="/login" className="kindra-button button-ghost button-sm">Entrar</Link>
           <Link to="/register" className="kindra-button button-outline button-sm">Criar conta</Link>
         </nav>
@@ -27,63 +40,97 @@ export function Landing() {
 
       <main id="conteudo" tabIndex={-1}>
         <section className="landing-hero public-container" aria-labelledby="hero-title">
-          <div className="landing-hero-photo" aria-hidden="true"><img src={heroPhoto} alt="" width="1672" height="941" fetchPriority="high" /></div>
-          <div className="landing-intro">
-            <p className="landing-context">Treino e nutrição em um só lugar</p>
-            <h1 id="hero-title">Uma versão<br />mais forte<br /><span>de você.</span></h1>
-            <p className="landing-lead">Organize seus treinos, registre alimentação e água e acompanhe sua evolução.</p>
-            <div className="landing-actions">
+          <div className="landing-hero-stage">
+            <motion.p className="landing-hero-kicker" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+              TREINO · NUTRIÇÃO · EVOLUÇÃO
+            </motion.p>
+            <motion.h1 id="hero-title" initial={reduceMotion ? false : { clipPath: 'inset(0 0 100% 0)' }} animate={{ clipPath: 'inset(0 0 0% 0)' }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.14 }}>
+              Continue<span>.</span>
+            </motion.h1>
+            <motion.div className="landing-hero-guardian" initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, delay: 0.28, ease: 'easeOut' }}>
+              <img src={guardianMain} width="525" height="718" fetchPriority="high" alt="Guardian Totem do Kindra, guardião de corpo graphite e olhos mint" />
+            </motion.div>
+            <span className="landing-hero-index" aria-hidden="true">K / 01</span>
+          </div>
+          <div className="landing-hero-bottom">
+            <motion.div initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.55 }}>
+              <p className="landing-hero-statement">Um dia de cada vez.<br /><strong>Um caminho inteiro pela frente.</strong></p>
+              <p className="landing-hero-description">O Kindra reúne seus treinos, sua alimentação e sua evolução para você seguir com clareza.</p>
+            </motion.div>
+            <div className="landing-hero-actions">
               <Link to="/register" className="kindra-button button-primary button-lg">Criar conta <ArrowUpRight size={18} aria-hidden="true" /></Link>
-              <a href="#seu-dia" className="landing-explore">Conhecer o Kindra <ArrowDown size={15} aria-hidden="true" /></a>
+              <Link to="/login" className="landing-text-link">Já tenho conta <ArrowUpRight size={16} aria-hidden="true" /></Link>
             </div>
           </div>
-
-          <figure className="landing-product" aria-labelledby="product-caption">
-            <div className="landing-app-preview">
-              <div className="landing-preview-header"><Brand /><span>Início</span></div>
-              <div className="landing-preview-greeting"><span>Seu espaço</span><h2>Seu dia, no Kindra.</h2></div>
-              <div className="landing-preview-streak">
-                <p>Consistência nutricional</p><h3>Sua<br />ofensiva.</h3>
-                <Flame className="landing-preview-flame" size={112} strokeWidth={1.1} aria-hidden="true" />
-                <p className="landing-preview-note">Acompanhe sua constância em alimentação e água.</p>
-              </div>
-              <div className="landing-preview-today"><Dumbbell size={19} aria-hidden="true" /><div><h3>Treino de hoje</h3><p>Organize sua semana de treinos.</p></div></div>
-              <div className="landing-preview-care">
-                <div><Utensils size={17} aria-hidden="true" /><h3>Alimentação</h3><p>Suas refeições do dia</p></div>
-                <div><Droplet size={18} aria-hidden="true" /><h3>Hidratação</h3><p>Seus registros de água</p></div>
-              </div>
-              <div className="landing-preview-nav" aria-hidden="true"><span>Início</span><span>Treino</span><span>Nutrição</span></div>
-            </div>
-            <div className="landing-preview-companion"><span>Acompanhe</span><strong>Sua evolução<ArrowUpRight size={22} aria-hidden="true" /></strong><p>Da primeira série<br />às suas melhores marcas.</p></div>
-            <figcaption id="product-caption">Prévia da interface · sem dados pessoais</figcaption>
-          </figure>
-          <div className="landing-hero-foot"><span>Planejar. Registrar. Acompanhar.</span><a href="#seu-dia" aria-label="Explore o que você pode fazer no Kindra"><ArrowDown size={18} aria-hidden="true" /></a></div>
+          <a href="#disciplina" className="landing-scroll-cue">Descubra o Kindra <ArrowDown size={17} aria-hidden="true" /></a>
         </section>
 
-        <section id="seu-dia" className="landing-daily public-container" aria-labelledby="daily-title">
-          <div className="landing-section-heading"><p className="landing-context">Uma rotina, conectada.</p><h2 id="daily-title">Organize o dia.<br /><span>Registre o que fez.</span></h2><p>Menos registros espalhados. Mais clareza sobre seu treino, sua alimentação e sua água.</p></div>
-          <div className="landing-daily-grid">
-            <article className="landing-training-feature">
-              <div className="landing-feature-title"><Dumbbell size={22} aria-hidden="true" /><h3>Um lugar para cada treino.</h3></div>
-              <p>Monte suas rotinas e distribua os treinos pela semana. Durante a sessão, registre carga, repetições e séries concluídas.</p>
-              <div className="landing-training-type" aria-hidden="true"><span>Minha</span><strong>semana<span>.</span></strong></div>
-              <p className="landing-feature-foot">Planejamento e execução, no mesmo lugar.</p>
-            </article>
-            <div className="landing-care-features">
-              <article><Utensils size={22} aria-hidden="true" /><h3>Alimentação<br />com contexto.</h3><p>Reúna suas refeições e acompanhe calorias e nutrientes em relação às suas metas.</p></article>
-              <article><Droplet size={23} aria-hidden="true" /><h3>Água também<br />faz parte.</h3><p>Registre a água ao longo do dia e consulte o que já foi registrado.</p></article>
-            </div>
+        <section id="disciplina" className="landing-discipline" aria-labelledby="discipline-title">
+          <div className="public-container landing-discipline-inner">
+            <div className="landing-section-label"><span>01 / A IDEIA</span><span>DISCIPLINA</span></div>
+            <motion.div className="landing-discipline-copy" initial={reduceMotion ? false : { opacity: 0, x: -28 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 0.7 }}>
+              <p>Motivação passa.</p>
+              <h2 id="discipline-title">Disciplina<br /><em>permanece<span>.</span></em></h2>
+              <span>Não é sobre fazer tudo. É sobre continuar fazendo o que importa.</span>
+            </motion.div>
+            <img className="landing-discipline-guardian" src={guardianFocused} width="264" height="329" loading="lazy" alt="Guardian Totem em postura focada" />
           </div>
         </section>
 
-        <section className="landing-evolution public-container" aria-labelledby="evolution-title">
-          <div className="landing-evolution-title"><p className="landing-context">Seus registros têm continuidade.</p><h2 id="evolution-title">Cada<br />treino<br /><span>conta.</span></h2></div>
-          <div className="landing-evolution-copy"><h3>Veja o caminho<br />que você está construindo.</h3><p>Consulte sua progressão por exercício, a carga movimentada e suas melhores marcas a partir dos treinos registrados.</p>
-            <dl><div><dt>Sua força, sessão a sessão</dt><dd>Acompanhe a estimativa de força por exercício ao longo do tempo.</dd></div><div><dt>Suas melhores marcas</dt><dd>Consulte maior carga e melhor estimativa de força, no período e no histórico.</dd></div><div><dt>Consistência além do treino</dt><dd>A ofensiva nutricional acompanha os dias consolidados conforme suas metas de alimentação e água.</dd></div></dl>
+        <section id="sistema" className="landing-system public-container" aria-labelledby="system-title">
+          <div className="landing-section-label"><span>02 / O SISTEMA</span><span>FEITO PARA O SEU DIA</span></div>
+          <div className="landing-system-intro">
+            <h2 id="system-title">Tudo se<br /><span>conecta.</span></h2>
+            <p>Planeje, registre e acompanhe. Cada parte da sua rotina encontra seu lugar.</p>
+          </div>
+          <div className="landing-pillar-list">
+            {pillars.map((pillar) => (
+              <article className="landing-pillar" key={pillar.number}>
+                <span className="landing-pillar-number">{pillar.number}</span>
+                <h3>{pillar.name}</h3>
+                <p>{pillar.description}</p>
+                <ArrowUpRight size={22} aria-hidden="true" />
+              </article>
+            ))}
           </div>
         </section>
 
-        <section className="landing-start public-container" aria-labelledby="start-title"><div><p className="landing-context">Seu próximo passo</p><h2 id="start-title">Comece pela<br />sua rotina<span>.</span></h2></div><div><Link to="/register" className="kindra-button button-primary button-lg">Criar conta <ArrowUpRight size={18} aria-hidden="true" /></Link><p>Já usa o Kindra? <Link to="/login">Entrar</Link></p></div></section>
+        <section className="landing-product public-container" aria-labelledby="product-title">
+          <div className="landing-section-label"><span>03 / O PRODUTO</span><span>O KINDRA É REAL</span></div>
+          <div className="landing-product-heading">
+            <h2 id="product-title">Uma rotina.<br /><span>Um lugar.</span></h2>
+            <p>O seu dia ganha contexto: treino, alimentação e registros acessíveis na mesma experiência.</p>
+          </div>
+          <motion.figure className="landing-product-figure" initial={reduceMotion ? false : { clipPath: 'inset(0 0 12% 0)', opacity: 0.7 }} whileInView={{ clipPath: 'inset(0 0 0% 0)', opacity: 1 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
+            <img src={productInterface} width="1042" height="568" loading="lazy" alt="Captura real da interface do Kindra com visão da rotina e atalhos para nutrição e treinos" />
+            <figcaption>Interface do Kindra · visão da rotina</figcaption>
+          </motion.figure>
+        </section>
+
+        <section className="landing-progress public-container" aria-labelledby="progress-title">
+          <div className="landing-section-label"><span>04 / O CAMINHO</span><span>PROGRESSO</span></div>
+          <div className="landing-progress-layout">
+            <div>
+              <h2 id="progress-title">O progresso<br />tem memória<span>.</span></h2>
+              <p>Um treino concluído. Uma refeição registrada. Uma marca revisitada. O Kindra ajuda você a enxergar o que está construindo.</p>
+              <div className="landing-progress-notes" aria-label="O que você pode acompanhar"><span>Treinos</span><span>Alimentação</span><span>Evolução</span></div>
+            </div>
+            <img src={guardianCelebrating} width="300" height="329" loading="lazy" alt="Guardian Totem celebrando" />
+          </div>
+        </section>
+
+        <section className="landing-guardian-moment" aria-labelledby="guardian-title">
+          <div className="public-container landing-guardian-inner">
+            <img src={guardianSad} width="262" height="329" loading="lazy" alt="Guardian Totem em momento de pausa" />
+            <div><p className="landing-moment-overline">PRESENÇA, TODOS OS DIAS</p><h2 id="guardian-title">Nem todo dia<br />vai ser fácil.<br /><span>Continue mesmo assim.</span></h2><p>O importante é poder voltar.</p></div>
+          </div>
+        </section>
+
+        <section className="landing-start public-container" aria-labelledby="start-title">
+          <p className="landing-moment-overline">SEU PRÓXIMO PASSO</p>
+          <h2 id="start-title">Comece hoje<span>.</span><br />Continue amanhã.</h2>
+          <div className="landing-start-actions"><Link to="/register" className="kindra-button button-primary button-lg">Criar conta <ArrowUpRight size={18} aria-hidden="true" /></Link><Link to="/login" className="landing-text-link">Já usa o Kindra? Entrar <ArrowUpRight size={16} aria-hidden="true" /></Link></div>
+        </section>
       </main>
       <footer className="public-footer public-container"><Link to="/" aria-label="Kindra — página inicial"><Brand /></Link><nav aria-label="Links do rodapé" className="landing-footer-links"><Link to="/register">Criar conta</Link><Link to="/login">Já tenho conta</Link><a href="#conteudo">Voltar ao início ↑</a></nav></footer>
     </div>
