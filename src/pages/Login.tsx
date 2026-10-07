@@ -3,20 +3,24 @@ import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { apiFetch } from '../lib/api';
 import { loginSchema, type LoginInput } from '../lib/validations';
-import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { GoogleAuthButton } from '../components/ui/GoogleAuthButton';
 import { useToast } from '../components/ui/ToastProvider';
+
+import './login.css';
+
+const guardianMain = new URL('../assets/brand/totem/guardian-main.webp', import.meta.url).href;
 
 const LOGIN_ERROR_TOAST_ID = 'login-error';
 
 export function Login() {
   const navigate = useNavigate();
   const { showToast, dismissToast } = useToast();
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     // Se o usuário já estiver logado, pula o login
@@ -70,75 +74,85 @@ export function Login() {
   };
 
   return (
-    <AuthLayout>
+    <div className="login-page">
+      <AuthLayout>
+        <div className="login-content">
+          <motion.figure
+            className="login-guardian"
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <img
+              src={guardianMain}
+              width="525"
+              height="718"
+              alt="Guardian Totem do Kindra dando boas-vindas ao seu retorno"
+            />
+          </motion.figure>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-md relative z-10 flex flex-col items-center"
-      >
+          <motion.div
+            className="login-intro"
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.38, delay: 0.06, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <h1>Bom te ver de volta<span>.</span></h1>
+            <p>Entre para continuar de onde parou.</p>
+          </motion.div>
 
+          <motion.div
+            className="login-form-area"
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.38, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+              <Input
+                title="Email"
+                type="email"
+                placeholder="voce@exemplo.com"
+                {...register('email')}
+                error={errors.email?.message}
+              />
 
-        <div className="auth-title">
-          <h1 className="text-2xl sm:text-[28px] font-display font-bold mb-2 text-kindra-950">
-            Bem-vindo de volta
-          </h1>
-          <p className="text-kindra-500 text-[15px] font-medium">
-            Entre para continuar no Kindra
+              <div className="login-password-field">
+                <Input
+                  title="Senha"
+                  type="password"
+                  placeholder="••••••••"
+                  {...register('password')}
+                  error={errors.password?.message}
+                />
+                <div className="login-forgot">
+                  <Link to="/forgot-password">
+                    Esqueceu a senha?
+                  </Link>
+                </div>
+              </div>
+
+              <div className="login-submit-wrap">
+                <Button type="submit" className="login-submit" isLoading={isSubmitting}>
+                  Entrar
+                </Button>
+              </div>
+
+              <div className="login-alternative">
+                <span>ou continue com</span>
+              </div>
+
+              <GoogleAuthButton />
+            </form>
+          </motion.div>
+
+          <p className="login-register">
+            Não tem conta?{' '}
+            <Link to="/register">
+              Criar conta
+            </Link>
           </p>
         </div>
-
-        <Card className="w-full rounded-[20px] p-8 border-kindra-200 bg-kindra-100 shadow-none">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <Input
-              title="Email"
-              type="email"
-              placeholder="voce@exemplo.com"
-              {...register('email')}
-              error={errors.email?.message}
-            />
-
-            <div className="space-y-3">
-              <Input
-                title="Senha"
-                type="password"
-                placeholder="••••••••"
-                {...register('password')}
-                error={errors.password?.message}
-              />
-              <div className="flex justify-end pt-1">
-                <Link to="/forgot-password" className="text-sm font-bold text-teal-400 hover:text-teal-300 transition-colors">
-                  Esqueceu a senha?
-                </Link>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <Button type="submit" className="w-full h-12 text-[15px] rounded-xl font-bold bg-teal-400 text-kindra-base border-0 hover:bg-teal-300" isLoading={isSubmitting}>
-                Entrar
-              </Button>
-            </div>
-
-            <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-kindra-200"></div>
-              <span className="flex-shrink-0 mx-4 text-kindra-400 text-sm font-medium">
-                ou continue com
-              </span>
-              <div className="flex-grow border-t border-kindra-200"></div>
-            </div>
-
-            <GoogleAuthButton />
-          </form>
-        </Card>
-
-        <p className="text-center text-[15px] text-kindra-500 mt-8 font-medium">
-          Não tem conta?{' '}
-          <Link to="/register" className="text-teal-400 font-bold hover:text-teal-300 transition-colors">
-            Criar conta
-          </Link>
-        </p>
-      </motion.div>
-    </AuthLayout>
+      </AuthLayout>
+    </div>
   );
 }
