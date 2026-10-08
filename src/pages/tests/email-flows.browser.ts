@@ -125,9 +125,9 @@ try {
     input.dispatchEvent(new Event('input', { bubbles: true }));
   })()`);
   await evaluate("document.querySelector('form').requestSubmit(); document.querySelector('form').requestSubmit();");
-  await wait("document.body.innerText.includes('Etapa 2 de 3')");
+  await wait("document.body.innerText.includes('1 DE 3')");
   assert.equal(forgotRequests, 1, 'Recuperação não envia duas requisições simultâneas');
-  assert.ok(await evaluate("document.body.innerText.includes('Pedir outro código em')"), 'Cooldown de reenvio visível');
+  await wait("document.body.innerText.includes('Pedir outro código em')");
   assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'), false, 'Recuperação sem overflow em 390 px');
   for (const width of [1024, 1440]) {
     await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });

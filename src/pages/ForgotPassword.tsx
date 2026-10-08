@@ -5,13 +5,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'motion/react';
 import { apiFetch } from '../lib/api';
-import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { OtpInput } from '../components/ui/OtpInput';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { z } from 'zod';
 import './forgot-password.css';
+
+const guardianMain = new URL('../assets/brand/totem/guardian-main.webp', import.meta.url).href;
+const guardianFocused = new URL('../assets/brand/totem/guardian-focused.webp', import.meta.url).href;
+const guardianCelebrating = new URL('../assets/brand/totem/guardian-celebrating.webp', import.meta.url).href;
 
 // Schemas locais para os passos
 const step1Schema = z.object({ email: z.string().email("E-mail inválido.") });
@@ -150,29 +153,45 @@ export function ForgotPassword() {
             Voltar para o login
           </Link>
 
-          <Card>
+          <div className="forgot-password-progress" role="progressbar" aria-label="Recuperação de senha"
+            aria-valuemin={0} aria-valuemax={3} aria-valuenow={step - 1}
+            aria-valuetext={`${step - 1} de 3 etapas concluídas`}>
+            <span className="forgot-password-progress-count">{step - 1} <span>DE 3</span></span>
+            <span className="forgot-password-progress-label">RECUPERAÇÃO DE ACESSO</span>
+            <span className="forgot-password-progress-track" aria-hidden="true">
+              <span style={{ width: `${((step - 1) / 3) * 100}%` }} />
+            </span>
+          </div>
+
+          <div className="forgot-password-stage" data-stage={step}>
+            <div className="forgot-password-guardian" aria-hidden="true">
+              <img
+                src={step === 2 ? guardianFocused : step === 4 ? guardianCelebrating : guardianMain}
+                alt=""
+              />
+            </div>
             <AnimatePresence mode="wait">
 
               {/* STEP 1: Solicitar Código */}
               {step === 1 && (
                 <motion.div
                   key="step1"
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="w-full"
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.18 }}
+                  className="forgot-password-panel"
                 >
                   <div className="forgot-password-heading">
-                    <p className="forgot-password-step">Etapa 1 de 3</p>
                     <h1 className="font-display font-bold text-kindra-950">
-                      Recuperar senha
+                      Esqueceu sua senha?<br /><span>Vamos resolver.</span>
                     </h1>
                     <p className="text-kindra-500 text-sm font-medium">
-                      Informe o e-mail da sua conta para receber um código de 6 dígitos.
+                      Digite o e-mail usado no seu cadastro. Enviaremos um código para você continuar com segurança.
                     </p>
                   </div>
 
-                  <form onSubmit={hand1(onStep1)} className="space-y-5">
+                  <form onSubmit={hand1(onStep1)} className="forgot-password-form">
                     <Input
                       title="E-mail cadastrado"
                       type="email"
@@ -185,7 +204,7 @@ export function ForgotPassword() {
                         {serverError}
                       </div>
                     )}
-                    <Button type="submit" className="w-full" isLoading={sub1 || isRequesting}>
+                    <Button type="submit" className="forgot-password-primary" isLoading={sub1 || isRequesting}>
                       Enviar código
                     </Button>
                   </form>
@@ -196,13 +215,13 @@ export function ForgotPassword() {
               {step === 2 && (
                 <motion.div
                   key="step2"
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="w-full"
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.18 }}
+                  className="forgot-password-panel"
                 >
                   <div className="forgot-password-heading">
-                    <p className="forgot-password-step">Etapa 2 de 3</p>
                     <h1 className="font-display font-bold text-kindra-950">
                       Confira seu e-mail
                     </h1>
@@ -212,8 +231,8 @@ export function ForgotPassword() {
                     </p>
                   </div>
 
-                  <form onSubmit={hand2(onStep2)} className="space-y-5">
-                    <div role="group" aria-label="Código de 6 dígitos" aria-describedby={err2.token ? 'reset-code-error' : undefined}>
+                  <form onSubmit={hand2(onStep2)} className="forgot-password-form">
+                    <div className="forgot-password-code" role="group" aria-label="Código de 6 dígitos" aria-describedby={err2.token ? 'reset-code-error' : undefined}>
                       <OtpInput
                         value={tokenValue}
                         onChange={(val) => setVal2('token', val, { shouldValidate: true })}
@@ -228,11 +247,11 @@ export function ForgotPassword() {
                         {serverError}
                       </div>
                     )}
-                    <Button type="submit" className="w-full" isLoading={sub2}>
+                    <Button type="submit" className="forgot-password-primary" isLoading={sub2}>
                       Validar código
                     </Button>
-                    {resendNotice && <p role="status" className="text-sm text-kindra-500">{resendNotice}</p>}
-                    <Button type="button" variant="ghost" className="w-full" onClick={onResend}
+                    {resendNotice && <p role="status" className="forgot-password-notice">{resendNotice}</p>}
+                    <Button type="button" variant="ghost" className="forgot-password-resend" onClick={onResend}
                       isLoading={isResending} disabled={resendCooldown > 0 || sub2}>
                       {resendCooldown > 0 ? `Pedir outro código em ${resendCooldown} s` : 'Pedir outro código'}
                     </Button>
@@ -244,22 +263,22 @@ export function ForgotPassword() {
               {step === 3 && (
                 <motion.div
                   key="step3"
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="w-full"
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.18 }}
+                  className="forgot-password-panel"
                 >
                   <div className="forgot-password-heading">
-                    <p className="forgot-password-step">Etapa 3 de 3</p>
                     <h1 className="font-display font-bold text-kindra-950">
-                      Crie sua nova senha
+                      Agora escolha sua nova senha.
                     </h1>
                     <p className="text-kindra-500 text-sm font-medium">
                       Escolha uma nova senha para acessar sua conta.
                     </p>
                   </div>
 
-                  <form onSubmit={hand3(onStep3)} className="space-y-5">
+                  <form onSubmit={hand3(onStep3)} className="forgot-password-form">
                     <Input
                       title="Nova senha"
                       type="password"
@@ -283,7 +302,7 @@ export function ForgotPassword() {
                         {serverError}
                       </div>
                     )}
-                    <Button type="submit" className="w-full" isLoading={sub3}>
+                    <Button type="submit" className="forgot-password-primary" isLoading={sub3}>
                       Redefinir senha
                     </Button>
                   </form>
@@ -294,29 +313,30 @@ export function ForgotPassword() {
               {step === 4 && (
                 <motion.div
                   key="step4"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="w-full"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.18 }}
+                  className="forgot-password-panel"
                 >
                   <div role="status" className="forgot-password-heading">
                     <div className="forgot-password-success-icon">
                       <CheckCircle2 className="w-7 h-7" aria-hidden="true" />
                     </div>
                     <h1 className="font-display font-bold text-kindra-950">
-                      Senha redefinida
+                      Pronto. Sua senha foi atualizada.
                     </h1>
                     <p className="text-kindra-500 text-sm font-medium">
                       Sua senha foi redefinida com sucesso. Você já pode acessar sua conta.
                     </p>
                   </div>
-                  <Button onClick={() => navigate('/login')} className="w-full">
+                  <Button onClick={() => navigate('/login')} className="forgot-password-primary">
                     Ir para o login
                   </Button>
                 </motion.div>
               )}
 
             </AnimatePresence>
-          </Card>
+          </div>
         </div>
       </AuthLayout>
     </div>
