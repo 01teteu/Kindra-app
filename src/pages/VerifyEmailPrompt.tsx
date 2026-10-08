@@ -4,13 +4,14 @@ import { AuthLayout } from '../components/layout/AuthLayout';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, X, ArrowLeft, CheckCircle } from 'lucide-react';
-import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { OtpInput } from '../components/ui/OtpInput';
 import { apiFetch } from '../lib/api';
 import { z } from 'zod';
 import { AnimatePresence, motion } from 'motion/react';
+
+const guardianFocused = new URL('../assets/brand/totem/guardian-focused.webp', import.meta.url).href;
 
 // Reusing same logic from backend schema
 const emailSchema = z.string().email("E-mail inválido.");
@@ -220,36 +221,44 @@ export function VerifyEmailPrompt() {
   };
 
   return (
-    <div className="verify-email-page">
+    <div className="verify-email-page verify-email-prompt-page">
       <AuthLayout>
-        <Card className="verify-email-content">
+        <div className="verify-email-content verify-email-flow">
+          <div className="verify-email-guardian" aria-hidden="true">
+            <img src={guardianFocused} alt="" />
+          </div>
           <AnimatePresence mode="wait">
             {!isSuccess ? (
               <motion.div
                 key="form"
+                className="verify-email-main"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
               >
                 <div className="verify-email-heading">
-                  <p className="verify-email-context">Falta confirmar seu e-mail</p>
-                  <h1>Confira seu e-mail</h1>
-                  <p>Se o cadastro puder prosseguir, você receberá um link e um código no endereço informado.</p>
-                  {hasContext ? <strong className="verify-email-address">{currentEmail}</strong> : (
-                    <div className="mt-4 text-left">
-                      <Input title="E-mail" type="email" value={currentEmail} onChange={event => setCurrentEmail(event.target.value)} />
+                  <p className="verify-email-context">CONFIRMAÇÃO DE E-MAIL</p>
+                  <h1>Agora só falta <span>confirmar.</span></h1>
+                  <p>{hasContext
+                    ? 'Digite o código do e-mail e crie sua senha para continuar o cadastro.'
+                    : 'Confira seu e-mail. Se este endereço puder ser verificado, você receberá um link e um código para continuar.'}</p>
+                  {hasContext ? <div className="verify-email-address-row">
+                    <strong className="verify-email-address">{currentEmail}</strong>
+                    <button onClick={handleOpenEditModal} disabled={isVerifying || isResending} className="verify-email-edit">Alterar e-mail</button>
+                  </div> : (
+                    <div className="verify-email-email-entry">
+                      <Input title="E-mail" type="email" placeholder="voce@exemplo.com" value={currentEmail} onChange={event => setCurrentEmail(event.target.value)} />
                     </div>
                   )}
-                  {hasContext && <button onClick={handleOpenEditModal} disabled={isVerifying || isResending} className="verify-email-edit">Alterar e-mail</button>}
-                  <p id="verify-email-code-help">Abra o link recebido por e-mail. Depois, digite o código e defina sua senha.</p>
                 </div>
 
                 {hasContext && <>
-                  <div className="mb-6" role="group" aria-label="Código de 6 dígitos" aria-describedby="verify-email-code-help">
+                  <p id="verify-email-code-help" className="verify-email-code-label">Código de 6 dígitos</p>
+                  <div className="verify-email-otp" role="group" aria-label="Código de 6 dígitos" aria-describedby="verify-email-code-help">
                     <OtpInput value={otp} onChange={setOtp} />
                   </div>
-                  <div className="space-y-4 mb-6">
+                  <div className="verify-email-password-fields">
                     <Input title="Nova senha" type="password" value={password} onChange={event => setPassword(event.target.value)} />
                     <Input title="Confirme a nova senha" type="password" value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} />
                   </div>
@@ -261,9 +270,9 @@ export function VerifyEmailPrompt() {
                   </div>
                 )}
 
-                <div className="space-y-4">
+                <div className="verify-email-actions">
                   {hasContext && <Button
-                    className="w-full"
+                    className="verify-email-primary"
                     onClick={handleVerify}
                     isLoading={isVerifying}
                     disabled={isResending}
@@ -272,7 +281,7 @@ export function VerifyEmailPrompt() {
                   </Button>}
                   <Button
                     variant="ghost"
-                    className="w-full"
+                    className={hasContext ? 'verify-email-resend' : 'verify-email-primary'}
                     onClick={executeNormalResend}
                     isLoading={isResending}
                     disabled={cooldown > 0 || isVerifying}
@@ -290,7 +299,7 @@ export function VerifyEmailPrompt() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.2 }}
-                className="verify-email-heading"
+                className="verify-email-heading verify-email-main verify-email-success"
                 role="status"
               >
                 <div className="verify-email-status-icon text-teal-300">
@@ -303,7 +312,7 @@ export function VerifyEmailPrompt() {
               </motion.div>
             )}
           </AnimatePresence>
-        </Card>
+        </div>
 
         {/* MODAL DE CONFIRMAÇÃO */}
         <AnimatePresence>
