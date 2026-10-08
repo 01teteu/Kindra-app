@@ -1,0 +1,320 @@
+/* Both modes share the same presentation; their existing requests and outcomes remain separate. */
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-layout {
+  width: 100%;
+  max-width: 1180px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.onboarding-page {
+  width: 100%;
+  padding-inline: clamp(20px, 4vw, 56px);
+  background: var(--color-kindra-base);
+}
+
+.onboarding-page > header,
+.onboarding-page > footer {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.onboarding-page > header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-kindra-200);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-aside {
+  position: relative;
+  min-width: 0;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-story {
+  margin-bottom: 28px;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-story h2 {
+  max-width: 420px;
+  font-size: clamp(28px, 3.3vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.055em;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-story > p:last-child {
+  max-width: 370px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-guardian {
+  width: clamp(150px, 18vw, 220px);
+  margin: 22px auto 25px 10px;
+  pointer-events: none;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-guardian img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 18px 22px rgb(0 0 0 / 13%));
+  animation: onboarding-guardian-float 9s ease-in-out infinite;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-progress {
+  padding-top: 18px;
+  border-top: 1px solid var(--color-kindra-200);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-progress-list [aria-current='step'] p:first-child {
+  color: var(--color-teal-300);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-form-surface {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-step-heading {
+  margin-bottom: 32px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid var(--color-kindra-200);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-step-heading .eyebrow {
+  color: var(--color-teal-300);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-step-heading h1 {
+  max-width: 660px;
+  font-size: clamp(34px, 4vw, 49px);
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-step-heading > p:last-child {
+  max-width: 560px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-fields {
+  max-width: 620px;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-fields label,
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-fields legend {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-kindra-700);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-fields .kindra-input {
+  height: 56px;
+  border-color: var(--color-kindra-300);
+  background: var(--color-kindra-100);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-fields .kindra-input:focus {
+  outline: 2px solid var(--color-teal-400);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-choice {
+  border-color: var(--color-kindra-300);
+  background: var(--color-kindra-100);
+  color: var(--color-kindra-800);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-choice:hover:not([aria-pressed='true']) {
+  border-color: var(--color-kindra-500);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-choice[aria-pressed='true'] {
+  border-color: var(--color-teal-400);
+  background: rgb(45 212 191 / 10%);
+  color: var(--color-teal-300);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-choice:focus-visible {
+  outline: 2px solid var(--color-teal-400);
+  outline-offset: 3px;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-option-list .onboarding-choice {
+  min-height: 70px;
+  padding: 13px 18px;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-sex-options .onboarding-choice {
+  min-height: 58px;
+  text-align: center;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-care-options .onboarding-choice {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: var(--control-radius);
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-form-surface .button-primary {
+  min-height: 54px;
+  padding-inline: 26px;
+  font-weight: 700;
+}
+
+:is(.onboarding-page, .onboarding-edit-page) .onboarding-form-surface .button-primary:focus-visible {
+  outline: 2px solid var(--color-teal-400);
+  outline-offset: 3px;
+}
+
+.onboarding-state-surface,
+.onboarding-saved {
+  border-color: var(--color-kindra-300);
+  background: var(--color-kindra-100);
+}
+
+.onboarding-saved {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.onboarding-saved h2 {
+  font-size: clamp(27px, 3vw, 36px);
+  letter-spacing: -0.05em;
+}
+
+@keyframes onboarding-guardian-float {
+  50% { transform: translateY(-7px); }
+}
+
+@media (min-width: 1024px) {
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-layout {
+    grid-template-columns: minmax(270px, 340px) minmax(0, 1fr);
+    gap: clamp(56px, 7vw, 112px);
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-aside {
+    align-self: start;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-progress-list {
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-progress {
+    padding-right: 135px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-guardian {
+    position: absolute;
+    top: 300px;
+    right: 0;
+    width: 135px;
+    margin: 0;
+  }
+}
+
+@media (max-width: 1023px) {
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-layout {
+    max-width: 680px;
+    gap: 26px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-aside {
+    position: relative;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-story {
+    min-height: 116px;
+    padding-right: 126px;
+    margin-bottom: 15px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-story h2 {
+    font-size: clamp(27px, 4.5vw, 34px);
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-guardian {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 112px;
+    margin: 0;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-progress {
+    padding-top: 13px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-form-surface {
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 430px) {
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-layout {
+    gap: 18px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-story {
+    min-height: 0;
+    padding-right: 100px;
+    margin-bottom: 10px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-story h2 {
+    font-size: 27px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-story > p:last-child {
+    font-size: 13px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-guardian {
+    width: 86px;
+    top: 10px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-step-heading h1 {
+    font-size: 33px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-step-heading {
+    margin-bottom: 23px;
+    padding-bottom: 18px;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-measure-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .onboarding-edit-page .onboarding-story {
+    padding-right: 0;
+  }
+
+  .onboarding-edit-page .onboarding-story h2 {
+    font-size: 24px;
+  }
+
+  .onboarding-edit-page .onboarding-guardian {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-guardian img {
+    animation: none;
+  }
+
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-choice,
+  :is(.onboarding-page, .onboarding-edit-page) .onboarding-fields .kindra-input {
+    transition: none;
+  }
+}

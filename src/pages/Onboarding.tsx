@@ -10,6 +10,9 @@ import { Input } from '../components/ui/Input';
 import { ArrowLeft, ArrowRight, Check, Loader2, AlertCircle } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ACTIVITY_LEVEL_OPTIONS, GOAL_OPTIONS } from '../shared/onboardingOptions';
+import './onboarding.css';
+
+const guardianMain = new URL('../assets/brand/totem/guardian-main.webp', import.meta.url).href;
 
 interface CatalogOption {
   id: string;
@@ -267,13 +270,13 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
   ];
   const currentStage = stages[step - 1];
   const selectionClass = (selected: boolean) => clsx(
-    'min-h-12 rounded-xl border px-4 py-3 text-left text-sm transition-colors motion-reduce:transition-none',
+    'onboarding-choice min-h-12 rounded-xl border px-4 py-3 text-left text-sm transition-colors motion-reduce:transition-none',
     selected ? 'border-teal-400 bg-teal-500/10 text-teal-300' : 'border-kindra-300 bg-kindra-50 text-kindra-800 hover:border-kindra-500',
   );
 
   if (saved) {
     return (
-      <Card className="p-6 sm:p-8 space-y-5">
+      <Card className="onboarding-saved p-6 sm:p-8 space-y-5">
         <div role="status" className="space-y-3">
           <Check className="h-8 w-8 text-teal-300" aria-hidden="true" />
           <h2 className="text-2xl font-display font-semibold text-kindra-950">Metas atualizadas</h2>
@@ -289,9 +292,9 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
 
   if (isInitializing || fetchError) {
     return (
-      <div className={isEditing ? "w-full" : "onboarding-page"}>
+      <div className={isEditing ? "w-full onboarding-edit-page" : "onboarding-page"}>
         {!isEditing && <header className="w-full max-w-5xl mb-12"><Brand /></header>}
-        <Card className="w-full max-w-md my-auto p-6 sm:p-8">
+        <Card className="onboarding-state-surface w-full max-w-md my-auto p-6 sm:p-8">
           {isInitializing ? (
             <div role="status" className="space-y-4">
               <Loader2 aria-hidden="true" className="h-6 w-6 text-teal-400 animate-spin motion-reduce:animate-none" />
@@ -312,7 +315,7 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
   }
 
   return (
-    <div className={isEditing ? "w-full" : "onboarding-page"}>
+    <div className={isEditing ? "w-full onboarding-edit-page" : "onboarding-page"}>
       {!isEditing && <header className="w-full max-w-5xl flex items-center justify-between gap-4 mb-8 lg:mb-12">
         <Brand />
         <span className="hidden sm:block eyebrow">Seu ritmo. Sua evolução.</span>
@@ -321,16 +324,16 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
         <Button variant="ghost" onClick={() => navigate('/settings')} disabled={isSubmitting}><ArrowLeft className="h-4 w-4" aria-hidden="true" />Cancelar edição</Button>
         <p className="border-l-2 border-teal-400 pl-4 text-sm leading-relaxed text-kindra-500">Ao salvar, suas metas de alimentação e água serão recalculadas com estas respostas. Os registros de consumo e os dias já consolidados serão preservados.</p>
       </div>}
-      <ContentTag className="w-full max-w-5xl grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-12 items-start">
-        <aside className="lg:sticky lg:top-8">
-          <div className="hidden lg:block mb-8">
+      <ContentTag className="onboarding-layout w-full max-w-5xl grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-12 items-start">
+        <aside className="onboarding-aside lg:sticky lg:top-8">
+          <div className="onboarding-story mb-8">
             <p className="eyebrow mb-4">{isEditing ? 'Seu momento atual' : 'Seu começo no Kindra'}</p>
             <h2 className="text-3xl font-display font-bold tracking-tight leading-tight">{isEditing ? 'Sua rotina muda. Suas metas acompanham.' : <>Uma rotina que<br />começa com você.</>}</h2>
             <p className="text-sm text-kindra-500 leading-relaxed mt-4">{isEditing ? 'Revise suas respostas e ajuste o que mudou desde o seu início.' : 'Quatro passos para conhecer seu momento e preparar seu perfil.'}</p>
           </div>
-          <nav aria-label={isEditing ? "Progresso da edição" : "Progresso do onboarding"}>
+          <nav className="onboarding-progress" aria-label={isEditing ? "Progresso da edição" : "Progresso do onboarding"}>
             <p className="text-sm text-kindra-500 mb-4" aria-live="polite">Etapa <span className="text-kindra-950 font-semibold">{step}</span> de 4 <span className="lg:hidden">· {currentStage.label}</span></p>
-            <ol className="grid grid-cols-4 gap-2 lg:grid-cols-1 lg:gap-5">
+            <ol className="onboarding-progress-list grid grid-cols-4 gap-2 lg:grid-cols-1 lg:gap-5">
               {stages.map((stage, index) => (
                 <li key={stage.label} aria-current={step === index + 1 ? 'step' : undefined} className="min-w-0">
                   <div className={clsx('h-1 rounded-full lg:hidden', index < step ? 'bg-teal-400' : 'bg-kindra-200')} />
@@ -345,8 +348,9 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
               ))}
             </ol>
           </nav>
+          <div className="onboarding-guardian" aria-hidden="true"><img src={guardianMain} alt="" /></div>
         </aside>
-        <Card className="p-5 sm:p-8 shadow-none">
+        <Card className="onboarding-form-surface p-5 sm:p-8 shadow-none">
           <form noValidate onSubmit={event => {
             event.preventDefault();
             if (isSubmitting || !validateStep()) return;
@@ -362,42 +366,42 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
                   transition={{ duration: reduceMotion ? 0 : 0.16 }}
                   onAnimationComplete={focusStep}
                 >
-                  <div className="mb-8">
+                  <div className="onboarding-step-heading mb-8">
                     <p className="eyebrow mb-3">{currentStage.label}</p>
                     <h1 ref={headingRef} tabIndex={-1} className="font-display font-bold text-kindra-950 leading-tight focus:outline-none">{currentStage.title}</h1>
                     <p className="mt-3 text-sm leading-relaxed text-kindra-500">{currentStage.description}</p>
                   </div>
-                  {step === 1 && <div className="space-y-5">
+                  {step === 1 && <div className="onboarding-fields space-y-5">
                     <Input title="Nome" autoComplete="given-name" placeholder="Seu nome" value={formData.firstName} onChange={e => handleChange('firstName', e.target.value)} />
                     <Input title="Sobrenome" autoComplete="family-name" placeholder="Seu sobrenome" value={formData.lastName} onChange={e => handleChange('lastName', e.target.value)} />
                   </div>}
-                  {step === 2 && <div className="space-y-6">
+                  {step === 2 && <div className="onboarding-fields space-y-6">
                     <Input title="Data de nascimento" type="date" autoComplete="bday" value={formData.birthDate} onChange={e => handleChange('birthDate', e.target.value)} />
                     <fieldset><legend className="text-sm font-medium text-kindra-700 mb-2">Sexo biológico</legend>
-                      <div className="grid grid-cols-2 gap-3">{[{ id: 'MALE', label: 'Masculino' }, { id: 'FEMALE', label: 'Feminino' }].map(option => <button type="button" key={option.id} aria-pressed={formData.biologicalSex === option.id} onClick={() => handleChange('biologicalSex', option.id)} className={selectionClass(formData.biologicalSex === option.id)}>{option.label}</button>)}</div>
+                      <div className="onboarding-sex-options grid grid-cols-2 gap-3">{[{ id: 'MALE', label: 'Masculino' }, { id: 'FEMALE', label: 'Feminino' }].map(option => <button type="button" key={option.id} aria-pressed={formData.biologicalSex === option.id} onClick={() => handleChange('biologicalSex', option.id)} className={selectionClass(formData.biologicalSex === option.id)}>{option.label}</button>)}</div>
                     </fieldset>
-                    <div className="grid grid-cols-2 gap-3 sm:gap-5">
+                    <div className="onboarding-measure-grid grid grid-cols-2 gap-3 sm:gap-5">
                       <Input title="Peso (kg)" type="number" step="any" inputMode="decimal" placeholder="Ex: 75.5" value={formData.weightKg} onChange={e => handleChange('weightKg', e.target.value)} />
                       <Input title="Altura (cm)" type="number" step="any" inputMode="numeric" placeholder="Ex: 175" value={formData.heightCm} onChange={e => handleChange('heightCm', e.target.value)} />
                     </div>
                   </div>}
-                  {step === 3 && <div className="space-y-8">
+                  {step === 3 && <div className="onboarding-fields space-y-8">
                     {[{ field: 'goal' as const, label: 'Seu objetivo principal', options: goals }, { field: 'activityLevel' as const, label: 'Sua rotina de exercícios', options: activityLevels }].map(group => <fieldset key={group.field}>
                       <legend className="text-sm font-semibold text-kindra-800 mb-3">{group.label}</legend>
-                      <div className="space-y-2">{group.options.map(option => <button type="button" key={option.id} aria-pressed={formData[group.field] === option.id} onClick={() => handleChange(group.field, option.id)} className={clsx(selectionClass(formData[group.field] === option.id), 'w-full flex items-center justify-between gap-3')}>
+                      <div className="onboarding-option-list space-y-2">{group.options.map(option => <button type="button" key={option.id} aria-pressed={formData[group.field] === option.id} onClick={() => handleChange(group.field, option.id)} className={clsx(selectionClass(formData[group.field] === option.id), 'w-full flex items-center justify-between gap-3')}>
                         <span><span className="block font-semibold">{option.label}</span><span className="block text-xs text-kindra-500 leading-relaxed mt-1">{option.desc}</span></span>
                         <span className={clsx('w-5 h-5 shrink-0 rounded-full border flex items-center justify-center', formData[group.field] === option.id ? 'border-teal-400' : 'border-kindra-300')} aria-hidden="true">{formData[group.field] === option.id && <Check className="w-3 h-3" />}</span>
                       </button>)}</div>
                     </fieldset>)}
                   </div>}
-                  {step === 4 && <div className="space-y-8">
+                  {step === 4 && <div className="onboarding-fields space-y-8">
                     <p className="text-sm text-kindra-500 border-l-2 border-teal-400 pl-3">Você pode selecionar mais de uma opção. Se não tiver restrições, marque “Nenhuma” em cada grupo.</p>
                     {[
                       { field: 'allergies' as const, other: 'hasOtherAllergy' as const, text: 'otherAllergyText' as const, label: 'Alergias alimentares', inputLabel: 'Qual outra alergia?', options: allergiesOptions },
                       { field: 'limitations' as const, other: 'hasOtherLimitation' as const, text: 'otherLimitationText' as const, label: 'Limitações físicas', inputLabel: 'Qual outra limitação?', options: limitationsOptions },
                     ].map(group => <fieldset key={group.field}>
                       <legend className="text-sm font-semibold text-kindra-800 mb-3">{group.label}</legend>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="onboarding-care-options flex flex-wrap gap-2">
                         {group.options.map(option => <button type="button" key={option.id} aria-pressed={formData[group.field].includes(option.id)} onClick={() => handleToggle(group.field, option.id, group.other)} className={clsx(selectionClass(formData[group.field].includes(option.id)), 'inline-flex items-center gap-2')}>
                           {formData[group.field].includes(option.id) && <Check className="w-4 h-4" aria-hidden="true" />}{option.name}
                         </button>)}
