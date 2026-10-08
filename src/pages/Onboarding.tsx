@@ -371,11 +371,11 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
                     <h1 ref={headingRef} tabIndex={-1} className="font-display font-bold text-kindra-950 leading-tight focus:outline-none">{currentStage.title}</h1>
                     <p className="mt-3 text-sm leading-relaxed text-kindra-500">{currentStage.description}</p>
                   </div>
-                  {step === 1 && <div className="onboarding-fields space-y-5">
+                  {step === 1 && <div className="onboarding-fields onboarding-name-fields space-y-5">
                     <Input title="Nome" autoComplete="given-name" placeholder="Seu nome" value={formData.firstName} onChange={e => handleChange('firstName', e.target.value)} />
                     <Input title="Sobrenome" autoComplete="family-name" placeholder="Seu sobrenome" value={formData.lastName} onChange={e => handleChange('lastName', e.target.value)} />
                   </div>}
-                  {step === 2 && <div className="onboarding-fields space-y-6">
+                  {step === 2 && <div className="onboarding-fields onboarding-body-fields space-y-6">
                     <Input title="Data de nascimento" type="date" autoComplete="bday" value={formData.birthDate} onChange={e => handleChange('birthDate', e.target.value)} />
                     <fieldset><legend className="text-sm font-medium text-kindra-700 mb-2">Sexo biológico</legend>
                       <div className="onboarding-sex-options grid grid-cols-2 gap-3">{[{ id: 'MALE', label: 'Masculino' }, { id: 'FEMALE', label: 'Feminino' }].map(option => <button type="button" key={option.id} aria-pressed={formData.biologicalSex === option.id} onClick={() => handleChange('biologicalSex', option.id)} className={selectionClass(formData.biologicalSex === option.id)}>{option.label}</button>)}</div>
@@ -385,8 +385,8 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
                       <Input title="Altura (cm)" type="number" step="any" inputMode="numeric" placeholder="Ex: 175" value={formData.heightCm} onChange={e => handleChange('heightCm', e.target.value)} />
                     </div>
                   </div>}
-                  {step === 3 && <div className="onboarding-fields space-y-8">
-                    {[{ field: 'goal' as const, label: 'Seu objetivo principal', options: goals }, { field: 'activityLevel' as const, label: 'Sua rotina de exercícios', options: activityLevels }].map(group => <fieldset key={group.field}>
+                  {step === 3 && <div className="onboarding-fields onboarding-routine-fields space-y-8">
+                    {[{ field: 'goal' as const, label: 'Seu objetivo principal', options: goals }, { field: 'activityLevel' as const, label: 'Sua rotina de exercícios', options: activityLevels }].map(group => <fieldset className="onboarding-choice-group" key={group.field}>
                       <legend className="text-sm font-semibold text-kindra-800 mb-3">{group.label}</legend>
                       <div className="onboarding-option-list space-y-2">{group.options.map(option => <button type="button" key={option.id} aria-pressed={formData[group.field] === option.id} onClick={() => handleChange(group.field, option.id)} className={clsx(selectionClass(formData[group.field] === option.id), 'w-full flex items-center justify-between gap-3')}>
                         <span><span className="block font-semibold">{option.label}</span><span className="block text-xs text-kindra-500 leading-relaxed mt-1">{option.desc}</span></span>
@@ -394,12 +394,12 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
                       </button>)}</div>
                     </fieldset>)}
                   </div>}
-                  {step === 4 && <div className="onboarding-fields space-y-8">
+                  {step === 4 && <div className="onboarding-fields onboarding-care-fields space-y-8">
                     <p className="text-sm text-kindra-500 border-l-2 border-teal-400 pl-3">Você pode selecionar mais de uma opção. Se não tiver restrições, marque “Nenhuma” em cada grupo.</p>
                     {[
                       { field: 'allergies' as const, other: 'hasOtherAllergy' as const, text: 'otherAllergyText' as const, label: 'Alergias alimentares', inputLabel: 'Qual outra alergia?', options: allergiesOptions },
                       { field: 'limitations' as const, other: 'hasOtherLimitation' as const, text: 'otherLimitationText' as const, label: 'Limitações físicas', inputLabel: 'Qual outra limitação?', options: limitationsOptions },
-                    ].map(group => <fieldset key={group.field}>
+                    ].map(group => <fieldset className="onboarding-care-group" key={group.field}>
                       <legend className="text-sm font-semibold text-kindra-800 mb-3">{group.label}</legend>
                       <div className="onboarding-care-options flex flex-wrap gap-2">
                         {group.options.map(option => <button type="button" key={option.id} aria-pressed={formData[group.field].includes(option.id)} onClick={() => handleToggle(group.field, option.id, group.other)} className={clsx(selectionClass(formData[group.field].includes(option.id)), 'inline-flex items-center gap-2')}>
@@ -408,9 +408,9 @@ export function Onboarding({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
                         {group.options.length > 0 && <button type="button" aria-pressed={formData[group.other]} onClick={() => handleToggle(group.field, 'Outras', group.other)} className={selectionClass(formData[group.other])}>Outras</button>}
                       </div>
                       {group.options.length === 0 && <div role="alert" className="text-sm text-rose-400 space-y-2"><p>Não foi possível obter as opções deste grupo.</p><Button type="button" variant="outline" onClick={loadData}>Tentar novamente</Button></div>}
-                      {formData[group.other] && <div className="mt-4"><Input title={group.inputLabel} placeholder="Descreva em até 50 caracteres" value={formData[group.text]} onChange={e => handleChange(group.text, e.target.value)} maxLength={50} autoFocus /></div>}
+                      {formData[group.other] && <div className="onboarding-other-field mt-4"><Input title={group.inputLabel} placeholder="Descreva em até 50 caracteres" value={formData[group.text]} onChange={e => handleChange(group.text, e.target.value)} maxLength={50} autoFocus /></div>}
                     </fieldset>)}
-                    <label className="flex items-center gap-3 min-h-12 border-t border-kindra-200 pt-5 cursor-pointer text-sm text-kindra-800">
+                    <label className="onboarding-pcd-choice flex items-center gap-3 min-h-12 border-t border-kindra-200 pt-5 cursor-pointer text-sm text-kindra-800">
                       <input type="checkbox" className="w-5 h-5 shrink-0 accent-teal-400" checked={formData.isPCD} onChange={e => handleChange('isPCD', e.target.checked)} />Sou Pessoa com Deficiência (PCD)
                     </label>
                   </div>}
