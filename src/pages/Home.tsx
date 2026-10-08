@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowRight, ArrowUpRight, Droplet, Dumbbell, Flame, LogOut, RefreshCw, Utensils } from 'lucide-react';
+import { AlertCircle, ArrowRight, ArrowUpRight, LogOut, RefreshCw } from 'lucide-react';
 import { apiFetch } from '../lib/api';
 import * as nutritionApi from '../lib/nutrition';
 import type { Meal, NutritionGoal, NutritionHistoryResponse, WaterIntakeLog } from '../lib/nutrition';
@@ -13,6 +13,10 @@ import './home.css';
 type Status = 'loading' | 'available' | 'empty' | 'error';
 interface Section<T> { status: Status; data: T | null; }
 const initial = <T,>(): Section<T> => ({ status: 'loading', data: null });
+const guardianStreak = new URL('../assets/home/guardians/guardian-streak.png', import.meta.url).href;
+const guardianWorkout = new URL('../assets/home/guardians/guardian-workout.png', import.meta.url).href;
+const guardianNutrition = new URL('../assets/home/guardians/guardian-nutrition.png', import.meta.url).href;
+const guardianHydration = new URL('../assets/home/guardians/guardian-hydration.png', import.meta.url).href;
 
 export function Home() {
   const navigate = useNavigate();
@@ -77,14 +81,14 @@ export function Home() {
 
   return <main className="page-container home-page">
     <header className="home-heading">
-      <div><span className="eyebrow">Seu espaço</span><h1>Olá, {profile?.firstName}.</h1><p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}. Vamos cuidar do seu dia?</p></div>
+      <div><span className="eyebrow">Seu espaço</span><h1>Olá, {profile?.firstName}.</h1><p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}.<br />Vamos cuidar do seu dia?</p></div>
       <button onClick={handleLogout} className="icon-button" aria-label="Sair da conta"><LogOut size={18} /></button>
     </header>
 
     <section className="home-streak" aria-labelledby="home-streak-title">
       <div className="home-streak-main">
         <span className="eyebrow">Consistência nutricional</span>
-        <h2 id="home-streak-title">Sua ofensiva.</h2>
+        <h2 id="home-streak-title"><span>Sua</span> ofensiva.</h2>
         {streak.status === 'loading' && <p className="home-section-status" role="status">Atualizando sua constância…</p>}
         {streak.status === 'error' && <div className="home-inline-error" role="alert"><p>Não foi possível carregar sua ofensiva.</p><Button variant="outline" size="sm" onClick={() => window.location.reload()}>Tentar novamente</Button></div>}
         {streak.data && <div className="home-streak-count"><strong>{streak.data.currentStreak}</strong><span>dias<br />consecutivos</span></div>}
@@ -93,36 +97,45 @@ export function Home() {
         {goal.status === 'error' && <p className="home-streak-note" role="status">Não foi possível atualizar a meta nutricional agora.</p>}
         <Link to="/nutri" className="home-text-link">Acompanhar nutrição <ArrowRight size={17} aria-hidden="true" /></Link>
       </div>
-      <div className="home-streak-mark" aria-hidden="true"><Flame /></div>
+      <div className="home-streak-art" aria-hidden="true"><img src={guardianStreak} width="1254" height="1254" fetchPriority="high" decoding="async" alt="" /></div>
     </section>
 
     <section className="home-today" aria-labelledby="home-today-title">
-      <div className="home-section-heading"><div><span className="eyebrow">{weekdayLabels[today].full}</span><h2 id="home-today-title">Treino de hoje</h2></div><Dumbbell aria-hidden="true" /></div>
-      {plan.status === 'loading' && <p className="home-section-status" role="status">Buscando seu plano…</p>}
-      {plan.status === 'error' && <p className="home-section-status" role="alert">Não foi possível carregar o treino de hoje.</p>}
-      {plan.status === 'empty' && <div className="home-plan-message"><p>Você ainda não tem um plano semanal ativo.</p><Link to="/workout">Organizar meus treinos <ArrowUpRight size={16} aria-hidden="true" /></Link></div>}
-      {plan.status === 'available' && (todayPlan
-        ? <div className="home-plan-message"><h3>{todayPlan.routine.name}</h3><p>{todayPlan.routine.exerciseCount === 0 ? 'Rotina sem exercícios' : `${todayPlan.routine.exerciseCount} ${todayPlan.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'} planejados`}</p><Link to="/workout">Ver treino de hoje <ArrowUpRight size={16} aria-hidden="true" /></Link></div>
-        : <div className="home-plan-message"><h3>Hoje é dia de descanso</h3><p>Seu plano semanal não tem treino previsto para hoje.</p><Link to="/workout">Ver minha semana <ArrowUpRight size={16} aria-hidden="true" /></Link></div>)}
+      <div className="home-today-content">
+        <div className="home-section-heading"><div><span className="eyebrow">{weekdayLabels[today].full}</span><h2 id="home-today-title">Treino de hoje</h2></div></div>
+        {plan.status === 'loading' && <p className="home-section-status" role="status">Buscando seu plano…</p>}
+        {plan.status === 'error' && <p className="home-section-status" role="alert">Não foi possível carregar o treino de hoje.</p>}
+        {plan.status === 'empty' && <div className="home-plan-message"><p>Você ainda não tem um plano semanal ativo.</p><Link to="/workout">Organizar meus treinos <ArrowUpRight size={16} aria-hidden="true" /></Link></div>}
+        {plan.status === 'available' && (todayPlan
+          ? <div className="home-plan-message"><h3>{todayPlan.routine.name}</h3><p>{todayPlan.routine.exerciseCount === 0 ? 'Rotina sem exercícios' : `${todayPlan.routine.exerciseCount} ${todayPlan.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'} planejados`}</p><Link to="/workout">Ver treino de hoje <ArrowUpRight size={16} aria-hidden="true" /></Link></div>
+          : <div className="home-plan-message"><h3>Hoje é dia de descanso</h3><p>Seu plano semanal não tem treino previsto para hoje.</p><Link to="/workout">Ver minha semana <ArrowUpRight size={16} aria-hidden="true" /></Link></div>)}
+      </div>
+      <div className="home-module-art home-workout-art" aria-hidden="true"><img src={guardianWorkout} width="1254" height="1254" loading="lazy" decoding="async" alt="" /></div>
     </section>
 
     <div className="home-daily-grid">
       <section className="home-daily-section" aria-labelledby="home-food-title">
-        <div className="home-section-heading"><div><span className="eyebrow">Alimentação</span><h2 id="home-food-title">Resumo do dia</h2></div><Utensils aria-hidden="true" /></div>
-        {meals.status === 'loading' && <p className="home-section-status" role="status">Carregando refeições…</p>}
-        {meals.status === 'error' && <p className="home-section-status" role="alert">Não foi possível carregar suas refeições.</p>}
-        {meals.data && <><div className="home-food-kcal"><strong>{mealsValue!.kcal.toFixed(0)}</strong><span>kcal consumidas</span></div><p className="home-daily-caption">{meals.data.length === 0 ? 'Nenhuma refeição registrada hoje.' : `${meals.data.reduce((count, meal) => count + meal.entries.length, 0)} alimentos registrados hoje.`}</p><div className="home-macros"><span>Proteínas <strong>{mealsValue!.proteinG.toFixed(0)} g</strong></span><span>Carboidratos <strong>{mealsValue!.carbsG.toFixed(0)} g</strong></span><span>Gorduras <strong>{mealsValue!.fatG.toFixed(0)} g</strong></span></div>{goal.data && <p className="home-target-note">Meta diária: {goal.data.targetKcal.toFixed(0)} kcal</p>}</>}
-        {goal.status === 'empty' && <p className="home-target-note">Meta diária indisponível.</p>}
-        <Link to="/nutri" className="home-text-link">Abrir diário <ArrowRight size={17} aria-hidden="true" /></Link>
+        <div className="home-daily-content">
+          <div className="home-section-heading"><div><span className="eyebrow">Alimentação</span><h2 id="home-food-title">Resumo do dia</h2></div></div>
+          {meals.status === 'loading' && <p className="home-section-status" role="status">Carregando refeições…</p>}
+          {meals.status === 'error' && <p className="home-section-status" role="alert">Não foi possível carregar suas refeições.</p>}
+          {meals.data && <><div className="home-food-kcal"><strong>{mealsValue!.kcal.toFixed(0)}</strong><span>kcal consumidas</span></div><p className="home-daily-caption">{meals.data.length === 0 ? 'Nenhuma refeição registrada hoje.' : `${meals.data.reduce((count, meal) => count + meal.entries.length, 0)} alimentos registrados hoje.`}</p><div className="home-macros"><span>Proteínas <strong>{mealsValue!.proteinG.toFixed(0)} g</strong></span><span>Carboidratos <strong>{mealsValue!.carbsG.toFixed(0)} g</strong></span><span>Gorduras <strong>{mealsValue!.fatG.toFixed(0)} g</strong></span></div>{goal.data && <p className="home-target-note">Meta diária: {goal.data.targetKcal.toFixed(0)} kcal</p>}</>}
+          {goal.status === 'empty' && <p className="home-target-note">Meta diária indisponível.</p>}
+          <Link to="/nutri" className="home-text-link">Abrir diário <ArrowRight size={17} aria-hidden="true" /></Link>
+        </div>
+        <div className="home-module-art home-nutrition-art" aria-hidden="true"><img src={guardianNutrition} width="1254" height="1254" loading="lazy" decoding="async" alt="" /></div>
       </section>
 
       <section className="home-daily-section home-water-section" aria-labelledby="home-water-title">
-        <div className="home-section-heading"><div><span className="eyebrow">Hidratação</span><h2 id="home-water-title">Água hoje</h2></div><Droplet aria-hidden="true" /></div>
-        {water.status === 'loading' && <p className="home-section-status" role="status">Carregando registros…</p>}
-        {water.status === 'error' && <p className="home-section-status" role="alert">Não foi possível carregar sua hidratação.</p>}
-        {water.data && <><div className="home-water-total"><strong>{waterValue}</strong><span>ml registrados</span></div><p className="home-daily-caption">{water.data.length === 0 ? 'Nenhuma água registrada hoje.' : `${water.data.length} ${water.data.length === 1 ? 'registro' : 'registros'} hoje.`}</p>{waterTarget !== null && <p className="home-target-note">Meta diária: {waterTarget} ml</p>}</>}
-        {water.status === 'empty' && waterTarget === null && <p className="home-target-note">Meta de água indisponível.</p>}
-        <Link to="/nutri" className="home-text-link">Registrar água <ArrowRight size={17} aria-hidden="true" /></Link>
+        <div className="home-daily-content">
+          <div className="home-section-heading"><div><span className="eyebrow">Hidratação</span><h2 id="home-water-title">Água hoje</h2></div></div>
+          {water.status === 'loading' && <p className="home-section-status" role="status">Carregando registros…</p>}
+          {water.status === 'error' && <p className="home-section-status" role="alert">Não foi possível carregar sua hidratação.</p>}
+          {water.data && <><div className="home-water-total"><strong>{waterValue}</strong><span>ml registrados</span></div><p className="home-daily-caption">{water.data.length === 0 ? 'Nenhuma água registrada hoje.' : `${water.data.length} ${water.data.length === 1 ? 'registro' : 'registros'} hoje.`}</p>{waterTarget !== null && <p className="home-target-note">Meta diária: {waterTarget} ml</p>}</>}
+          {water.status === 'empty' && waterTarget === null && <p className="home-target-note">Meta de água indisponível.</p>}
+          <Link to="/nutri" className="home-text-link">Registrar água <ArrowRight size={17} aria-hidden="true" /></Link>
+        </div>
+        <div className="home-module-art home-hydration-art" aria-hidden="true"><img src={guardianHydration} width="1254" height="1254" loading="lazy" decoding="async" alt="" /></div>
       </section>
     </div>
   </main>;
