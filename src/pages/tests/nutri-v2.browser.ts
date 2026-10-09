@@ -17,18 +17,38 @@ let browser: ChildProcess | undefined;
 let socket: WebSocket | undefined;
 const requests: string[] = [];
 const today = new Date().toISOString();
-const meals = [{ id: 'meal-1', name: 'BREAKFAST', loggedAt: today, entries: [{ id: 'entry-1', amountGrams: 150, food: { id: 'food-1', name: 'Aveia', kcal: 100, proteinG: 10, carbsG: 20, fatG: 5 } }] }];
+const oatmeal = { id: 'food-1', name: 'Aveia', kcal: 100, proteinG: 10, carbsG: 20, fatG: 5 };
+const longFood = { id: 'food-2', name: 'Abadejo, filé, congelado, assado com ervas e acompanhamento caseiro', kcal: 125, proteinG: 23, carbsG: 2, fatG: 3 };
+let meals = [{ id: 'meal-1', name: 'BREAKFAST', loggedAt: today, entries: [{ id: 'entry-1', amountGrams: 150, food: oatmeal }] }];
+let failMeals = false;
+let mealResponseDelayMs = 0;
 const vite = await createServer({ configFile: false, plugins: [react(), tailwindcss(), {
   name: 'nutri-v2-fixtures', configureServer(server) {
-    server.middlewares.use((req, res, next) => {
+    server.middlewares.use(async (req, res, next) => {
       if (!req.url?.startsWith('/api/')) return next();
       requests.push(`${req.method} ${req.url}`);
       res.setHeader('Content-Type', 'application/json');
+      if (req.url.startsWith('/api/meals/entries/') && req.method === 'DELETE') {
+        const entryId = req.url.split('/').pop();
+        meals = meals.map(meal => ({ ...meal, entries: meal.entries.filter(entry => entry.id !== entryId) }));
+        res.end('{}'); return;
+      }
+      if (req.url.startsWith('/api/meals/entries') && req.method === 'POST') {
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) chunks.push(Buffer.from(chunk));
+        const body = JSON.parse(Buffer.concat(chunks).toString()) as { category: string; amountGrams: number };
+        meals = meals.map(meal => meal.name === body.category ? { ...meal, entries: [...meal.entries, { id: 'entry-added', amountGrams: body.amountGrams, food: oatmeal }] } : meal);
+        res.end('{}'); return;
+      }
       let data: unknown = [];
       if (req.url.startsWith('/api/nutrition/goals/current')) data = { id: 'goal-1', userId: 'user-1', targetKcal: 2200, targetProteinG: 140, targetCarbsG: 260, targetFatG: 70, targetWaterMl: 2400 };
       else if (req.url.startsWith('/api/nutrition/history/consolidate')) data = { currentStreak: 5, history: [] };
-      else if (req.url.startsWith('/api/meals?')) data = meals;
-      else if (req.url.startsWith('/api/foods')) data = [];
+      else if (req.url.startsWith('/api/meals?')) {
+        if (mealResponseDelayMs) await delay(mealResponseDelayMs);
+        if (failMeals) { res.statusCode = 500; res.end('{}'); return; }
+        data = meals;
+      }
+      else if (req.url.startsWith('/api/foods')) data = [oatmeal];
       else if (req.url.startsWith('/api/nutrition/water?')) data = [];
       else if (req.url.startsWith('/api/nutrition/weight')) data = [{ id: 'weight-1', weightKg: 75.5, loggedAt: today }];
       res.end(JSON.stringify(data));
@@ -97,13 +117,50 @@ try {
   assert.equal(await evaluate("Math.abs(document.querySelector('.nutrition-settings-card').getBoundingClientRect().top - document.querySelector('.nutrition-weight-card').getBoundingClientRect().top) < 2"), true, 'Utilitários lado a lado em 390px');
   assert.equal(await evaluate("document.querySelector('.nutrition-weight-card .metric-number')?.textContent?.trim()"), '75.5');
   await capture('mobile-430', 430, 900);
+  meals = [
+    { id: 'meal-1', name: 'BREAKFAST', loggedAt: today, entries: [{ id: 'entry-1', amountGrams: 150, food: oatmeal }, { id: 'entry-long', amountGrams: 200, food: longFood }] },
+    { id: 'meal-2', name: 'LUNCH', loggedAt: today, entries: [{ id: 'entry-3', amountGrams: 120, food: longFood }] },
+  ];
   await evaluate("document.querySelector('.nutri-records-link')?.click()");
   await wait("location.pathname === '/nutri/registros' && !!document.querySelector('.nutrition-meal-card')");
   assert.equal(await evaluate("document.body.innerText.includes('Aveia')"), true);
+  assert.equal(await evaluate("document.querySelectorAll('.nutrition-meal-card.is-filled').length"), 2);
+  assert.equal(await evaluate("document.querySelectorAll('.nutrition-meal-card.is-empty').length"), 2);
+  assert.equal(await evaluate("document.querySelectorAll('.nutrition-meal-entry-icon').length"), 3);
+  assert.equal(await evaluate("document.body.innerText.includes('Abadejo, filé, congelado, assado com ervas e acompanhamento caseiro')"), true);
+  await capture('records-mobile-360', 360, 800);
   await capture('records-mobile', 390, 844);
+  await capture('records-mobile-430', 430, 900);
+  await capture('records-desktop', 1440, 900);
+  await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+  await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+  assert.equal(await evaluate("(() => { const button = document.querySelector('.nutrition-meal-add'); button?.focus(); return document.activeElement === button && button.matches(':focus-visible'); })()"), true, 'Foco visível no botão de adicionar');
   await evaluate("document.querySelector('.nutrition-meal-add')?.click()");
   await wait("!!document.querySelector('[aria-label=\"Adicionar alimento\"]')");
-  await evaluate("document.querySelector('[aria-label=\"Fechar busca de alimentos\"]')?.click()");
+  await wait("!!document.querySelector('.food-search-result')");
+  await evaluate("document.querySelector('.food-search-result')?.click()");
+  await wait("!!document.querySelector('.food-search-footer button')");
+  await evaluate("document.querySelector('.food-search-footer button')?.click()");
+  await wait("document.querySelectorAll('.nutrition-meal-entry').length === 4");
+  assert.ok(requests.some(value => value.startsWith('POST /api/meals/entries')));
+  await evaluate("document.querySelector('.nutrition-meal-entry .nutrition-meal-remove')?.click()");
+  await wait("!!document.querySelector('.nutrition-meal-remove.is-confirming')");
+  await evaluate("document.querySelector('.nutrition-meal-remove.is-confirming')?.click()");
+  await wait("document.querySelectorAll('.nutrition-meal-entry').length === 3");
+  assert.ok(requests.some(value => value.startsWith('DELETE /api/meals/entries/entry-1')));
+  meals = [];
+  mealResponseDelayMs = 1500;
+  await send('Page.reload', { ignoreCache: true });
+  await wait("!!document.querySelector('.nutrition-meals-loading[role=status]')");
+  assert.equal(await evaluate("document.querySelectorAll('.nutrition-meal-loading-row').length"), 4);
+  await capture('records-loading-mobile', 390, 844);
+  await wait("document.querySelectorAll('.nutrition-meal-card.is-empty').length === 4");
+  mealResponseDelayMs = 0;
+  await capture('records-empty-mobile', 390, 844);
+  failMeals = true;
+  await send('Page.reload', { ignoreCache: true });
+  await wait("!!document.querySelector('.nutri-records-page [role=alert]')");
+  failMeals = false;
   await evaluate("document.querySelector('.nutri-back-link')?.click()");
   await wait("location.pathname === '/nutri' && !!document.querySelector('#tab-hidratacao')");
   await evaluate("document.querySelector('#tab-hidratacao')?.click()");

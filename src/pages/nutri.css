@@ -285,3 +285,86 @@
   .nutri-overview-page .metric-rail > span,
   .nutri-records-link { transition: none; }
 }
+
+/* Food records V2: only the dedicated records page uses this composition. */
+.app-shell:has(.nutri-records-page) .app-brand { padding-top: calc(5px + env(safe-area-inset-top)); padding-bottom: 3px; }
+.nutri-records-page { max-width: 1020px; padding-top: 12px; padding-bottom: 80px; }
+.nutri-records-page .nutri-records-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 19px; }
+.nutri-records-page .nutri-back-link { display: grid; flex: none; place-items: center; width: 44px; height: 44px; min-height: 44px; margin: 0; border: 1px solid var(--color-kindra-300); border-radius: 12px; color: var(--color-teal-300); }
+.nutri-records-page .nutri-back-link:focus-visible { outline: 2px solid var(--color-teal-300); outline-offset: 3px; }
+.nutri-records-page .nutri-records-heading h1 { margin: 0; font: 700 clamp(32px, 4vw, 46px)/1.02 var(--font-display); letter-spacing: -.055em; }
+.nutri-records-page .nutri-records-heading p { margin-top: 3px; color: var(--color-kindra-700); font-size: 13px; line-height: 1.25; }
+.nutri-records-page .nutrition-meals-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.nutri-records-page .nutrition-meals-loading { display: grid; gap: 10px; }
+.nutri-records-page .nutrition-meal-loading-row { height: 70px; border: 1px solid var(--color-kindra-300); border-radius: 20px; background: var(--color-kindra-100); }
+.nutri-records-page .nutrition-meal-card { border-color: var(--color-kindra-300); border-radius: 20px; background: #0d1513; box-shadow: none; }
+.nutri-records-page .nutrition-meal-card.is-filled { border-color: #165a52; box-shadow: none; }
+.nutri-records-page .nutrition-meal-card:hover,
+.nutri-records-page .nutrition-meal-card:focus-within { border-color: var(--color-teal-400); }
+.nutri-records-page .nutrition-meal-header { min-height: 75px; gap: 10px; padding: 12px 14px; }
+.nutri-records-page .nutrition-meal-heading { gap: 11px; }
+.nutri-records-page .nutrition-meal-icon { width: 43px; height: 43px; border-color: var(--color-teal-400); border-radius: 11px; color: var(--color-teal-300); background: #0a201d; }
+.nutri-records-page .nutrition-meal-card .nutrition-meal-title { font-size: clamp(18px, 2vw, 23px); line-height: 1.15; }
+.nutri-records-page .nutrition-meal-calories { margin-top: 2px; color: var(--color-kindra-700); font-size: 13px; line-height: 1.2; }
+.nutri-records-page .nutrition-meal-calories strong { color: var(--color-kindra-950); font-size: 17px; }
+.nutri-records-page .nutrition-meal-add { width: 44px; height: 44px; border: 0; border-radius: 11px; background: var(--color-teal-400); color: var(--color-kindra-base); }
+.nutri-records-page .nutrition-meal-add:hover { background: var(--color-teal-300); color: var(--color-kindra-base); }
+.nutri-records-page .nutrition-meal-add svg { width: 23px; height: 23px; }
+.nutri-records-page .nutrition-meal-card.is-empty .nutrition-meal-header { min-height: 70px; padding-block: 10px; }
+.nutri-records-page .nutrition-meal-content { padding: 0 10px 10px; }
+.nutri-records-page .nutrition-meal-entries { display: grid; gap: 7px; }
+.nutri-records-page .nutrition-meal-entry { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) 54px; grid-template-areas: 'icon copy kcal' 'icon macros macros'; align-items: center; gap: 4px 7px; padding: 8px; border: 1px solid #183e39; border-left: 3px solid var(--color-teal-400); border-radius: 13px; background: #0b1a18; }
+.nutri-records-page .nutrition-meal-entry-icon { grid-area: icon; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid #1d6663; border-radius: 10px; color: #78e0eb; background: #0a2626; }
+.nutri-records-page .nutrition-meal-entry-copy { grid-area: copy; min-width: 0; }
+.nutri-records-page .nutrition-meal-entry-name { font-size: 15px; line-height: 1.18; overflow-wrap: anywhere; }
+.nutri-records-page .nutrition-meal-entry-amount { margin-top: 3px; color: var(--color-kindra-700); font-size: 11px; }
+.nutri-records-page .nutrition-meal-entry-amount strong { color: inherit; font-size: inherit; font-weight: 500; }
+.nutri-records-page .nutrition-meal-entry-kcal { grid-area: kcal; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 44px; margin: 0; padding: 3px; border: 1px solid #1b4540; border-radius: 9px; background: #102320; }
+.nutri-records-page .nutrition-meal-entry-kcal strong { font-size: 17px; line-height: 1.05; }
+.nutri-records-page .nutrition-meal-entry-kcal span { font-size: 10px; }
+.nutri-records-page .nutrition-meal-entry-nutrients { grid-area: macros; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; min-width: 0; margin: 0; padding: 0 44px 0 0; border: 0; }
+.nutri-records-page .nutrition-meal-entry-nutrients > div { display: flex; align-items: baseline; justify-content: center; gap: 3px; min-width: 0; padding: 4px 2px; border: 1px solid #1b4540; border-radius: 8px; background: #102320; }
+.nutri-records-page .nutrition-meal-entry-nutrients > div:first-child { padding-left: 2px; }
+.nutri-records-page .nutrition-meal-entry-nutrients > div + div { border-left: 1px solid #1b4540; }
+.nutri-records-page .nutrition-meal-entry-nutrients > div:nth-child(1),
+.nutri-records-page .nutrition-meal-total-macros > div:nth-child(1) { --record-macro-accent: #2fdaa0; }
+.nutri-records-page .nutrition-meal-entry-nutrients > div:nth-child(2),
+.nutri-records-page .nutrition-meal-total-macros > div:nth-child(2) { --record-macro-accent: #46d1de; }
+.nutri-records-page .nutrition-meal-entry-nutrients > div:nth-child(3),
+.nutri-records-page .nutrition-meal-total-macros > div:nth-child(3) { --record-macro-accent: #88e9d5; }
+.nutri-records-page .nutrition-meal-entry-nutrients dt { color: var(--record-macro-accent); font-size: 10px; font-weight: 700; }
+.nutri-records-page .nutrition-meal-entry-nutrients dd { margin: 0; color: var(--color-kindra-950); font: 600 11px/1.2 var(--font-sans); white-space: nowrap; }
+.nutri-records-page .nutrition-meal-entry-nutrients dd span { margin: 0; color: var(--color-kindra-700); font: inherit; }
+.nutri-records-page .nutrition-meal-remove { position: absolute; right: 5px; bottom: 3px; display: grid; place-items: center; width: 44px; min-height: 44px; padding: 0 4px; border: 0; border-radius: 9px; background: transparent; color: var(--color-kindra-600); }
+.nutri-records-page .nutrition-meal-remove:hover { color: #f49aa3; background: #422127; }
+.nutri-records-page .nutrition-meal-remove.is-confirming { color: white; background: #b4394c; }
+.nutri-records-page .nutrition-meal-remove.is-confirming span { font-size: 10px; font-weight: 700; }
+.nutri-records-page .nutrition-meal-macros { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(0, 2fr); align-items: center; gap: 8px; margin-top: 8px; padding: 9px 10px 0; border-top: 1px solid var(--color-kindra-300); }
+.nutri-records-page .nutrition-meal-total-kcal { min-width: 0; }
+.nutri-records-page .nutrition-meal-total-kcal > span { display: block; color: var(--color-kindra-700); font-size: 10px; line-height: 1.15; }
+.nutri-records-page .nutrition-meal-total-kcal strong { display: block; margin-top: 2px; color: var(--color-kindra-950); font: 700 19px/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.nutri-records-page .nutrition-meal-total-kcal small { color: var(--color-kindra-700); font: 500 11px/1.2 var(--font-sans); }
+.nutri-records-page .nutrition-meal-total-macros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; min-width: 0; }
+.nutri-records-page .nutrition-meal-total-macros > div { display: flex; justify-content: center; gap: 3px; min-width: 0; padding: 6px 1px; border: 1px solid #1b4540; border-radius: 8px; background: #102320; }
+.nutri-records-page .nutrition-meal-total-macros dt { color: var(--record-macro-accent); font-size: 10px; font-weight: 700; }
+.nutri-records-page .nutrition-meal-total-macros dd { margin: 0; color: var(--color-kindra-950); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.nutri-records-page .nutrition-meal-total-macros dd span { color: var(--color-kindra-700); }
+@media (min-width: 720px) {
+  .nutri-records-page { padding-top: 22px; }
+  .nutri-records-page .nutrition-meal-header { padding: 15px 20px; }
+  .nutri-records-page .nutrition-meal-content { padding: 0 15px 15px; }
+  .nutri-records-page .nutrition-meal-entry { grid-template-columns: 46px minmax(0, 1.3fr) 66px minmax(225px, 1fr) 44px; grid-template-areas: 'icon copy kcal macros remove'; gap: 10px; padding: 10px 14px; }
+  .nutri-records-page .nutrition-meal-entry-icon { width: 46px; height: 46px; }
+  .nutri-records-page .nutrition-meal-entry-nutrients { padding-right: 0; }
+  .nutri-records-page .nutrition-meal-entry-nutrients > div { padding-block: 8px; }
+  .nutri-records-page .nutrition-meal-remove { position: static; grid-area: remove; }
+  .nutri-records-page .nutrition-meal-macros { margin-top: 10px; padding: 12px 14px 0; }
+}
+@media (max-width: 380px) {
+  .nutri-records-page .nutrition-meal-header { padding-inline: 10px; }
+  .nutri-records-page .nutrition-meal-heading { gap: 8px; }
+  .nutri-records-page .nutrition-meal-entry { grid-template-columns: 36px minmax(0, 1fr) 49px; gap: 5px; padding: 7px; }
+  .nutri-records-page .nutrition-meal-entry-icon { width: 36px; height: 36px; }
+  .nutri-records-page .nutrition-meal-entry-kcal strong { font-size: 15px; }
+  .nutri-records-page .nutrition-meal-remove { width: 40px; }
+}

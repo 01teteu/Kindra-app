@@ -26,10 +26,11 @@ export function NutriRecords() {
   return (
     <div className="page-container nutri-page nutri-records-page">
       <header className="nutri-records-heading">
-        <Link to="/nutri" className="nutri-back-link"><ArrowLeft size={18} aria-hidden="true" /> Voltar para nutrição</Link>
-        <span className="eyebrow">Seu diário alimentar</span>
-        <h1>Registros alimentares.</h1>
-        <p>Organize as refeições e acompanhe o que você registrou hoje.</p>
+        <Link to="/nutri" className="nutri-back-link" aria-label="Voltar para nutrição"><ArrowLeft size={20} aria-hidden="true" /></Link>
+        <div>
+          <h1>Registros</h1>
+          <p>Seu diário alimentar.</p>
+        </div>
       </header>
       {loadError ? (
         <div role="alert" className="kindra-card p-6 text-center">
