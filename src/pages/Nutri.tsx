@@ -5,15 +5,15 @@ import { WaterTracker } from '../components/nutri/WaterTracker';
 import { WeightTracker } from '../components/nutri/WeightTracker';
 import { Card } from '../components/ui/Card';
 import { StreakPanel } from '../components/nutri/StreakPanel';
-import { MealTracker } from '../components/nutri/MealTracker';
 import { AreaWelcome } from '../components/nutri/AreaWelcome';
 import './nutri.css';
-import { ArrowRight, Target, Calendar, Droplet, Beef, Wheat, Flame } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Target, Calendar, Droplet, Beef, Wheat, Flame } from 'lucide-react';
 import * as nutritionApi from '../lib/nutrition';
 import { calculateConsumedTotals, calculateWaterTotal } from '../lib/nutritionTotals';
 import type { NutritionGoal, WaterIntakeLog, WeightLog, NutritionHistoryResponse, Meal } from '../lib/nutrition';
 
 export function Nutri() {
+  const recordsGuardian = new URL('../assets/nutri/guardian-records.png', import.meta.url).href;
   const [activeTab, setActiveTab] = useState<'diario' | 'hidratacao'>('diario');
   const [goal, setGoal] = useState<NutritionGoal | null>(null);
   const [waterLogs, setWaterLogs] = useState<WaterIntakeLog[]>([]);
@@ -93,6 +93,7 @@ export function Nutri() {
   }, []);
 
   const consumedTotals = calculateConsumedTotals(meals);
+  const foodCount = meals.reduce((count, meal) => count + meal.entries.length, 0);
 
   const handleAddWater = async (ml: number) => {
     if (waterBusy.current) return false;
@@ -185,11 +186,7 @@ export function Nutri() {
   const todayAchieved = todayWaterAchieved && todayKcalAchieved && todayProteinAchieved && todayCarbsAchieved && todayFatAchieved;
 
   return (
-    <div className="page-container nutri-page">
-
-
-
-
+    <div className="page-container nutri-page nutri-overview-page">
       <div className="w-full">
         <div className="page-heading">
           <div>
@@ -202,10 +199,6 @@ export function Nutri() {
           </div>
         </div>
 
-        {!isLoading && !loadError && (
-          <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} />
-        )}
-
         <div className="segmented-tabs" role="tablist" aria-label="Acompanhamento nutricional">
           {(['diario', 'hidratacao'] as const).map((tab, index) => <button key={tab} id={`tab-${tab}`} role="tab"
             aria-selected={activeTab === tab} aria-controls={`panel-${tab}`} tabIndex={activeTab === tab ? 0 : -1}
@@ -215,7 +208,7 @@ export function Nutri() {
                 const next = event.key === 'Home' ? 'diario' : event.key === 'End' ? 'hidratacao' : index === 0 ? 'hidratacao' : 'diario';
                 setActiveTab(next); document.getElementById(`tab-${next}`)?.focus();
               }
-            }}>{tab === 'diario' ? 'Diário' : 'Hidratação'}</button>)}
+            }}>{tab === 'diario' ? 'Nutrição' : 'Hidratação'}</button>)}
         </div>
 
         {loadError ? <div role="alert" className="kindra-card p-6 text-center"><p className="text-sm text-kindra-600 mb-4">{loadError}</p><button onClick={fetchDashboardData} className="kindra-button button-outline">Tentar novamente</button></div> : isLoading ? (
@@ -229,10 +222,17 @@ export function Nutri() {
             {activeTab === 'diario' && (
               <AreaWelcome area="diario" userId={goal?.userId}>
                 <>
-                  <div className="nutrition-layout nutrition-diary-layout">
-                    <div className="nutrition-primary"><NutritionOverview goal={goal} consumed={consumedTotals} /></div>
-                    <div className="nutrition-secondary"><MealTracker meals={meals} isLoading={isLoading} onUpdate={fetchDashboardData} /></div>
-                  </div>
+                  <NutritionOverview goal={goal} consumed={consumedTotals} />
+                  <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} />
+                  <Link to="/nutri/registros" className="nutri-records-link" aria-label="Abrir meus registros alimentares">
+                    <div className="nutri-records-copy">
+                      <span className="eyebrow">Alimentação · hoje</span>
+                      <h2>Registre seus alimentos aqui.</h2>
+                      <p>{foodCount} {foodCount === 1 ? 'alimento registrado' : 'alimentos registrados'} hoje. Acompanhe suas refeições e adicione o próximo alimento.</p>
+                      <span className="nutri-records-action">Ir para registros de alimentos <ArrowUpRight size={18} aria-hidden="true" /></span>
+                    </div>
+                    <img src={recordsGuardian} width="1254" height="1254" loading="lazy" decoding="async" alt="" aria-hidden="true" />
+                  </Link>
                   <div className="nutrition-utilities">
                     <Card className="nutrition-settings-card p-5 sm:p-8">
                       <div className="flex items-start gap-4">
@@ -264,6 +264,8 @@ export function Nutri() {
 
             {activeTab === 'hidratacao' && (
               <AreaWelcome area="hidratacao" userId={goal?.userId}>
+              <>
+              <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} />
               <div className="nutrition-layout">
                 <WaterTracker
                   currentMl={currentWaterMl}
@@ -376,6 +378,7 @@ export function Nutri() {
                   </div>
                 </div>
               </div>
+              </>
               </AreaWelcome>
             )}
           </>

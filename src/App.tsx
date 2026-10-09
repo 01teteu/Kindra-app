@@ -37,6 +37,7 @@ const ExerciseCatalog = lazy(() =>
   import('./pages/ExerciseCatalog').then((module) => ({ default: module.ExerciseCatalog })),
 );
 const Nutri = lazy(() => import('./pages/Nutri').then((module) => ({ default: module.Nutri })));
+const NutriRecords = lazy(() => import('./pages/NutriRecords').then((module) => ({ default: module.NutriRecords })));
 const Workout = lazy(() =>
   import('./pages/Workout').then((module) => ({ default: module.Workout })),
 );
@@ -78,6 +79,7 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route path="/home" element={<Home />} />
                 <Route path="/nutri" element={<Nutri />} />
+                <Route path="/nutri/registros" element={<NutriRecords />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/settings/nutrition" element={<NutritionSettings />} />
                 <Route path="/workout" element={<Workout />} />

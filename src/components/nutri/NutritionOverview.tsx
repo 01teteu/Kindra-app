@@ -1,4 +1,4 @@
-import { Info, Flame } from 'lucide-react';
+import { Info } from 'lucide-react';
 import type { NutritionGoal } from '../../lib/nutrition';
 import { Card } from '../ui/Card';
 
@@ -32,51 +32,39 @@ export function NutritionOverview({ goal, consumed }: NutritionOverviewProps) {
   const { targetKcal, targetProteinG, targetCarbsG, targetFatG } = goal;
 
   const remainingKcal = targetKcal - consumed.kcal;
-  const remainingProtein = targetProteinG - consumed.proteinG;
-  const remainingCarbs = targetCarbsG - consumed.carbsG;
-  const remainingFat = targetFatG - consumed.fatG;
-
   const macros = [
-    { label: 'Proteínas', remaining: remainingProtein },
-    { label: 'Carboidratos', remaining: remainingCarbs },
-    { label: 'Gorduras', remaining: remainingFat },
+    { label: 'Proteínas', consumed: consumed.proteinG, target: targetProteinG },
+    { label: 'Carboidratos', consumed: consumed.carbsG, target: targetCarbsG },
+    { label: 'Gorduras', consumed: consumed.fatG, target: targetFatG },
   ];
+  const guardian = new URL('../../assets/nutri/guardian-nutrition.png', import.meta.url).href;
   return (
-    <Card className="nutrition-goal-card p-5 sm:p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <span className="eyebrow">Balanço do dia</span>
-          <h2 className="text-lg font-semibold mt-1">Sua meta diária</h2>
+    <Card className="nutrition-goal-card">
+      <div className="nutri-goal-main">
+        <span className="eyebrow">Balanço do dia</span>
+        <h2>Sua energia<br />de hoje.</h2>
+        <div className="nutri-energy-value">
+          <strong>{Math.abs(remainingKcal).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</strong>
+          <span>kcal {remainingKcal >= 0 ? 'restantes' : 'acima da meta'}</span>
         </div>
-        <Flame size={22} className="text-teal-300" aria-hidden="true" />
+        <div className="nutri-goal-comparison">
+          <span>{consumed.kcal.toFixed(0)} kcal consumidas</span>
+          <span>Meta: {targetKcal.toFixed(0)} kcal</span>
+        </div>
+        <div className="metric-rail" role="meter" aria-label="Progresso de calorias" aria-valuemin={0} aria-valuemax={Math.max(targetKcal, consumed.kcal, 1)} aria-valuenow={consumed.kcal}>
+          <span style={{ width: `${targetKcal > 0 ? Math.min(100, Math.max(0, (consumed.kcal / targetKcal) * 100)) : 0}%` }} />
+        </div>
+        <div className="macro-grid">
+          {macros.map((macro) => (
+            <div key={macro.label}>
+              <p>{macro.label}</p>
+              <strong>{macro.consumed.toFixed(0)}<small> / {macro.target.toFixed(0)} g</small></strong>
+              <span>{Math.abs(macro.target - macro.consumed).toFixed(1)} g {macro.target >= macro.consumed ? 'restantes' : 'acima da meta'}</span>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="flex items-baseline flex-wrap gap-2">
-        <span className="metric-number">{remainingKcal.toFixed(0)}</span>
-        <span className="text-sm text-kindra-500">kcal restantes</span>
-      </div>
-      <div className="flex justify-between gap-3 text-xs text-kindra-500 mt-5 mb-3">
-        <span>{consumed.kcal.toFixed(0)} consumidas</span>
-        <span>Meta: {targetKcal.toFixed(0)}</span>
-      </div>
-      <div className="metric-rail" aria-hidden="true">
-        <span
-          style={{
-            width: `${targetKcal > 0 ? Math.min(100, Math.max(0, (consumed.kcal / targetKcal) * 100)) : 0}%`,
-          }}
-        />
-      </div>
-      <div className="macro-grid">
-        {macros.map((macro) => (
-          <div key={macro.label}>
-            <p>{macro.label}</p>
-            <strong>
-              {macro.remaining.toFixed(1)}
-              <small>g</small>
-            </strong>
-            <span className="block text-[10px] text-kindra-500 mt-1">restantes</span>
-          </div>
-        ))}
-      </div>
+      <img className="nutri-goal-guardian" src={guardian} width="1254" height="1254" loading="lazy" decoding="async" alt="" aria-hidden="true" />
     </Card>
   );
 }
