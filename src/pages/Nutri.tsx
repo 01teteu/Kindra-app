@@ -186,12 +186,12 @@ export function Nutri() {
   const todayAchieved = todayWaterAchieved && todayKcalAchieved && todayProteinAchieved && todayCarbsAchieved && todayFatAchieved;
 
   return (
-    <div className="page-container nutri-page nutri-overview-page">
+    <div className={`page-container nutri-page nutri-overview-page${activeTab === 'hidratacao' ? ' nutri-hydration-view' : ''}`}>
       <div className="w-full">
         <div className="nutri-topbar">
           <div className="page-heading">
             <div>
-              <h1 className="text-kindra-950">Nutrição</h1>
+              <h1 className="text-kindra-950">{activeTab === 'hidratacao' ? 'Hidratação' : 'Nutrição'}</h1>
               <p className="text-sm font-medium text-kindra-500 mt-1">Pequenos hábitos. Todos os dias.</p>
             </div>
           </div>
@@ -262,7 +262,7 @@ export function Nutri() {
             {activeTab === 'hidratacao' && (
               <AreaWelcome area="hidratacao" userId={goal?.userId}>
               <>
-              <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} />
+              <StreakPanel streak={streakData?.currentStreak || 0} history={streakData?.history || []} todayAchieved={todayAchieved} heading="Sua consistência na hidratação" />
               <div className="nutrition-layout">
                 <WaterTracker
                   currentMl={currentWaterMl}
@@ -278,102 +278,56 @@ export function Nutri() {
                   notice={waterNotice}
                 />
 
-                {/* --- HISTÓRICO DIÁRIO EMBUTIDO --- */}
-                <div className="pt-2">
-                  <div className="flex items-center gap-3 mb-4 px-1">
-                    <div className="h-10 w-10 rounded-xl bg-kindra-200/50 flex items-center justify-center border border-kindra-300/30">
-                      <Calendar className="h-5 w-5 text-kindra-900" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-display font-bold text-kindra-950">Histórico Diário</h3>
-                      <p className="text-sm font-medium text-kindra-500">Seus registros anteriores</p>
-                    </div>
+                <section className="nutrition-history" aria-labelledby="nutrition-history-heading">
+                  <div className="nutrition-history-heading">
+                    <h3 id="nutrition-history-heading">Histórico diário</h3>
+                    <p>Seu progresso de nutrição e hidratação juntos.</p>
                   </div>
-
-                  <div className="space-y-4">
-                    {(!streakData?.history || streakData.history.length === 0) ? (
-                      <div className="flex flex-col items-center justify-center text-center py-10 px-4 bg-kindra-100/50 rounded-2xl border border-kindra-200/50">
-                        <div className="h-16 w-16 bg-kindra-200/50 rounded-full flex items-center justify-center mb-4">
-                          <Calendar className="h-7 w-7 text-kindra-500" />
-                        </div>
-                        <h3 className="text-lg font-bold text-kindra-950 mb-1">Nenhum registro</h3>
-                        <p className="text-sm text-kindra-500 max-w-[240px] leading-relaxed">
-                          Seus dados diários aparecerão aqui automaticamente após a meia-noite.
-                        </p>
+                  {(!streakData?.history || streakData.history.length === 0) ? (
+                    <div className="nutrition-history-empty">
+                      <Calendar aria-hidden="true" />
+                      <div>
+                        <h4>Nenhum registro</h4>
+                        <p>Seus dados diários aparecerão aqui automaticamente após a meia-noite.</p>
                       </div>
-                    ) : (
-                      streakData.history.map((day) => {
+                    </div>
+                  ) : (
+                    <div className="nutrition-history-list">
+                      {streakData.history.map((day) => {
                         const dateObj = new Date(day.date);
                         const dateStr = dateObj.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', timeZone: 'UTC' });
                         const allAchieved = day.waterGoalAchieved && day.kcalGoalAchieved && day.proteinGoalAchieved && day.carbsGoalAchieved && day.fatGoalAchieved;
 
                         return (
-                          <div key={day.id} className="bg-kindra-100/80 rounded-[24px] p-5 border border-kindra-200/50 shadow-sm relative overflow-hidden group">
-
-
-                            <div className="relative z-10">
-                              <div className="flex justify-between items-center mb-5">
-                                <span className="font-display font-bold text-kindra-950 capitalize text-lg">{dateStr}</span>
-                                {allAchieved ? (
-                                  <span className="text-xs font-bold tracking-widest text-teal-300 bg-teal-500/10 border border-teal-500/20 px-3 py-1.5 rounded-full uppercase flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
-                                    Perfeito
-                                  </span>
-                                ) : (
-                                  <span className="text-xs font-bold tracking-widest text-kindra-500 bg-kindra-200/50 border border-kindra-300/30 px-3 py-1.5 rounded-full uppercase">
-                                    Incompleto
-                                  </span>
-                                )}
+                          <article key={day.id} className="nutrition-history-day">
+                            <div className="nutrition-history-day-head">
+                              <time dateTime={day.date}>{dateStr}</time>
+                              <span className={`nutrition-history-status${allAchieved ? ' is-complete' : ''}`}>{allAchieved ? 'Perfeito' : 'Incompleto'}</span>
+                            </div>
+                            <div className="nutrition-history-metrics">
+                              <div className="nutrition-history-metric nutrition-history-water">
+                                <Droplet aria-hidden="true" />
+                                <div><strong>{day.waterIngestedMl} <small>ml</small></strong><span>de {day.targetWaterMl} ml</span></div>
                               </div>
-
-                              <div className="grid grid-cols-2 gap-2.5">
-                                {/* Água recebe destaque extra */}
-                                <div className={`rounded-2xl p-4 border transition-colors ${day.waterGoalAchieved ? 'bg-kindra-100 border-teal-500/30 shadow-sm shadow-teal-500/5' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
-                                  <div className="flex items-center gap-2 text-xs font-bold text-kindra-400 uppercase tracking-widest mb-1.5">
-                                    <Droplet className={`h-4 w-4 ${day.waterGoalAchieved ? 'text-teal-500' : 'text-kindra-400'}`} /> Água
-                                  </div>
-                                  <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-display font-bold text-kindra-950">{day.waterIngestedMl}</span>
-                                    <span className="text-xs font-medium text-kindra-500">ml</span>
-                                  </div>
-                                </div>
-
-                                <div className={`rounded-2xl p-4 border transition-colors ${day.kcalGoalAchieved ? 'bg-kindra-100 border-teal-500/30 shadow-sm shadow-teal-500/5' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
-                                  <div className="flex items-center gap-2 text-xs font-bold text-kindra-400 uppercase tracking-widest mb-1.5">
-                                    <Flame className="h-4 w-4" /> Kcal
-                                  </div>
-                                  <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-display font-bold text-kindra-950">{Math.round(day.consumedKcal)}</span>
-                                  </div>
-                                </div>
-
-                                <div className={`rounded-2xl p-3 border transition-colors ${day.proteinGoalAchieved ? 'bg-kindra-100 border-teal-500/20' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
-                                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-kindra-400 uppercase tracking-widest mb-1">
-                                    <Beef className="h-3 w-3" /> Prot
-                                  </div>
-                                  <div className="flex items-baseline gap-0.5">
-                                    <span className="text-base font-bold text-kindra-950">{Math.round(day.consumedProteinG)}</span>
-                                    <span className="text-[10px] font-medium text-kindra-500">g</span>
-                                  </div>
-                                </div>
-
-                                <div className={`rounded-2xl p-3 border transition-colors ${day.carbsGoalAchieved ? 'bg-kindra-100 border-teal-500/20' : 'bg-kindra-200/30 border-kindra-300/30'}`}>
-                                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-kindra-400 uppercase tracking-widest mb-1">
-                                    <Wheat className="h-3 w-3" /> Carb
-                                  </div>
-                                  <div className="flex items-baseline gap-0.5">
-                                    <span className="text-base font-bold text-kindra-950">{Math.round(day.consumedCarbsG)}</span>
-                                    <span className="text-[10px] font-medium text-kindra-500">g</span>
-                                  </div>
-                                </div>
+                              <div className="nutrition-history-metric nutrition-history-kcal">
+                                <Flame aria-hidden="true" />
+                                <div><strong>{Math.round(day.consumedKcal)}</strong><span>kcal</span></div>
+                              </div>
+                              <div className="nutrition-history-metric nutrition-history-protein">
+                                <Beef aria-hidden="true" />
+                                <div><strong>{Math.round(day.consumedProteinG)} <small>g</small></strong><span>proteínas</span></div>
+                              </div>
+                              <div className="nutrition-history-metric nutrition-history-carbs">
+                                <Wheat aria-hidden="true" />
+                                <div><strong>{Math.round(day.consumedCarbsG)} <small>g</small></strong><span>carboidratos</span></div>
                               </div>
                             </div>
-                          </div>
+                          </article>
                         );
-                      })
-                    )}
-                  </div>
-                </div>
+                      })}
+                    </div>
+                  )}
+                </section>
               </div>
               </>
               </AreaWelcome>

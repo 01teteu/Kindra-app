@@ -43,6 +43,7 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
   };
 
   const percentage = Math.min(100, Math.round((currentMl / (targetMl || 1)) * 100));
+  const guardian = new URL('../../assets/home/guardians/guardian-hydration.png', import.meta.url).href;
 
   const handleCustomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,58 +62,46 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
   };
 
   return (
-    <Card className="nutrition-water-card p-5 sm:p-6 relative overflow-hidden self-start">
-      <div className="relative z-10">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="h-10 w-10 shrink-0 bg-kindra-200 text-teal-300 rounded-xl flex items-center justify-center">
-            <Droplet className="h-6 w-6" />
-          </div>
-          <div className="flex flex-col">
-            <h2 className="text-lg font-semibold text-kindra-950 tracking-tight leading-tight">
-              Hidratação
-            </h2>
-            <p className="text-sm font-medium text-kindra-500">Acompanhe seu consumo</p>
-          </div>
+    <>
+    <Card className="nutrition-water-card">
+      <img className="nutrition-water-guardian" src={guardian} width="1254" height="1254" loading="lazy" decoding="async" alt="" aria-hidden="true" />
+      <div className="nutrition-water-inner">
+        <div className="nutrition-water-intro">
+          <span className="eyebrow">Hidratação · hoje</span>
+          <h2>Sua hidratação<br />de hoje.</h2>
+          <p>Cada gole te aproxima da sua meta.</p>
         </div>
 
-        <div className="flex flex-wrap gap-2 justify-between items-end mb-2" aria-label={`Consumo de hoje: ${currentMl} de ${targetMl} ml`}>
-          <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-display font-bold text-kindra-950">{currentMl}</span>
-            <span className="text-sm font-medium text-kindra-500">/ {targetMl} ml</span>
-          </div>
-          <span className="text-sm font-medium text-kindra-900 bg-kindra-100 px-2 py-1 rounded-md">
-            {percentage}%
-          </span>
+        <div className="nutrition-water-metrics" aria-label={`Consumo de hoje: ${currentMl} de ${targetMl} ml`}>
+          <strong>{currentMl.toLocaleString('pt-BR')} <span>ml</span></strong>
+          <div className="nutrition-water-goal"><span>de {targetMl.toLocaleString('pt-BR')} ml</span><strong>{percentage}%</strong></div>
         </div>
 
-        {/* Progress Bar */}
-        <div role="progressbar" aria-label="Meta diária de hidratação" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage} aria-valuetext={`${currentMl} de ${targetMl} ml`} className="h-2 bg-kindra-200 rounded-full overflow-hidden mb-6 border border-kindra-200/50">
+        <div role="progressbar" aria-label="Meta diária de hidratação" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage} aria-valuetext={`${currentMl} de ${targetMl} ml`} className="nutrition-water-progress">
           <div
-            className="h-full bg-teal-400 transition-all duration-500 motion-reduce:transition-none ease-out rounded-full"
+            className="nutrition-water-progress-fill"
             style={{ width: `${percentage}%` }}
           />
         </div>
 
-        {/* Quick Add Buttons */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="nutrition-water-actions">
           <button
             onClick={() => onAddWater(250)}
             disabled={busy}
-            className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-teal-400 text-kindra-base font-medium rounded-xl hover:bg-teal-300 active:scale-95 transition-all disabled:opacity-50 border border-transparent"
+            className="nutrition-water-quick"
           >
-            <Plus className="h-4 w-4 shrink-0" /> 250ml
+            <Plus className="h-5 w-5 shrink-0" aria-hidden="true" /> 250ml
           </button>
           <button
             onClick={() => onAddWater(500)}
             disabled={busy}
-            className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-teal-400 text-kindra-base font-medium rounded-xl hover:bg-teal-300 active:scale-95 transition-all disabled:opacity-50 border border-transparent"
+            className="nutrition-water-quick"
           >
-            <Droplet className="h-4 w-4 shrink-0" /> 500ml
+            <Droplet className="h-5 w-5 shrink-0" aria-hidden="true" /> 500ml
           </button>
         </div>
 
-        {/* Custom Input */}
-        <form onSubmit={handleCustomSubmit} className="flex flex-col gap-2 pt-4 border-t border-kindra-100/50">
+        <form onSubmit={handleCustomSubmit} className="nutrition-water-custom">
           <div className="flex gap-2 items-center">
             <div className="relative flex-1 min-w-0">
               <input
@@ -127,7 +116,7 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
                   if (errorMsg) setErrorMsg('');
                 }}
                 disabled={busy}
-                className="w-full bg-kindra-50 border border-kindra-200 text-kindra-900 placeholder:text-kindra-400 text-base font-medium rounded-xl py-3 pl-4 pr-10 outline-none focus:border-kindra-900 focus:ring-1 focus:ring-kindra-900 transition-all disabled:opacity-50"
+                className="nutrition-water-input"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-kindra-400 text-xs font-bold uppercase tracking-wider pointer-events-none">
                 ml
@@ -135,9 +124,9 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
             </div>
             <button
               type="submit"
-            aria-label="Registrar água"
+              aria-label="Registrar água"
               disabled={busy || !customValue}
-              className="flex items-center justify-center p-3 shrink-0 bg-teal-400 text-kindra-base font-medium rounded-xl hover:bg-teal-300 active:scale-95 transition-all disabled:opacity-50 border border-transparent"
+              className="nutrition-water-custom-submit"
             >
               <Check className="h-5 w-5" />
             </button>
@@ -147,14 +136,17 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
           )}
         </form>
 
-        <div className="mt-5 space-y-2">
+        <div className="nutrition-water-feedback">
           <p role="status" className="text-sm text-teal-300 leading-relaxed">
             {isAdding ? 'Registrando consumo…' : removingId ? 'Removendo registro…' : notice}
           </p>
           {error && <p role="alert" className="p-3 rounded-xl border border-rose-500/20 bg-rose-500/10 text-sm text-rose-400 leading-relaxed">{error}</p>}
         </div>
 
-        <section aria-labelledby="water-records-heading" className="mt-6 pt-6 border-t border-kindra-200">
+      </div>
+    </Card>
+
+        <section aria-labelledby="water-records-heading" className="nutrition-water-records">
           <div className="flex items-start justify-between gap-3 mb-5">
             <div>
               <h3 ref={listHeadingRef} tabIndex={-1} id="water-records-heading" className="text-base font-semibold text-kindra-950">Registros de hoje</h3>
@@ -165,16 +157,16 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
             </Button>
           </div>
           {logs.length === 0 ? (
-            <div className="rounded-xl border border-kindra-200 bg-kindra-50 p-5">
+            <div className="nutrition-water-empty">
               <p className="text-sm font-medium text-kindra-800">Seu primeiro copo começa aqui.</p>
               <p className="text-xs text-kindra-500 leading-relaxed mt-2">Use os atalhos acima ou registre uma quantidade personalizada.</p>
             </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="nutrition-water-log-list">
               {logs.map(log => {
                 const time = new Date(log.loggedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                 return (
-                  <li key={log.id} className={`rounded-xl border p-4 transition-colors motion-reduce:transition-none ${confirmId === log.id ? 'border-rose-500/20 bg-rose-500/10' : 'border-kindra-200 bg-kindra-50'}`}>
+                  <li key={log.id} className={`nutrition-water-log ${confirmId === log.id ? 'is-confirming' : ''}`}>
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <Droplet aria-hidden="true" className="w-5 h-5 text-teal-300 shrink-0" />
@@ -210,7 +202,6 @@ export function WaterTracker({ currentMl, targetMl, onAddWater, isAdding, logs, 
           )}
           <p className="mt-4 text-xs text-kindra-500 leading-relaxed">Você pode remover registros de hoje enquanto o dia não estiver consolidado.</p>
         </section>
-      </div>
-    </Card>
+    </>
   );
 }

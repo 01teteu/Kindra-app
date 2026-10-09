@@ -368,3 +368,127 @@
   .nutri-records-page .nutrition-meal-entry-kcal strong { font-size: 15px; }
   .nutri-records-page .nutrition-meal-remove { width: 40px; }
 }
+
+/* Hydration V2: presentation stays within the hydration tab. */
+.nutri-hydration-view .nutrition-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.nutri-hydration-view .nutrition-water-card {
+  position: relative;
+  min-width: 0;
+  padding: clamp(20px, 3vw, 34px);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--color-teal-400);
+  border-radius: 28px;
+  background: radial-gradient(circle at 78% 35%, #103c33 0, #0b211d 32%, #0a1513 68%);
+  box-shadow: inset 2px 0 var(--color-teal-400);
+}
+.nutri-hydration-view .nutrition-water-inner { position: relative; z-index: 1; }
+.nutri-hydration-view .nutrition-water-guardian {
+  position: absolute;
+  z-index: 0;
+  top: -72px;
+  right: -96px;
+  width: min(61%, 600px);
+  height: auto;
+  pointer-events: none;
+  animation: nutrition-water-float 7s ease-in-out infinite;
+}
+.nutri-hydration-view .nutrition-water-intro { width: 60%; min-height: 170px; }
+.nutri-hydration-view .nutrition-water-intro .eyebrow { color: var(--color-teal-300); font-size: 12px; letter-spacing: .19em; }
+.nutri-hydration-view .nutrition-water-intro h2 { margin-top: 10px; color: var(--color-kindra-950); font: 700 clamp(34px, 4.2vw, 52px)/1.01 var(--font-display); letter-spacing: -.055em; }
+.nutri-hydration-view .nutrition-water-intro p { max-width: 340px; margin-top: 12px; color: var(--color-kindra-800); font-size: clamp(13px, 1.5vw, 17px); line-height: 1.35; }
+.nutri-hydration-view .nutrition-water-metrics { width: min(58%, 530px); }
+.nutri-hydration-view .nutrition-water-metrics > strong { display: block; color: var(--color-kindra-950); font: 700 clamp(53px, 6vw, 76px)/.95 var(--font-display); letter-spacing: -.065em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nutri-hydration-view .nutrition-water-metrics > strong span { font-size: .46em; letter-spacing: -.03em; }
+.nutri-hydration-view .nutrition-water-goal { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; color: var(--color-kindra-800); font-size: 15px; }
+.nutri-hydration-view .nutrition-water-goal strong { color: var(--color-kindra-950); font: 700 23px/1 var(--font-display); }
+.nutri-hydration-view .nutrition-water-progress { width: min(58%, 530px); height: 10px; margin-top: 10px; overflow: hidden; border-radius: 99px; background: #263531; }
+.nutri-hydration-view .nutrition-water-progress-fill { height: 100%; border-radius: inherit; background: var(--color-teal-400); box-shadow: 0 0 14px rgba(22, 224, 195, .28); transition: width 300ms ease; }
+.nutri-hydration-view .nutrition-water-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 30px; }
+.nutri-hydration-view .nutrition-water-quick { display: flex; align-items: center; justify-content: center; gap: 12px; min-width: 0; min-height: 58px; padding: 10px; border: 1px solid var(--color-teal-400); border-radius: 14px; background: var(--color-teal-400); color: var(--color-kindra-base); font: 750 17px/1 var(--font-sans); transition: background-color 180ms ease, transform 180ms ease; }
+.nutri-hydration-view .nutrition-water-quick:hover:not(:disabled) { background: var(--color-teal-300); transform: translateY(-2px); }
+.nutri-hydration-view .nutrition-water-custom { margin-top: 12px; }
+.nutri-hydration-view .nutrition-water-custom > div { gap: 10px; }
+.nutri-hydration-view .nutrition-water-input { width: 100%; min-height: 56px; padding: 12px 48px 12px 17px; border: 1px solid #34504a; border-radius: 14px; outline: 0; background: rgba(3, 13, 12, .72); color: var(--color-kindra-950); font-size: 16px; }
+.nutri-hydration-view .nutrition-water-input::placeholder { color: var(--color-kindra-700); }
+.nutri-hydration-view .nutrition-water-input:focus-visible { border-color: var(--color-teal-300); box-shadow: 0 0 0 2px rgba(22, 224, 195, .22); }
+.nutri-hydration-view .nutrition-water-custom-submit { display: grid; flex: none; place-items: center; width: 56px; min-height: 56px; border: 0; border-radius: 14px; background: var(--color-teal-400); color: var(--color-kindra-base); }
+.nutri-hydration-view .nutrition-water-quick:disabled,
+.nutri-hydration-view .nutrition-water-custom-submit:disabled { opacity: .5; cursor: not-allowed; }
+.nutri-hydration-view .nutrition-water-quick:focus-visible,
+.nutri-hydration-view .nutrition-water-custom-submit:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+.nutri-hydration-view .nutrition-water-feedback:empty { display: none; }
+.nutri-hydration-view .nutrition-water-feedback:not(:empty) { margin-top: 10px; }
+.nutri-hydration-view .nutrition-water-feedback p:empty { display: none; }
+.nutri-hydration-view .nutrition-water-records { min-width: 0; padding: 18px; border: 1px solid var(--color-kindra-300); border-radius: 22px; background: #0d1916; }
+.nutri-hydration-view .nutrition-water-records > div:first-child { margin-bottom: 12px; }
+.nutri-hydration-view .nutrition-water-records h3 { color: var(--color-kindra-950); font: 700 20px/1.2 var(--font-display); }
+.nutri-hydration-view .nutrition-water-records button:focus-visible { outline: 2px solid var(--color-teal-300); outline-offset: 2px; }
+.nutri-hydration-view .nutrition-water-empty { padding: 17px; border: 1px dashed var(--color-kindra-300); border-radius: 14px; background: var(--color-kindra-100); }
+.nutri-hydration-view .nutrition-water-log-list { display: grid; gap: 8px; }
+.nutri-hydration-view .nutrition-water-log { padding: 10px 13px; border: 1px solid var(--color-kindra-300); border-radius: 13px; background: var(--color-kindra-100); }
+.nutri-hydration-view .nutrition-water-log.is-confirming { border-color: #a54955; }
+.nutri-hydration-view .nutrition-water-records > p:last-child { margin-top: 12px; }
+.nutri-hydration-view .nutrition-history { min-width: 0; }
+.nutri-hydration-view .nutrition-history-heading { margin: 3px 0 12px; }
+.nutri-hydration-view .nutrition-history-heading h3 { color: var(--color-kindra-950); font: 700 clamp(26px, 3vw, 34px)/1.1 var(--font-display); letter-spacing: -.04em; }
+.nutri-hydration-view .nutrition-history-heading p { margin-top: 4px; color: var(--color-kindra-700); font-size: 13px; }
+.nutri-hydration-view .nutrition-history-list { display: grid; gap: 9px; }
+.nutri-hydration-view .nutrition-history-day { min-width: 0; padding: 14px 18px; border: 1px solid var(--color-kindra-300); border-radius: 19px; background: #0d1917; }
+.nutri-hydration-view .nutrition-history-day-head { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+.nutri-hydration-view .nutrition-history-day-head time { color: var(--color-kindra-950); font-size: 14px; font-weight: 650; text-transform: capitalize; }
+.nutri-hydration-view .nutrition-history-status { padding: 3px 9px; border: 1px solid var(--color-kindra-400); border-radius: 99px; color: var(--color-kindra-800); background: var(--color-kindra-200); font-size: 10px; }
+.nutri-hydration-view .nutrition-history-status.is-complete { border-color: var(--color-teal-400); color: var(--color-kindra-base); background: var(--color-teal-400); }
+.nutri-hydration-view .nutrition-history-metrics { display: grid; grid-template-columns: 1.3fr repeat(3, 1fr); gap: 0; }
+.nutri-hydration-view .nutrition-history-metric { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 3px 12px; border-left: 1px solid var(--color-kindra-300); }
+.nutri-hydration-view .nutrition-history-metric:first-child { padding-left: 0; border-left: 0; }
+.nutri-hydration-view .nutrition-history-metric svg { flex: none; width: 22px; height: 22px; }
+.nutri-hydration-view .nutrition-history-water svg { color: var(--color-teal-300); }
+.nutri-hydration-view .nutrition-history-kcal svg { color: #f69062; }
+.nutri-hydration-view .nutrition-history-protein svg { color: #b790ec; }
+.nutri-hydration-view .nutrition-history-carbs svg { color: #a4e68f; }
+.nutri-hydration-view .nutrition-history-metric strong { display: block; color: var(--color-kindra-950); font: 700 18px/1.1 var(--font-display); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.nutri-hydration-view .nutrition-history-metric strong small { font-size: .7em; }
+.nutri-hydration-view .nutrition-history-metric span { display: block; margin-top: 3px; color: var(--color-kindra-700); font-size: 11px; line-height: 1.1; }
+.nutri-hydration-view .nutrition-history-empty { display: flex; align-items: center; gap: 14px; padding: 21px; border: 1px solid var(--color-kindra-300); border-radius: 18px; background: var(--color-kindra-100); }
+.nutri-hydration-view .nutrition-history-empty > svg { flex: none; width: 30px; height: 30px; color: var(--color-teal-300); }
+.nutri-hydration-view .nutrition-history-empty h4 { color: var(--color-kindra-950); font-weight: 700; }
+.nutri-hydration-view .nutrition-history-empty p { margin-top: 3px; color: var(--color-kindra-700); font-size: 12px; }
+@keyframes nutrition-water-float { 50% { transform: translateY(-7px); } }
+@media (max-width: 760px) {
+  .nutri-hydration-view .page-heading h1 { font-size: 27px; white-space: nowrap; }
+  .nutri-hydration-view .segmented-tabs button { min-width: 68px; }
+  .nutri-hydration-view .nutrition-water-card { padding: 20px; border-radius: 22px; }
+  .nutri-hydration-view .nutrition-water-guardian { top: -22px; right: -80px; width: 310px; }
+  .nutri-hydration-view .nutrition-water-intro { width: 63%; min-height: 166px; }
+  .nutri-hydration-view .nutrition-water-intro .eyebrow { font-size: 10px; }
+  .nutri-hydration-view .nutrition-water-intro h2 { font-size: clamp(29px, 8vw, 38px); }
+  .nutri-hydration-view .nutrition-water-intro p { margin-top: 10px; font-size: 12px; }
+  .nutri-hydration-view .nutrition-water-metrics,
+  .nutri-hydration-view .nutrition-water-progress { width: 65%; }
+  .nutri-hydration-view .nutrition-water-metrics > strong { font-size: clamp(42px, 12vw, 56px); }
+  .nutri-hydration-view .nutrition-water-goal { font-size: 12px; }
+  .nutri-hydration-view .nutrition-water-goal strong { font-size: 17px; }
+  .nutri-hydration-view .nutrition-water-actions { gap: 9px; margin-top: 36px; }
+  .nutri-hydration-view .nutrition-water-quick { min-height: 52px; font-size: 15px; }
+  .nutri-hydration-view .nutrition-water-input,
+  .nutri-hydration-view .nutrition-water-custom-submit { min-height: 52px; }
+  .nutri-hydration-view .nutrition-water-custom-submit { width: 52px; }
+  .nutri-hydration-view .nutrition-history-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 11px; }
+  .nutri-hydration-view .nutrition-history-metric:nth-child(3) { padding-left: 0; border-left: 0; }
+}
+@media (max-width: 380px) {
+  .nutri-hydration-view .page-heading h1 { font-size: 24px; }
+  .nutri-hydration-view .segmented-tabs button { min-width: 65px; }
+  .nutri-hydration-view .nutrition-water-card { padding: 17px; }
+  .nutri-hydration-view .nutrition-water-guardian { right: -91px; width: 300px; }
+  .nutri-hydration-view .nutrition-water-intro { width: 66%; }
+  .nutri-hydration-view .nutrition-water-metrics,
+  .nutri-hydration-view .nutrition-water-progress { width: 69%; }
+  .nutri-hydration-view .nutrition-water-actions { margin-top: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nutri-hydration-view .nutrition-water-guardian { animation: none; }
+  .nutri-hydration-view .nutrition-water-progress-fill,
+  .nutri-hydration-view .nutrition-water-quick { transition: none; }
+}

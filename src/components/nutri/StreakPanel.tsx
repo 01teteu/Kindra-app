@@ -7,11 +7,12 @@ interface StreakPanelProps {
   streak: number;
   history: NutritionHistory[];
   todayAchieved: boolean;
+  heading?: string;
 }
 
 const WEEK_DAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
-export function StreakPanel({ streak, history, todayAchieved }: StreakPanelProps) {
+export function StreakPanel({ streak, history, todayAchieved, heading = 'Sua ofensiva nutricional' }: StreakPanelProps) {
   const today = new Date();
   const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 0 }); // 0 = Domingo
 
@@ -54,7 +55,7 @@ export function StreakPanel({ streak, history, todayAchieved }: StreakPanelProps
           <Flame className={isFireActive ? 'text-teal-300' : 'text-kindra-500'} />
         </span>
         <div className="streak-identity-copy">
-          <p className="streak-heading">Sua ofensiva nutricional</p>
+          <p className="streak-heading">{heading}</p>
           <div className="streak-count">
             <strong>{displayStreak}</strong>
             <span>dias de constância</span>

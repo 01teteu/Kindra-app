@@ -20,6 +20,8 @@ const today = new Date().toISOString();
 const oatmeal = { id: 'food-1', name: 'Aveia', kcal: 100, proteinG: 10, carbsG: 20, fatG: 5 };
 const longFood = { id: 'food-2', name: 'Abadejo, filé, congelado, assado com ervas e acompanhamento caseiro', kcal: 125, proteinG: 23, carbsG: 2, fatG: 3 };
 let meals = [{ id: 'meal-1', name: 'BREAKFAST', loggedAt: today, entries: [{ id: 'entry-1', amountGrams: 150, food: oatmeal }] }];
+let waterLogs: { id: string; amountMl: number; loggedAt: string }[] = [];
+let hydrationHistory: object[] = [];
 let failMeals = false;
 let mealResponseDelayMs = 0;
 const vite = await createServer({ configFile: false, plugins: [react(), tailwindcss(), {
@@ -40,16 +42,29 @@ const vite = await createServer({ configFile: false, plugins: [react(), tailwind
         meals = meals.map(meal => meal.name === body.category ? { ...meal, entries: [...meal.entries, { id: 'entry-added', amountGrams: body.amountGrams, food: oatmeal }] } : meal);
         res.end('{}'); return;
       }
+      if (req.url.startsWith('/api/nutrition/water/') && req.method === 'DELETE') {
+        const id = req.url.split('/')[4].split('?')[0];
+        waterLogs = waterLogs.filter(log => log.id !== id);
+        res.end('{}'); return;
+      }
+      if (req.url === '/api/nutrition/water' && req.method === 'POST') {
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) chunks.push(Buffer.from(chunk));
+        const body = JSON.parse(Buffer.concat(chunks).toString()) as { amountMl: number };
+        const log = { id: `water-${waterLogs.length + 1}`, amountMl: body.amountMl, loggedAt: today };
+        waterLogs = [log, ...waterLogs];
+        res.end(JSON.stringify(log)); return;
+      }
       let data: unknown = [];
       if (req.url.startsWith('/api/nutrition/goals/current')) data = { id: 'goal-1', userId: 'user-1', targetKcal: 2200, targetProteinG: 140, targetCarbsG: 260, targetFatG: 70, targetWaterMl: 2400 };
-      else if (req.url.startsWith('/api/nutrition/history/consolidate')) data = { currentStreak: 5, history: [] };
+      else if (req.url.startsWith('/api/nutrition/history/consolidate')) data = { currentStreak: 5, history: hydrationHistory };
       else if (req.url.startsWith('/api/meals?')) {
         if (mealResponseDelayMs) await delay(mealResponseDelayMs);
         if (failMeals) { res.statusCode = 500; res.end('{}'); return; }
         data = meals;
       }
       else if (req.url.startsWith('/api/foods')) data = [oatmeal];
-      else if (req.url.startsWith('/api/nutrition/water?')) data = [];
+      else if (req.url.startsWith('/api/nutrition/water?')) data = waterLogs;
       else if (req.url.startsWith('/api/nutrition/weight')) data = [{ id: 'weight-1', weightKg: 75.5, loggedAt: today }];
       res.end(JSON.stringify(data));
     });
@@ -167,8 +182,55 @@ try {
   await wait("!!document.querySelector('#panel-hidratacao')");
   await evaluate("document.querySelector('#panel-hidratacao button')?.click()");
   await wait("!!document.querySelector('.nutrition-water-card')");
+  assert.equal(await evaluate("document.querySelector('.nutrition-water-metrics > strong')?.textContent?.trim()"), '0 ml');
+  assert.equal(await evaluate("document.querySelector('.nutrition-water-goal strong')?.textContent"), '0%');
+  assert.equal(await evaluate("document.querySelector('.nutrition-history-empty h4')?.textContent"), 'Nenhum registro');
+  await capture('hydration-empty-360', 360, 720);
+  await capture('hydration-empty-390', 390, 844);
+  await capture('hydration-empty-430', 430, 900);
+  await capture('hydration-empty-desktop', 1440, 900);
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('.nutrition-water-guardian')).animationName"), 'none');
+  await send('Emulation.setEmulatedMedia', { features: [] });
+  await evaluate("document.querySelectorAll('.nutrition-water-quick')[0]?.click()");
+  await wait("document.querySelector('.nutrition-water-metrics > strong')?.textContent?.includes('250')");
+  await evaluate("document.querySelectorAll('.nutrition-water-quick')[1]?.click()");
+  await wait("document.querySelector('.nutrition-water-metrics > strong')?.textContent?.includes('750')");
+  await evaluate("document.querySelector('.nutrition-water-input')?.focus()");
+  await send('Input.insertText', { text: '1650' });
+  assert.equal(await evaluate("document.querySelector('.nutrition-water-input')?.value"), '1650');
+  assert.equal(await evaluate("document.querySelector('.nutrition-water-custom-submit')?.disabled"), false);
+  await evaluate("document.querySelector('.nutrition-water-custom-submit')?.click()");
+  await wait("document.querySelector('.nutrition-water-metrics > strong')?.textContent?.includes('2.400')");
+  assert.equal(await evaluate("document.querySelector('.nutrition-water-goal strong')?.textContent"), '100%');
+  await capture('hydration-goal-390', 390, 844);
+  await evaluate("document.querySelector('.nutrition-water-input')?.focus()");
+  await send('Input.insertText', { text: '100' });
+  await evaluate("document.querySelector('.nutrition-water-custom-submit')?.click()");
+  await wait("document.querySelector('.nutrition-water-metrics > strong')?.textContent?.includes('2.500')");
+  assert.equal(await evaluate("document.querySelector('.nutrition-water-goal strong')?.textContent"), '100%');
+  await capture('hydration-over-goal-390', 390, 844);
+  await evaluate("document.querySelector('[aria-label^=\"Remover 100 ml\"]')?.click()");
+  await wait("!!document.querySelector('.nutrition-water-log.is-confirming')");
+  await evaluate("document.querySelector('.nutrition-water-log.is-confirming [id^=\"water-confirm-\"] button:last-child')?.click()");
+  await wait("document.querySelector('.nutrition-water-metrics > strong')?.textContent?.includes('2.400')");
+  assert.ok(requests.some(value => value.startsWith('DELETE /api/nutrition/water/')));
+  hydrationHistory = [
+    { id: 'day-1', date: '2026-10-08', waterIngestedMl: 3220, targetWaterMl: 2400, consumedKcal: 2180, consumedProteinG: 120, consumedCarbsG: 280, waterGoalAchieved: true, kcalGoalAchieved: true, proteinGoalAchieved: true, carbsGoalAchieved: true, fatGoalAchieved: true },
+    { id: 'day-2', date: '2026-10-07', waterIngestedMl: 1890, targetWaterMl: 2400, consumedKcal: 1950, consumedProteinG: 110, consumedCarbsG: 220, waterGoalAchieved: false, kcalGoalAchieved: false, proteinGoalAchieved: false, carbsGoalAchieved: false, fatGoalAchieved: false },
+  ];
+  await send('Page.reload', { ignoreCache: true });
+  await wait("!!document.querySelector('#tab-hidratacao')");
+  await evaluate("document.querySelector('#tab-hidratacao')?.click()");
+  await wait("!!document.querySelector('.nutrition-history-day')");
+  assert.equal(await evaluate("document.querySelectorAll('.nutrition-history-day').length"), 2);
+  assert.equal(await evaluate("document.querySelector('.nutrition-history-day .nutrition-history-status')?.textContent"), 'Perfeito');
+  assert.equal(await evaluate("document.querySelectorAll('.nutrition-history-day')[1]?.textContent?.includes('Incompleto')"), true);
+  assert.equal(await evaluate("document.querySelector('.nutrition-history-day')?.textContent?.includes('proteínas')"), true);
+  await capture('hydration-history-390', 390, 720);
+  await capture('hydration-history-desktop', 1440, 900);
   assert.deepEqual(runtimeErrors, []);
-  console.log(`PASS Nutri V2 browser: totals, records navigation, hydration tab, responsive widths; screenshots ${outputDir}`);
+  console.log(`PASS Nutri V2 browser: totals, records, hydration 0/goal/exceeded, add/remove, history, responsive widths, reduced motion; screenshots ${outputDir}`);
 } finally {
   socket?.close();
   if (browser && browser.exitCode === null) { browser.kill('SIGTERM'); await once(browser, 'exit'); }
