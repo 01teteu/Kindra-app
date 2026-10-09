@@ -188,18 +188,14 @@ export function Nutri() {
   return (
     <div className="page-container nutri-page nutri-overview-page">
       <div className="w-full">
-        <div className="page-heading">
-          <div>
-            <h1 className="text-kindra-950">
-              Nutrição
-            </h1>
-            <p className="text-sm font-medium text-kindra-500 mt-1">
-              Pequenos hábitos. Todos os dias.
-            </p>
+        <div className="nutri-topbar">
+          <div className="page-heading">
+            <div>
+              <h1 className="text-kindra-950">Nutrição</h1>
+              <p className="text-sm font-medium text-kindra-500 mt-1">Pequenos hábitos. Todos os dias.</p>
+            </div>
           </div>
-        </div>
-
-        <div className="segmented-tabs" role="tablist" aria-label="Acompanhamento nutricional">
+          <div className="segmented-tabs" role="tablist" aria-label="Acompanhamento nutricional">
           {(['diario', 'hidratacao'] as const).map((tab, index) => <button key={tab} id={`tab-${tab}`} role="tab"
             aria-selected={activeTab === tab} aria-controls={`panel-${tab}`} tabIndex={activeTab === tab ? 0 : -1}
             onClick={() => setActiveTab(tab)} onKeyDown={event => {
@@ -209,6 +205,7 @@ export function Nutri() {
                 setActiveTab(next); document.getElementById(`tab-${next}`)?.focus();
               }
             }}>{tab === 'diario' ? 'Nutrição' : 'Hidratação'}</button>)}
+          </div>
         </div>
 
         {loadError ? <div role="alert" className="kindra-card p-6 text-center"><p className="text-sm text-kindra-600 mb-4">{loadError}</p><button onClick={fetchDashboardData} className="kindra-button button-outline">Tentar novamente</button></div> : isLoading ? (
@@ -228,21 +225,21 @@ export function Nutri() {
                     <div className="nutri-records-copy">
                       <span className="eyebrow">Alimentação · hoje</span>
                       <h2>Registre seus alimentos aqui.</h2>
-                      <p>{foodCount} {foodCount === 1 ? 'alimento registrado' : 'alimentos registrados'} hoje. Acompanhe suas refeições e adicione o próximo alimento.</p>
+                      <p>{foodCount} {foodCount === 1 ? 'alimento registrado' : 'alimentos registrados'} hoje. Adicione o próximo.</p>
                       <span className="nutri-records-action">Ir para registros de alimentos <ArrowUpRight size={18} aria-hidden="true" /></span>
                     </div>
                     <img src={recordsGuardian} width="1254" height="1254" loading="lazy" decoding="async" alt="" aria-hidden="true" />
                   </Link>
                   <div className="nutrition-utilities">
-                    <Card className="nutrition-settings-card p-5 sm:p-8">
+                    <Card className="nutrition-settings-card">
                       <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-kindra-200 text-teal-300"><Target className="h-6 w-6" aria-hidden="true" /></div>
+                        <div className="nutrition-utility-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-kindra-200 text-teal-300"><Target className="h-6 w-6" aria-hidden="true" /></div>
                         <div>
                           <h2 className="text-xl font-display font-semibold text-kindra-950">Metas nutricionais</h2>
-                          <p className="mt-2 text-sm leading-relaxed text-kindra-500">Seu corpo, sua rotina e seus objetivos podem mudar. Revise as respostas do seu perfil para manter as metas de alimentação e água alinhadas ao seu momento.</p>
                         </div>
                       </div>
-                      <Link to="/settings/nutrition" className="kindra-button button-primary mt-6 w-full sm:w-auto">Editar metas nutricionais<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+                      <p className="mt-2 text-sm leading-relaxed text-kindra-500">Mantenha suas metas atualizadas.</p>
+                      <Link to="/settings/nutrition" className="kindra-button button-primary nutrition-utility-action">Editar metas<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
                     </Card>
                     <section className="nutrition-weight-section" aria-label="Acompanhamento do peso">
                       {weightActionError && <p role="alert" className="mb-4 rounded-xl bg-rose-500/10 p-4 text-sm text-rose-400">{weightActionError}</p>}

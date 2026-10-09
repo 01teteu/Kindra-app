@@ -30,7 +30,7 @@ const vite = await createServer({ configFile: false, plugins: [react(), tailwind
       else if (req.url.startsWith('/api/meals?')) data = meals;
       else if (req.url.startsWith('/api/foods')) data = [];
       else if (req.url.startsWith('/api/nutrition/water?')) data = [];
-      else if (req.url.startsWith('/api/nutrition/weight')) data = [];
+      else if (req.url.startsWith('/api/nutrition/weight')) data = [{ id: 'weight-1', weightKg: 75.5, loggedAt: today }];
       res.end(JSON.stringify(data));
     });
   },
@@ -73,6 +73,7 @@ try {
     throw new Error(`Timeout ${expression}`);
   }
   async function capture(name: string, width: number, height: number) {
+    await evaluate('window.scrollTo(0, 0)');
     await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 600 });
     await delay(180);
     assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'), false, `${name}: horizontal overflow`);
@@ -89,7 +90,13 @@ try {
   assert.equal(await evaluate("document.querySelector('.nutri-energy-value strong')?.textContent"), '2.050');
   assert.equal(await evaluate("document.querySelector('.nutri-records-link p')?.textContent?.includes('1 alimento registrado hoje')"), true);
   assert.ok(requests.some(value => value.startsWith('POST /api/nutrition/history/consolidate')));
-  await capture('desktop', 1440, 900); await capture('mobile-360', 360, 800); await capture('mobile-390', 390, 844); await capture('mobile-430', 430, 900);
+  await capture('desktop', 1440, 900); await capture('mobile-360', 360, 800); await capture('mobile-390', 390, 844);
+  assert.equal(await evaluate("document.querySelector('.nutrition-goal-card').getBoundingClientRect().height < 300"), true, 'Hero compacto em 390px');
+  assert.equal(await evaluate("document.querySelector('.streak-card').getBoundingClientRect().height < 90"), true, 'Ofensiva secundária em 390px');
+  assert.equal(await evaluate("document.querySelector('.nutri-records-link').getBoundingClientRect().height < 190"), true, 'CTA compacto em 390px');
+  assert.equal(await evaluate("Math.abs(document.querySelector('.nutrition-settings-card').getBoundingClientRect().top - document.querySelector('.nutrition-weight-card').getBoundingClientRect().top) < 2"), true, 'Utilitários lado a lado em 390px');
+  assert.equal(await evaluate("document.querySelector('.nutrition-weight-card .metric-number')?.textContent?.trim()"), '75.5');
+  await capture('mobile-430', 430, 900);
   await evaluate("document.querySelector('.nutri-records-link')?.click()");
   await wait("location.pathname === '/nutri/registros' && !!document.querySelector('.nutrition-meal-card')");
   assert.equal(await evaluate("document.body.innerText.includes('Aveia')"), true);

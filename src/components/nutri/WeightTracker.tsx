@@ -24,7 +24,7 @@ export function WeightTracker({ logs, onAddWeight, isAdding }: WeightTrackerProp
   };
 
   return (
-    <Card className="nutrition-weight-card p-5 sm:p-6 relative overflow-hidden">
+    <Card className="nutrition-weight-card relative overflow-hidden">
       <div className="relative z-10">
         <div className="flex items-center gap-4 mb-6">
           <div className="h-10 w-10 shrink-0 bg-kindra-200 text-teal-300 rounded-xl flex items-center justify-center">
@@ -58,7 +58,7 @@ export function WeightTracker({ logs, onAddWeight, isAdding }: WeightTrackerProp
               max="400"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Novo peso (ex: 75.5)"
+              placeholder="Novo peso"
               disabled={isAdding}
               className="w-full bg-kindra-50 border border-kindra-200 text-kindra-900 placeholder:text-kindra-400 text-base font-medium rounded-xl py-3 pl-4 pr-10 outline-none focus:border-kindra-900 focus:ring-1 focus:ring-kindra-900 transition-all disabled:opacity-50"
               required
