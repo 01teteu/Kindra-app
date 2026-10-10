@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowRight, ArrowUpRight, LogOut, RefreshCw } from 'lucide-react';
+import { AlertCircle, ArrowRight, ArrowUpRight, RefreshCw } from 'lucide-react';
 import { apiFetch } from '../lib/api';
 import * as nutritionApi from '../lib/nutrition';
 import type { Meal, NutritionGoal, NutritionHistoryResponse, WaterIntakeLog } from '../lib/nutrition';
@@ -64,11 +64,6 @@ export function Home() {
     return () => { current = false; };
   }, [authStatus, navigate]);
 
-  const handleLogout = async () => {
-    try { await apiFetch('/auth/logout', { data: {} }); navigate('/login'); }
-    catch (error) { console.error(error); }
-  };
-
   if (authStatus === 'loading') return <div className="home-loading" role="status"><RefreshCw aria-hidden="true" /> Carregando seu dia…</div>;
   if (authStatus === 'error') return <div className="home-auth-error"><Card><AlertCircle aria-hidden="true" /><h2>Não foi possível abrir sua Home</h2><p>Tente carregar novamente.</p><Button onClick={() => void loadAuth()}>Tentar novamente</Button></Card></div>;
 
@@ -82,7 +77,6 @@ export function Home() {
   return <main className="page-container home-page">
     <header className="home-heading">
       <div><span className="eyebrow">Seu espaço</span><h1>Olá, {profile?.firstName}.</h1><p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}.<br />Vamos cuidar do seu dia?</p></div>
-      <button onClick={handleLogout} className="icon-button" aria-label="Sair da conta"><LogOut size={18} /></button>
     </header>
 
     <section className="home-streak" aria-labelledby="home-streak-title">

@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { MoreVertical, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { LogOut, MoreVertical, RefreshCw } from 'lucide-react';
 import { Onboarding } from './Onboarding';
+import { apiFetch } from '../lib/api';
 import * as nutritionApi from '../lib/nutrition';
 
 export function Settings() {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRecalculating, setIsRecalculating] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -27,6 +30,11 @@ export function Settings() {
     } finally {
       setIsRecalculating(false);
     }
+  };
+
+  const handleLogout = async () => {
+    try { await apiFetch('/auth/logout', { data: {} }); navigate('/login'); }
+    catch (error) { console.error(error); }
   };
 
   return (
@@ -60,6 +68,15 @@ export function Settings() {
           )}
         </div>
       </div>
+      <section className="mt-20 flex flex-col gap-5 border-t border-kindra-200 pt-6 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="settings-session-title">
+        <div>
+          <h2 id="settings-session-title" className="font-display text-xl font-bold text-kindra-950">Sessão</h2>
+          <p className="mt-1 text-sm text-kindra-500">Encerre seu acesso quando terminar.</p>
+        </div>
+        <button type="button" onClick={handleLogout} className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl border border-kindra-300 px-4 py-2 text-sm font-semibold text-kindra-800 transition-colors hover:border-rose-400 hover:text-rose-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300 sm:self-auto">
+          <LogOut size={18} aria-hidden="true" /> Sair da conta
+        </button>
+      </section>
     </div>
   );
 }

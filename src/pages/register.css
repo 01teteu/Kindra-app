@@ -27,22 +27,25 @@
 
 .register-page .auth-content {
   width: 100%;
-  max-width: 540px;
-  margin: 8px auto 0;
+  max-width: 980px;
+  margin: clamp(20px, 4vh, 50px) auto 0;
 }
 
 .register-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  column-gap: clamp(30px, 6vw, 90px);
+  align-items: start;
   width: 100%;
 }
 
 .register-guardian {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   position: relative;
   isolation: isolate;
-  width: 180px;
-  margin: 0 auto -6px;
+  width: min(100%, 320px);
+  margin: 0 auto;
   pointer-events: none;
   animation: register-guardian-breathe 8s ease-in-out infinite;
 }
@@ -68,14 +71,16 @@
 }
 
 .register-intro {
+  grid-column: 1;
+  grid-row: 1;
   width: 100%;
-  text-align: center;
+  text-align: left;
 }
 
 .register-page .register-intro h1 {
   margin: 0;
   color: var(--color-kindra-950);
-  font: 700 clamp(36px, 4vw, 48px)/1.08 var(--font-display);
+  font: 700 clamp(42px, 4.5vw, 56px)/1.04 var(--font-display);
   letter-spacing: -.065em;
   text-wrap: balance;
 }
@@ -84,7 +89,7 @@
 
 .register-intro p {
   max-width: 465px;
-  margin: 16px auto 0;
+  margin: 14px 0 0;
   color: var(--color-kindra-500);
   font-size: 15px;
   line-height: 1.7;
@@ -92,9 +97,11 @@
 }
 
 .register-form-area {
+  grid-column: 1;
+  grid-row: 2;
   width: 100%;
   max-width: 460px;
-  margin-top: 27px;
+  margin-top: 25px;
 }
 
 .register-form {
@@ -193,7 +200,7 @@
   margin-top: 27px;
   color: var(--color-kindra-500);
   font-size: 14px;
-  text-align: center;
+  text-align: left;
 }
 
 .register-login a {
@@ -213,18 +220,19 @@
     padding: calc(19px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));
   }
   .register-page .auth-brand { padding-bottom: 16px; }
-  .register-page .auth-content { max-width: 500px; margin-top: 8px; }
-  .register-guardian { width: 150px; margin-bottom: 1px; }
-  .register-page .register-intro h1 { font-size: clamp(32px, 8.4vw, 42px); }
+  .register-page .auth-content { max-width: 500px; margin-top: 16px; }
+  .register-content { grid-template-columns: minmax(0, 1fr) clamp(100px, 28vw, 128px); column-gap: 8px; }
+  .register-guardian { grid-row: 1; width: 100%; margin: -6px 0 0; }
+  .register-page .register-intro h1 { font-size: clamp(32px, 8.3vw, 40px); }
   .register-intro p { margin-top: 12px; font-size: 14px; line-height: 1.6; }
-  .register-form-area { margin-top: 22px; }
+  .register-form-area { grid-column: 1 / -1; margin-top: 20px; }
   .register-terms { margin-top: 18px; }
   .register-alternative { margin-top: 23px; }
   .register-login { margin-top: 22px; }
 }
 
 @media (max-width: 380px), (max-height: 740px) {
-  .register-guardian { width: 130px; }
+  .register-guardian { width: min(100%, 104px); }
   .register-page .register-intro h1 { font-size: clamp(30px, 8vw, 39px); }
   .register-form-area { margin-top: 17px; }
 }

@@ -111,9 +111,16 @@ try {
   scenario = 'no-profile'; await load();
   assert.equal(await evaluate('location.pathname'), '/onboarding');
   scenario = 'normal'; await load();
-  await evaluate("document.querySelector('[aria-label=\"Sair da conta\"]').click()"); await wait("location.pathname === '/login'");
+  assert.equal(await evaluate("!!document.querySelector('.home-page [aria-label=\"Sair da conta\"]')"), false);
+  await send('Page.navigate', { url: `${url}settings` });
+  await wait("!!document.querySelector('[aria-label=\"Opções de nutrição\"]') && !!document.querySelector('button')");
+  await capture('settings-mobile', 390, 844);
+  await capture('settings-desktop', 1280, 900);
+  await evaluate("[...document.querySelectorAll('button')].find(button => button.textContent?.includes('Sair da conta'))?.click()");
+  await wait("location.pathname === '/login'");
+  assert.ok(requests.some(path => path.startsWith('/api/auth/logout')), 'Configurações usa a rota de logout existente');
   assert.deepEqual(runtimeErrors, []);
-  console.log(`PASS Home browser: auth/onboarding/logout, ordering, section errors, data and responsive widths; screenshots ${outputDir}`);
+  console.log(`PASS Home browser: auth/onboarding, logout em Configurações, ordering, section errors, data and responsive widths; screenshots ${outputDir}`);
 } finally {
   socket?.close();
   if (browser && browser.exitCode === null) { browser.kill('SIGTERM'); await once(browser, 'exit'); }
