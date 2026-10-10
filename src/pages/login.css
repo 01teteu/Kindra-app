@@ -170,11 +170,18 @@
   background: var(--color-teal-300);
 }
 
+.login-social {
+  padding: 18px 16px 20px;
+  border: 1px solid var(--color-kindra-200);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgb(45 212 191 / 5%), transparent 72%), var(--color-kindra-100);
+}
+
 .login-alternative {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 0 0 -5px;
+  margin: 0 0 17px;
   color: var(--color-kindra-400);
   font-size: 12px;
   white-space: nowrap;
@@ -185,6 +192,13 @@
   content: '';
   flex: 1;
   border-top: 1px solid var(--color-kindra-200);
+}
+
+.login-page .login-social .custom-google-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
 }
 
 .login-register {
@@ -220,6 +234,7 @@
   .login-intro p { margin-top: 10px; font-size: 14px; line-height: 1.6; }
   .login-form-area { grid-column: 1 / -1; margin-top: 20px; }
   .login-form { gap: 20px; }
+  .login-social { padding: 16px 12px 18px; }
   .login-register { grid-column: 1 / -1; margin-top: 24px; }
 }
 

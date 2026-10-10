@@ -9,7 +9,9 @@ const guardianMain = new URL('../assets/brand/totem/guardian-main.webp', import.
 const guardianFocused = new URL('../assets/brand/totem/guardian-focused.webp', import.meta.url).href;
 const guardianSad = new URL('../assets/brand/totem/guardian-sad.webp', import.meta.url).href;
 const guardianCelebrating = new URL('../assets/brand/totem/guardian-celebrating.webp', import.meta.url).href;
-const productInterface = new URL('../assets/landing/kindra-interface.webp', import.meta.url).href;
+const productHome = new URL('../assets/landing/product-home.png', import.meta.url).href;
+const productNutrition = new URL('../assets/landing/product-nutrition.png', import.meta.url).href;
+const productWorkouts = new URL('../assets/landing/product-workouts.png', import.meta.url).href;
 
 const pillars = [
   { number: '01', name: 'Treino', description: 'Planeje a semana. Registre séries, cargas e repetições quando for a hora de treinar.' },
@@ -102,8 +104,21 @@ export function Landing() {
             <p>O seu dia ganha contexto: treino, alimentação e registros acessíveis na mesma experiência.</p>
           </div>
           <motion.figure className="landing-product-figure" initial={reduceMotion ? false : { clipPath: 'inset(0 0 12% 0)', opacity: 0.7 }} whileInView={{ clipPath: 'inset(0 0 0% 0)', opacity: 1 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
-            <img src={productInterface} width="1042" height="568" loading="lazy" alt="Captura real da interface do Kindra com visão da rotina e atalhos para nutrição e treinos" />
-            <figcaption>Interface do Kindra · visão da rotina</figcaption>
+            <div className="landing-product-gallery">
+              <div className="landing-product-screen landing-product-screen-home">
+                <span>01 / Seu dia</span>
+                <div className="landing-product-viewport"><img src={productHome} width="390" height="1923" loading="lazy" alt="Tela atual da Home do Kindra com saudação e ofensiva" /></div>
+              </div>
+              <div className="landing-product-screen landing-product-screen-nutrition">
+                <span>02 / Nutrição</span>
+                <div className="landing-product-viewport"><img src={productNutrition} width="390" height="995" loading="lazy" alt="Tela atual de Nutrição com balanço do dia, macronutrientes e registro de alimentos" /></div>
+              </div>
+              <div className="landing-product-screen landing-product-screen-workouts">
+                <span>03 / Treinos</span>
+                <div className="landing-product-viewport"><img src={productWorkouts} width="390" height="1377" loading="lazy" alt="Tela atual de Treinos com rotina do dia e planejamento semanal" /></div>
+              </div>
+            </div>
+            <figcaption>Telas reais do Kindra · dados demonstrativos</figcaption>
           </motion.figure>
         </section>
 

@@ -97,6 +97,7 @@ try {
     await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 600 });
     await delay(160);
     assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'), false, `${name}: horizontal overflow`);
+    assert.equal(await evaluate("[...document.querySelectorAll('.weekly-day-mobile-label')].filter(el => getComputedStyle(el).display !== 'none').every(el => el.scrollWidth <= el.clientWidth + 1)"), true, `${name}: rótulo semanal cortado`);
     const layout = await send('Page.getLayoutMetrics');
     const screenshot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { x: 0, y: 0, width, height: layout.cssContentSize.height, scale: 1 } });
     writeFileSync(path.join(outputDir, `${name}.png`), Buffer.from(screenshot.data, 'base64'));
@@ -144,6 +145,8 @@ try {
   await wait("!!document.querySelector('.weekly-today h2') && document.querySelector('.weekly-today h2').textContent.includes('Treino de força A')");
   assert.deepEqual(requests.at(-1), { path: '/api/workouts/plans/generate', body: { trainingDaysPerWeek: 3, equipment: ['MACHINE'] } });
   assert.equal(await evaluate("document.querySelectorAll('.weekly-day').length"), 7);
+  assert.equal(await evaluate("document.querySelectorAll('.weekly-day-today').length"), 1);
+  assert.equal(await evaluate("document.querySelectorAll('.weekly-day-rest').length > 0 && document.querySelectorAll('.weekly-day-planned').length > 0"), true);
   assert.equal(await evaluate("document.querySelectorAll('.weekly-routine-row').length"), 3);
   assert.equal(await evaluate("document.querySelector('.weekly-today-detail')?.textContent?.includes('5 exercícios')"), true);
   assert.equal(await evaluate("document.querySelector('.weekly-guardian')?.complete"), true);
@@ -152,12 +155,24 @@ try {
   await capture('active-430', 430, 900);
   await capture('active-laptop', 1280, 800);
   await capture('active-desktop', 1600, 900);
+  routines.push(
+    { id: 'routine-4', name: 'Parte superior e estabilidade', exerciseCount: 8 },
+    { id: 'routine-5', name: 'Corrida leve e mobilidade', exerciseCount: 4 },
+    { id: 'routine-6', name: 'Rotina longa de força para membros inferiores', exerciseCount: 7 },
+    { id: 'routine-7', name: 'Alongamento', exerciseCount: 2 },
+  );
+  await send('Page.reload', { ignoreCache: true });
+  await wait("document.querySelectorAll('.weekly-routine-row').length === 7");
+  await capture('many-routines-390', 390, 844);
+  routines.splice(3);
   await click('.weekly-new-plan');
   await wait("!!document.querySelector('.weekly-editor input[aria-label=\"Nome do plano\"]') && !!document.querySelector('dialog[open]')");
   await send('Page.reload', { ignoreCache: true });
   await wait("!!document.querySelector('.weekly-day[data-weekday=\"MONDAY\"]')");
   await click('.weekly-day[data-weekday="MONDAY"]');
   await wait("!!document.querySelector('.weekly-editor') && !!document.querySelector('dialog[open]')");
+  assert.equal(await evaluate("document.querySelector('.weekly-day[data-weekday=\"MONDAY\"]')?.classList.contains('weekly-day-selected')"), true);
+  await capture('selected-day-390', 390, 844);
   async function checkNavigation(selector: string, destination: string) {
     await send('Page.navigate', { url: `${url}workout` });
     await wait(`!!document.querySelector(${JSON.stringify(selector)})`);

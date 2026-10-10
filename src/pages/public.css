@@ -93,7 +93,12 @@
 .kindra-landing .landing-product { padding-block: 42px 115px; }
 .kindra-landing .landing-product-heading { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-block: 70px 58px; }
 .kindra-landing .landing-product-figure { margin: 0; }
-.kindra-landing .landing-product-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--color-kindra-300); border-radius: 16px; }
+.kindra-landing .landing-product-gallery { display: grid; grid-template-columns: 1.08fr .94fr .94fr; align-items: center; gap: 18px; min-width: 0; padding: 34px; border: 1px solid var(--color-kindra-300); border-radius: 28px; background: radial-gradient(circle at 50% 3%, rgb(45 212 191 / 9%), transparent 47%), var(--color-kindra-100); }
+.kindra-landing .landing-product-screen { min-width: 0; padding: 10px; border: 1px solid var(--color-kindra-300); border-radius: 21px; background: var(--color-kindra-base); box-shadow: 0 22px 42px rgb(0 0 0 / 18%); }
+.kindra-landing .landing-product-screen > span { display: block; padding: 7px 9px 13px; color: var(--color-teal-300); font-size: 10px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
+.kindra-landing .landing-product-viewport { height: 520px; overflow: hidden; border: 1px solid var(--color-kindra-200); border-radius: 12px; background: #080c0b; }
+.kindra-landing .landing-product-screen-home .landing-product-viewport { height: 600px; }
+.kindra-landing .landing-product-viewport img { display: block; width: 100%; height: auto; }
 .kindra-landing .landing-product-figure figcaption { margin-top: 18px; color: var(--color-kindra-500); font-size: 11px; letter-spacing: .06em; }
 
 .kindra-landing .landing-progress { padding-block: 68px 90px; border-top: 1px solid var(--color-kindra-200); }
@@ -160,8 +165,11 @@
   .kindra-landing .landing-pillar p { grid-column: 2 / 3; grid-row: 2; }
   .kindra-landing .landing-pillar > svg { grid-column: 3; grid-row: 1; }
   .kindra-landing .landing-product { padding-block: 35px 75px; }
-  .kindra-landing .landing-product-figure img { width: 145%; max-width: none; }
-  .kindra-landing .landing-product-figure { overflow: hidden; }
+  .kindra-landing .landing-product-gallery { gap: 10px; padding: 16px; border-radius: 20px; }
+  .kindra-landing .landing-product-screen { padding: 7px; border-radius: 15px; }
+  .kindra-landing .landing-product-screen > span { padding: 5px 6px 10px; font-size: 9px; }
+  .kindra-landing .landing-product-viewport { height: 420px; border-radius: 9px; }
+  .kindra-landing .landing-product-screen-home .landing-product-viewport { height: 480px; }
   .kindra-landing .landing-product-figure figcaption { margin-top: 13px; }
   .kindra-landing .landing-progress { padding-block: 55px 70px; }
   .kindra-landing .landing-progress-layout { grid-template-columns: 1fr; gap: 24px; margin-top: 44px; }
@@ -174,6 +182,12 @@
   .kindra-landing .landing-start { padding-block: 85px 95px; }
   .kindra-landing .landing-start h2 { font-size: clamp(48px, 9vw, 75px); }
   .kindra-landing .landing-footer-links { gap: 8px 20px; }
+}
+@media (max-width: 767px) {
+  .kindra-landing .landing-product-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .kindra-landing .landing-product-screen-home { grid-column: 1 / -1; }
+  .kindra-landing .landing-product-screen-home .landing-product-viewport { height: 390px; }
+  .kindra-landing .landing-product-screen:not(.landing-product-screen-home) .landing-product-viewport { height: 250px; }
 }
 @media (max-width: 430px) {
   .kindra-landing .landing-hero-stage { height: clamp(405px, 106vw, 460px); }
@@ -195,6 +209,9 @@
   .kindra-landing .public-header .kindra-brand-mark { display: none; }
   .kindra-landing .landing-hero-actions { flex-direction: column; align-items: stretch; gap: 6px; }
   .kindra-landing .landing-hero-actions .landing-text-link { justify-content: center; }
+}
+@media (max-width: 380px) {
+  .kindra-landing .landing-product h2 { font-size: 14vw; }
 }
 @media (prefers-reduced-motion: reduce) {
   .kindra-landing .landing-hero-guardian img { animation: none; }

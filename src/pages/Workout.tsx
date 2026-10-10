@@ -115,10 +115,11 @@ export function Workout() {
           </div>
           <ol className="weekly-days">{trainingWeekdays.map(key => {
             const assigned = selected.days.find(item => item.dayOfWeek === key);
-            return <li key={key}><button className={`weekly-day${assigned ? assigned.routine.exerciseCount === 0 ? ' weekly-day-empty' : ' weekly-day-planned' : ' weekly-day-rest'}${key === weekday ? ' weekly-day-today' : ''}`} data-weekday={key} disabled={state.pending} aria-label={`Editar ${weekdayLabels[key].full}`} onClick={() => { setRoutineId(assigned?.routineId ?? ''); setEditor({ kind: 'day', planId: selected.id, day: key }); }}>
+            const isEditing = editor?.kind === 'day' && editor.planId === selected.id && editor.day === key;
+            return <li key={key}><button className={`weekly-day${assigned ? assigned.routine.exerciseCount === 0 ? ' weekly-day-empty' : ' weekly-day-planned' : ' weekly-day-rest'}${key === weekday ? ' weekly-day-today' : ''}${isEditing ? ' weekly-day-selected' : ''}`} data-weekday={key} disabled={state.pending} aria-label={`Editar ${weekdayLabels[key].full}: ${assigned ? `${assigned.routine.name}, ${assigned.routine.exerciseCount} ${assigned.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}` : 'Descanso'}`} onClick={() => { setRoutineId(assigned?.routineId ?? ''); setEditor({ kind: 'day', planId: selected.id, day: key }); }}>
               <span className={`weekly-day-label ${key === weekday ? 'weekly-current-day' : ''}`}>{weekdayLabels[key].short}</span>
               {assigned ? <Dumbbell className="weekly-day-icon" aria-hidden="true" /> : <Moon className="weekly-day-icon" aria-hidden="true" />}
-              <span className="weekly-day-content"><strong title={assigned?.routine.name ?? 'Descanso'}>{assigned?.routine.name ?? 'Descanso'}</strong>{assigned && <small title={`${assigned.routine.exerciseCount} ${assigned.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}>{assigned.routine.exerciseCount} ex.</small>}</span>
+              <span className="weekly-day-content"><strong title={assigned?.routine.name ?? 'Descanso'}>{assigned?.routine.name ?? 'Descanso'}</strong><span className="weekly-day-mobile-label" aria-hidden="true">{assigned ? assigned.routine.exerciseCount === 0 ? 'Sem ex.' : 'Treino' : 'Pausa'}</span>{assigned && <small title={`${assigned.routine.exerciseCount} ${assigned.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}>{assigned.routine.exerciseCount} ex.</small>}</span>
               {key === weekday && <span className="weekly-today-chip">Hoje</span>}
             </button></li>;
           })}</ol>
@@ -130,11 +131,10 @@ export function Workout() {
         <div className="weekly-section-heading"><div><h2>Minhas rotinas</h2><p>Listas de exercícios para usar nos seus treinos.</p></div><Button className="weekly-new-routine" variant="ghost" size="sm" onClick={() => navigate('/routines/new')}><Plus size={15} aria-hidden="true" /> Criar rotina</Button></div>
         {state.routines.length ? <div className="weekly-routine-list">{state.routines.map(routine => <div key={routine.id} className={`weekly-routine-row${routine.exerciseCount === 0 ? ' weekly-routine-empty' : ''}`}>
           <button className="weekly-routine" aria-label={`Abrir treino: ${routine.name}`} onClick={() => navigate(`/workout/live?routineId=${routine.id}`)}>
-            <span className="weekly-routine-icon"><Dumbbell size={19} aria-hidden="true" /></span>
-            <span className="weekly-routine-copy"><strong>{routine.name}</strong><small>{routine.exerciseCount === 0 ? 'Sem exercícios · pronta para organizar' : `${routine.exerciseCount} ${routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}</small></span>
+            <span className="weekly-routine-copy"><strong>{routine.name}</strong><small>{routine.exerciseCount === 0 ? 'Sem exercícios' : `${routine.exerciseCount} ${routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}</small></span>
             <ArrowRight className="weekly-routine-arrow" size={18} aria-hidden="true" />
           </button>
-          <Button variant="ghost" size="sm" aria-label={`Editar ${routine.name}`} onClick={() => navigate(`/routines/${routine.id}/edit`)}><Pencil size={15} aria-hidden="true" /> <span className="weekly-edit-label">Editar rotina</span></Button>
+          <Button variant="ghost" size="sm" aria-label={`Editar ${routine.name}`} title={`Editar ${routine.name}`} onClick={() => navigate(`/routines/${routine.id}/edit`)}><Pencil size={16} aria-hidden="true" /></Button>
         </div>)}</div> : <p className="weekly-empty-copy">Você ainda não tem rotinas. Crie uma lista de exercícios para usar na sua semana.</p>}
       </section>
       <section className="weekly-quick-links" aria-label="Outras formas de treinar">

@@ -159,8 +159,10 @@ export function Register() {
                 Cadastrar
               </Button>
 
-              <div className="register-alternative"><span>ou continue com</span></div>
-              <GoogleAuthButton />
+              <div className="register-social">
+                <div className="register-alternative"><span>ou continue com</span></div>
+                <GoogleAuthButton />
+              </div>
             </form>
 
             <p className="register-login">

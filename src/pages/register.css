@@ -179,11 +179,19 @@
   background: var(--color-teal-300);
 }
 
+.register-social {
+  margin-top: 25px;
+  padding: 18px 16px 20px;
+  border: 1px solid var(--color-kindra-200);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgb(45 212 191 / 5%), transparent 72%), var(--color-kindra-100);
+}
+
 .register-alternative {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 26px 0 18px;
+  margin: 0 0 17px;
   color: var(--color-kindra-400);
   font-size: 12px;
   white-space: nowrap;
@@ -194,6 +202,13 @@
   content: '';
   flex: 1;
   border-top: 1px solid var(--color-kindra-200);
+}
+
+.register-page .register-social .custom-google-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
 }
 
 .register-login {
@@ -227,7 +242,7 @@
   .register-intro p { margin-top: 12px; font-size: 14px; line-height: 1.6; }
   .register-form-area { grid-column: 1 / -1; margin-top: 20px; }
   .register-terms { margin-top: 18px; }
-  .register-alternative { margin-top: 23px; }
+  .register-social { margin-top: 23px; padding: 16px 12px 18px; }
   .register-login { margin-top: 22px; }
 }
 

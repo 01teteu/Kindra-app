@@ -137,11 +137,12 @@ export function Login() {
                 </Button>
               </div>
 
-              <div className="login-alternative">
-                <span>ou continue com</span>
+              <div className="login-social">
+                <div className="login-alternative">
+                  <span>ou continue com</span>
+                </div>
+                <GoogleAuthButton />
               </div>
-
-              <GoogleAuthButton />
             </form>
           </motion.div>
 
