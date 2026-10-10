@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Sheet } from '../components/ui/Sheet';
-import { Plus, Play, Dumbbell, ArrowUpRight, Pencil, X } from 'lucide-react';
+import { Plus, Play, Dumbbell, ArrowUpRight, ArrowRight, ChartNoAxesCombined, Moon, Pencil, X } from 'lucide-react';
+import { apiFetch } from '../lib/api';
 import { createWeeklyTrainingStore } from '../components/workout/weeklyTrainingState';
 import { localTrainingWeekday, trainingToday, trainingWeekdays, weekdayLabels, type TrainingWeekday } from '../shared/weeklyTraining';
 import './weekly-training.css';
@@ -11,6 +12,17 @@ import { starterEquipment, type StarterTrainingInput } from '../shared/starterTr
 import { equipmentLabels } from '../shared/activityOptions';
 
 type Editor = { kind: 'create' } | { kind: 'generate' } | { kind: 'rename'; planId: string } | { kind: 'day'; planId: string; day: TrainingWeekday };
+const guardianWorkout = new URL('../assets/workout/guardian-double-biceps.png', import.meta.url).href;
+const seenWelcomeInMemory = new Set<string>();
+const welcomeKey = (userId: string | null) => `kindra:workout-welcome:v1:${userId || 'session'}`;
+
+function hasSeenWelcome(userId: string | null) {
+  const key = welcomeKey(userId);
+  if (seenWelcomeInMemory.has(key)) return true;
+  if (!userId) return false;
+  try { return window.localStorage.getItem(key) === 'seen'; }
+  catch { return false; }
+}
 
 export function Workout() {
   const navigate = useNavigate();
@@ -22,8 +34,20 @@ export function Workout() {
   const [trainingDays, setTrainingDays] = useState<StarterTrainingInput['trainingDaysPerWeek'] | ''>('');
   const [equipment, setEquipment] = useState<StarterTrainingInput['equipment']>([]);
   const [today, setToday] = useState(() => new Date());
+  const [welcome, setWelcome] = useState<{ userId: string | null; open: boolean } | null>(null);
   useEffect(() => { void store.load(); }, [store]);
   useEffect(() => { if (state.authExpired) navigate('/login'); }, [state.authExpired, navigate]);
+  useEffect(() => {
+    let mounted = true;
+    void apiFetch('/auth/me').then((user: { id?: string }) => {
+      if (!mounted) return;
+      const userId = typeof user.id === 'string' ? user.id : null;
+      setWelcome({ userId, open: !hasSeenWelcome(userId) });
+    }).catch((error: { status?: number }) => {
+      if (mounted && error.status !== 401 && error.status !== 403) setWelcome({ userId: null, open: true });
+    });
+    return () => { mounted = false; };
+  }, []);
   useEffect(() => {
     const refresh = () => setToday(new Date());
     const timer = window.setInterval(refresh, 30000);
@@ -38,6 +62,19 @@ export function Workout() {
   const error = state.error && (!state.errorPlanId || state.errorPlanId === state.selectedId) ? state.error : '';
   const close = () => { if (editor?.kind !== 'generate' || !state.pending) setEditor(null); };
   const openCreate = () => { setName(''); setEditor({ kind: 'create' }); };
+  const dismissWelcome = () => setWelcome(current => current ? { ...current, open: false } : current);
+  const chooseWelcome = (kind: 'create' | 'generate') => {
+    if (!welcome) return;
+    const key = welcomeKey(welcome.userId);
+    seenWelcomeInMemory.add(key);
+    if (welcome.userId) {
+      try { window.localStorage.setItem(key, 'seen'); }
+      catch { /* Visual preference remains in memory for this session. */ }
+    }
+    dismissWelcome();
+    if (kind === 'generate') setEditor({ kind: 'generate' });
+    else openCreate();
+  };
   const save = async () => {
     if (!editor) return;
     const target = editor;
@@ -49,21 +86,22 @@ export function Workout() {
     if (success) setEditor(current => current === target ? null : current);
   };
   return <div className="page-container weekly-page">
-    <header className="weekly-heading"><h1>Seus treinos</h1><p>Organize sua semana e encontre o próximo treino.</p><Link to="/workout/progress" className="weekly-evolution-entry"><span className="weekly-evolution-kicker">Acompanhe seu caminho</span><span className="weekly-evolution-title">Sua evolução</span><span className="weekly-evolution-copy">Veja a força, o volume e as marcas que você construiu nos seus treinos.</span><span className="weekly-evolution-action">Ver evolução <ArrowUpRight size={18} aria-hidden="true" /></span></Link></header>
+    <header className="weekly-heading"><h1>Treinos</h1><p>Organize sua semana e encontre o próximo treino.</p></header>
     {!editor && error && <div role="alert" className="weekly-error">{error} <Button variant="ghost" onClick={() => void store.load()} disabled={state.pending || state.loading}>Tentar novamente</Button></div>}
     {!state.loaded && state.loading && <p role="status">Carregando sua semana...</p>}
     {state.loaded && <>
       <div className="weekly-overview">
-      {active && <section className={`weekly-today${day ? '' : ' weekly-today-rest'}`} aria-label="Treino de hoje">
+      {active ? <section className={`weekly-today${day ? '' : ' weekly-today-rest'}`} aria-label="Treino de hoje">
+        <img className="weekly-guardian" src={guardianWorkout} alt="" aria-hidden="true" width="1254" height="1254" decoding="async" />
         <div className="weekly-today-copy">
         <p className="weekly-context">Hoje <span>{weekdayLabels[weekday].full}</span></p>
-        <p className="weekly-next-label">{day ? 'Seu próximo treino' : 'Na sua semana'}</p>
+        <p className="weekly-next-label">{day ? 'Seu treino de hoje' : 'Na sua semana'}</p>
         <h2>{day ? day.routine.name : 'Hoje é descanso'}</h2>
         {day ? <p className="weekly-today-detail">{day.routine.exerciseCount === 0 ? 'Rotina sem exercícios' : <><strong>{day.routine.exerciseCount}</strong> {day.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'} nesta rotina</>}</p> : <p className="weekly-today-detail">Nenhuma rotina programada para hoje. Consulte os outros dias na sua agenda.</p>}
-        </div>
-        {day && <Button isLoading={state.pending} onClick={async () => { if (await store.start(day.routineId)) navigate('/workout/live'); }}><Play size={16} aria-hidden="true" /> Iniciar treino</Button>}
         <p className="weekly-active-source">Plano em uso<strong>{active.name}</strong></p>
-      </section>}
+        {day && <Button isLoading={state.pending} onClick={async () => { if (await store.start(day.routineId)) navigate('/workout/live'); }}><Play size={16} aria-hidden="true" /> Iniciar treino</Button>}
+        </div>
+      </section> : <section className="weekly-today weekly-today-empty" aria-label="Treino de hoje"><p className="weekly-context">Hoje</p><p className="weekly-next-label">Seu treino de hoje</p><h2>Sem plano em uso</h2><p className="weekly-today-detail">{state.plans.length ? 'Ative um plano abaixo para definir o treino de hoje.' : 'Crie uma base inicial para organizar sua semana de treino.'}</p></section>}
       <section aria-label="Minha Semana" className="weekly-section">
         <div className="weekly-section-heading"><div><h2>Minha semana</h2><p>Distribua suas rotinas pelos dias da semana.</p></div>{state.plans.length > 0 && <Button className="weekly-new-plan" variant="ghost" size="sm" onClick={openCreate} disabled={state.pending}><Plus size={16} aria-hidden="true" /> Novo plano</Button>}</div>
         {!state.plans.length ? <div className="weekly-empty"><p>Organize sua semana de treino</p><p className="text-kindra-500">Crie uma base inicial. Você pode editar tudo depois.</p><div className="weekly-empty-actions"><Button variant="outline" onClick={openCreate}>Montar manualmente</Button><Button onClick={() => setEditor({ kind: 'generate' })}>Criar uma base para mim</Button></div></div> : selected && <>
@@ -78,19 +116,32 @@ export function Workout() {
           <ol className="weekly-days">{trainingWeekdays.map(key => {
             const assigned = selected.days.find(item => item.dayOfWeek === key);
             return <li key={key}><button className={`weekly-day${assigned ? assigned.routine.exerciseCount === 0 ? ' weekly-day-empty' : ' weekly-day-planned' : ' weekly-day-rest'}${key === weekday ? ' weekly-day-today' : ''}`} data-weekday={key} disabled={state.pending} aria-label={`Editar ${weekdayLabels[key].full}`} onClick={() => { setRoutineId(assigned?.routineId ?? ''); setEditor({ kind: 'day', planId: selected.id, day: key }); }}>
-              <span className={`weekly-day-label ${key === weekday ? 'weekly-current-day' : ''}`}><span>{weekdayLabels[key].short}</span>{key === weekday && <small>Hoje</small>}</span>
-              <span className="weekly-day-content"><strong>{assigned?.routine.name ?? 'Descanso'}</strong>{assigned && <small>{assigned.routine.exerciseCount === 0 ? 'Sem exercícios' : `${assigned.routine.exerciseCount} ${assigned.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}</small>}</span>
+              <span className={`weekly-day-label ${key === weekday ? 'weekly-current-day' : ''}`}>{weekdayLabels[key].short}</span>
+              {assigned ? <Dumbbell className="weekly-day-icon" aria-hidden="true" /> : <Moon className="weekly-day-icon" aria-hidden="true" />}
+              <span className="weekly-day-content"><strong title={assigned?.routine.name ?? 'Descanso'}>{assigned?.routine.name ?? 'Descanso'}</strong>{assigned && <small title={`${assigned.routine.exerciseCount} ${assigned.routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}>{assigned.routine.exerciseCount} ex.</small>}</span>
+              {key === weekday && <span className="weekly-today-chip">Hoje</span>}
             </button></li>;
           })}</ol>
           <p className="weekly-edit-hint">Selecione um dia para ajustar sua semana.</p>
         </>}
       </section>
       </div>
-      <section aria-label="Minhas rotinas" className="weekly-routines"><div className="weekly-section-heading"><div><h2>Minhas rotinas</h2><p>Listas de exercícios para usar nos seus treinos.</p></div><Button className="weekly-new-plan" variant="ghost" size="sm" onClick={() => navigate('/routines/new')}><Plus size={15} aria-hidden="true" /> Criar rotina</Button></div>
-        {state.routines.length ? <div className="weekly-routine-list">{state.routines.map(routine => <div key={routine.id} className={`weekly-routine-row${routine.exerciseCount === 0 ? ' weekly-routine-empty' : ''}`}><button className="weekly-routine" aria-label={`Abrir treino: ${routine.name}`} onClick={() => navigate(`/workout/live?routineId=${routine.id}`)}><span><strong>{routine.name}</strong><small>{routine.exerciseCount === 0 ? 'Sem exercícios · pronta para organizar' : `${routine.exerciseCount} ${routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}</small></span><span className="weekly-open-routine">Abrir treino <ArrowUpRight size={16} aria-hidden="true" /></span></button><Button variant="ghost" size="sm" aria-label={`Editar ${routine.name}`} onClick={() => navigate(`/routines/${routine.id}/edit`)}><Pencil size={15} aria-hidden="true" /> Editar rotina</Button></div>)}</div> : <p className="weekly-empty-copy">Você ainda não tem rotinas. Crie uma lista de exercícios para usar na sua semana.</p>}
-        <div className="weekly-free"><div><h3>Prefere um treino livre?</h3><p>Escolha os exercícios durante a sessão.</p></div><Button variant="outline" size="sm" onClick={() => navigate('/workout/live')}><Play size={15} aria-hidden="true" /> Treino livre</Button></div>
+      <section aria-label="Minhas rotinas" className="weekly-routines">
+        <div className="weekly-section-heading"><div><h2>Minhas rotinas</h2><p>Listas de exercícios para usar nos seus treinos.</p></div><Button className="weekly-new-routine" variant="ghost" size="sm" onClick={() => navigate('/routines/new')}><Plus size={15} aria-hidden="true" /> Criar rotina</Button></div>
+        {state.routines.length ? <div className="weekly-routine-list">{state.routines.map(routine => <div key={routine.id} className={`weekly-routine-row${routine.exerciseCount === 0 ? ' weekly-routine-empty' : ''}`}>
+          <button className="weekly-routine" aria-label={`Abrir treino: ${routine.name}`} onClick={() => navigate(`/workout/live?routineId=${routine.id}`)}>
+            <span className="weekly-routine-icon"><Dumbbell size={19} aria-hidden="true" /></span>
+            <span className="weekly-routine-copy"><strong>{routine.name}</strong><small>{routine.exerciseCount === 0 ? 'Sem exercícios · pronta para organizar' : `${routine.exerciseCount} ${routine.exerciseCount === 1 ? 'exercício' : 'exercícios'}`}</small></span>
+            <ArrowRight className="weekly-routine-arrow" size={18} aria-hidden="true" />
+          </button>
+          <Button variant="ghost" size="sm" aria-label={`Editar ${routine.name}`} onClick={() => navigate(`/routines/${routine.id}/edit`)}><Pencil size={15} aria-hidden="true" /> <span className="weekly-edit-label">Editar rotina</span></Button>
+        </div>)}</div> : <p className="weekly-empty-copy">Você ainda não tem rotinas. Crie uma lista de exercícios para usar na sua semana.</p>}
       </section>
-      <Link to="/workout/exercises" className="weekly-catalog"><Dumbbell size={20} aria-hidden="true" /><div><h3>Explore os exercícios</h3><p>Busque por nome ou grupo muscular.</p></div><ArrowUpRight size={17} aria-hidden="true" /></Link>
+      <section className="weekly-quick-links" aria-label="Outras formas de treinar">
+        <div className="weekly-free"><span className="weekly-quick-icon"><Play size={22} aria-hidden="true" /></span><div><h3>Treino livre</h3><p>Treine sem seguir um plano fixo.</p></div><Button variant="ghost" size="sm" onClick={() => navigate('/workout/live')}><ArrowRight size={19} aria-hidden="true" /><span className="sr-only">Treino livre</span></Button></div>
+        <Link to="/workout/exercises" className="weekly-catalog"><span className="weekly-quick-icon"><Dumbbell size={22} aria-hidden="true" /></span><div><h3>Explore os exercícios</h3><p>Busque por nome ou grupo muscular.</p></div><ArrowRight size={19} aria-hidden="true" /></Link>
+      </section>
+      <Link to="/workout/progress" className="weekly-evolution-entry"><span className="weekly-evolution-icon"><ChartNoAxesCombined size={23} aria-hidden="true" /></span><span className="weekly-evolution-copy-wrap"><span className="weekly-evolution-kicker">Acompanhe seu caminho</span><span className="weekly-evolution-title">Sua evolução</span><span className="weekly-evolution-copy">Veja a força, o volume e as marcas que você construiu nos seus treinos.</span></span><ArrowRight className="weekly-evolution-arrow" size={19} aria-hidden="true" /></Link>
     </>}
     <Sheet open={Boolean(editor)} onClose={close} label={editor?.kind === 'generate' ? 'Criar base inicial' : editor?.kind === 'day' ? `Editar ${weekdayLabels[editor.day].full}` : editor?.kind === 'rename' ? 'Renomear plano' : 'Criar plano'}>
       {editor && <form className="weekly-editor" onSubmit={event => { event.preventDefault(); void save(); }}>
@@ -107,6 +158,18 @@ export function Workout() {
         <Button className="w-full" type="submit" isLoading={state.pending} disabled={editor.kind === 'generate' ? !trainingDays || !equipment.length : editor.kind !== 'day' && !name.trim()}>{editor.kind === 'generate' ? 'Criar base inicial' : 'Salvar alterações'}</Button>
         {editor.kind === 'day' && selected?.days.some(item => item.dayOfWeek === editor.day) && <Button className="w-full" type="button" variant="ghost" disabled={state.pending} onClick={async () => { const target = editor; if (await store.removeDay(target.planId, target.day)) setEditor(current => current === target ? null : current); }}>Remover treino do dia</Button>}
       </form>}
+    </Sheet>
+    <Sheet open={Boolean(welcome?.open && state.loaded && !editor)} onClose={dismissWelcome} label="Como você quer começar?">
+      <div className="weekly-welcome">
+        <div className="weekly-welcome-top"><span className="eyebrow">Bem-vindo aos treinos</span><button type="button" aria-label="Fechar apresentação" onClick={dismissWelcome}><X size={20} aria-hidden="true" /></button></div>
+        <h2>Como você quer começar?</h2>
+        <p>Escolha uma forma de organizar sua primeira semana. Você pode ajustar tudo depois.</p>
+        <div className="weekly-welcome-choices">
+          <button type="button" onClick={() => chooseWelcome('generate')}><span className="weekly-welcome-choice-icon"><Dumbbell size={22} aria-hidden="true" /></span><span><strong>Criar uma base para mim</strong><small>Escolha seus dias e equipamentos. O Kindra monta uma base inicial.</small></span><ArrowRight size={19} aria-hidden="true" /></button>
+          <button type="button" onClick={() => chooseWelcome('create')}><span className="weekly-welcome-choice-icon"><Pencil size={21} aria-hidden="true" /></span><span><strong>Montar manualmente</strong><small>Crie seu próprio plano e organize a semana do seu jeito.</small></span><ArrowRight size={19} aria-hidden="true" /></button>
+        </div>
+        <button type="button" className="weekly-welcome-later" onClick={dismissWelcome}>Agora não</button>
+      </div>
     </Sheet>
   </div>;
 }
