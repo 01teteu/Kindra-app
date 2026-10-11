@@ -48,7 +48,7 @@
 @layer base {
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-kindra-base);
+    background: var(--kindra-page-background) fixed;
     color: var(--color-kindra-950);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -63,6 +63,17 @@
   input[type='number'] {
     -moz-appearance: textfield;
   }
+}
+
+/* One backdrop for public pages, auth and the app; local cards keep their own surfaces. */
+:root {
+  --kindra-page-background:
+    radial-gradient(ellipse 85% 58% at 82% -8%, rgb(38 92 77 / 12%), transparent 72%),
+    linear-gradient(165deg, #0d1110 0%, #090c0b 58%, #060807 100%);
+}
+
+#root > :is(.public-page, .login-page, .register-page, .forgot-password-page, .verify-email-page, .onboarding-page, .app-shell, .workout-live) {
+  background-color: transparent;
 }
 
 /* Override global no Google Auth para deixá-lo um pouco mais largo se o Google permitir */

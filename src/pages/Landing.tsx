@@ -52,7 +52,7 @@ export function Landing() {
             <motion.div className="landing-hero-guardian" initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, delay: 0.28, ease: 'easeOut' }}>
               <img src={guardianMain} width="525" height="718" fetchPriority="high" alt="Guardian Totem do Kindra, guardião de corpo graphite e olhos mint" />
             </motion.div>
-            <span className="landing-hero-index" aria-hidden="true">K / 01</span>
+            <span className="landing-hero-index" aria-hidden="true">KINDRA / 01</span>
           </div>
           <div className="landing-hero-bottom">
             <motion.div initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.55 }}>

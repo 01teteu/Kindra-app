@@ -206,7 +206,6 @@
 }
 @media (max-width: 359px) {
   .kindra-landing .public-container { width: calc(100% - 32px); }
-  .kindra-landing .public-header .kindra-brand-mark { display: none; }
   .kindra-landing .landing-hero-actions { flex-direction: column; align-items: stretch; gap: 6px; }
   .kindra-landing .landing-hero-actions .landing-text-link { justify-content: center; }
 }
