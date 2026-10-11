@@ -98,7 +98,7 @@ try {
     await evaluate(`(() => {const e=document.querySelector(${JSON.stringify(selector)}); e.focus(); Object.getOwnPropertyDescriptor(${selector.includes('select') ? 'HTMLSelectElement' : selector.includes('textarea') ? 'HTMLTextAreaElement' : 'HTMLInputElement'}.prototype,'value').set.call(e,${JSON.stringify(value)}); e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true}));})()`);
   }
   async function capture(name: string) {
-    if (!['desktop-1920','mobile-390'].includes(name)) return;
+    if (!['desktop-1920','mobile-360','mobile-390','mobile-430'].includes(name)) return;
     await delay(150);
     const screenshot = await send('Page.captureScreenshot', { format: 'png' });
     writeFileSync(`${outputDir}/${name}.png`, Buffer.from(screenshot.data, 'base64'));
@@ -191,24 +191,24 @@ try {
     })()`);
     assert.ok(colors.border.includes('0px 0px 0px 2px inset'), colors.border);
     assert.equal(colors.neutral, 'none');
-    assert.equal(colors.neutralBackground, 'rgba(0, 0, 0, 0)');
+    assert.notEqual(colors.neutralBackground, 'rgba(0, 0, 0, 0)', `${theme}: neutral row has its own surface`);
     assert.ok(contrast(colors.ink, colors.background) >= 4.5, `${theme}: text contrast`);
     assert.ok(contrast(colors.ink, colors.base) >= 3, `${theme}: border contrast`);
     assert.ok(contrast(colors.input, colors.background) >= 4.5, `${theme}: input contrast ${JSON.stringify(colors)}`);
     console.log(`PASS ${theme}: gold text ${contrast(colors.ink, colors.background).toFixed(2)}:1; inputs ${contrast(colors.input, colors.background).toFixed(2)}:1.`);
   }
   await evaluate(`document.querySelector('.workout-live').removeAttribute('style')`);
-  for (const width of [390, 1366, 1920]) {
-    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width === 390 });
+  for (const width of [360, 390, 430, 1366, 1920]) {
+    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width <= 430 });
     assert.equal(await evaluate(`document.documentElement.scrollWidth <= window.innerWidth`), true);
     assert.equal(await evaluate(`[...document.querySelectorAll('.live-pr')].every(e=>e.scrollWidth<=e.clientWidth)`), true);
     await evaluate(`document.querySelector('[aria-label="Concluir Série 2"]').focus()`);
     assert.equal(await evaluate(`document.activeElement.matches('[aria-label="Concluir Série 2"]')`), true);
-    await capture(width === 390 ? 'mobile-390' : width === 1920 ? 'desktop-1920' : 'laptop');
+    await capture(width <= 430 ? `mobile-${width}` : width === 1920 ? 'desktop-1920' : 'laptop');
   }
   assert.deepEqual(runtimeErrors, []);
   assert.deepEqual(dialogs, []);
-  console.log(refreshOnly ? 'PASS navegador: refresh com PRs derivados, hidratação única, foco e 390/1366/1920 sem overflow.' : 'PASS navegador real: baseline, 99/105/103/110, PR confirmado, reopen, refresh com PRs derivados, foco e 390/1366/1920 sem overflow.');
+  console.log(refreshOnly ? 'PASS navegador: refresh com PRs derivados, hidratação única, foco e 360/390/430/1366/1920 sem overflow.' : 'PASS navegador real: baseline, 99/105/103/110, PR confirmado, reopen, refresh com PRs derivados, foco e 360/390/430/1366/1920 sem overflow.');
 } finally {
   socket?.close();
   if (browser && browser.exitCode === null) { browser.kill('SIGTERM'); await once(browser, 'exit'); }

@@ -106,7 +106,7 @@ try {
   async function names() { return evaluate(`[...document.querySelectorAll('.exercise-card-name')].map(e=>e.textContent)`); }
   async function ready() { await wait(`Boolean(document.querySelector('.workout-live'))`); }
   async function capture(name: string) {
-    if (!['desktop-1920','mobile-390'].includes(name)) return;
+    if (!['desktop-1920','mobile-390','mobile-390-upcoming'].includes(name)) return;
     await delay(150);
     const screenshot = await send('Page.captureScreenshot', { format: 'png' });
     writeFileSync(`${outputDir}/${name}.png`, Buffer.from(screenshot.data, 'base64'));
@@ -224,7 +224,7 @@ try {
   assert.equal(await evaluate(`document.querySelector('.live-note-saved p').textContent`), 'Banco no nível 3.');
   assert.equal(await evaluate(`document.querySelector('[aria-label="Carga de Série 1 em kg"]').value`), '32,5');
   assert.equal(await evaluate(`document.querySelector('[data-testid="volume"]').textContent.trim()`), '560 kg');
-  const displayed = await evaluate<string>(`document.querySelector('.live-header-clock span').textContent`);
+  const displayed = await evaluate<string>(`document.querySelector('.live-header-clock strong').textContent`);
   const seconds = displayed.split(':').reduce((total, part) => total * 60 + Number(part), 0);
   assert.ok(Math.abs(seconds - (Date.now() - session.startedAt.getTime()) / 1000) <= 3, 'Timer usa startedAt após refresh');
   for (const [width, height] of [[390, 844], [1366, 900], [1920, 1080]]) {
@@ -233,16 +233,36 @@ try {
     assert.equal(await evaluate(`document.documentElement.scrollWidth <= window.innerWidth`), true, `Overflow ${width}`);
     await capture(width === 390 ? 'mobile-390' : width === 1920 ? 'desktop-1920' : 'laptop');
   }
+  // With three real session exercises, only the one after the current exercise
+  // belongs in the informational upcoming list. All exercise editors remain available.
+  const addToSession = async (path: string, payload: object) => {
+    const response = await app.inject({ method: 'POST', url: `/api/workouts/sessions${path}`,
+      payload, headers: { authorization: `Bearer ${token}` } });
+    assert.equal(response.statusCode, 201);
+    return response.json();
+  };
+  for (let index = 0; index < 2; index++) {
+    const added = await addToSession(`/${session.id}/exercises`, { exerciseId: exercise.id });
+    const extraId = added.exercises.at(-1).id;
+    await addToSession(`/${session.id}/exercises/${extraId}/sets`, { weight: 20, reps: 8 });
+  }
+  await send('Page.reload');
+  await wait(`document.querySelectorAll('.live-exercises > div').length === 3 && document.querySelectorAll('.live-upcoming li').length === 1`);
+  assert.equal(await evaluate(`document.querySelector('.live-upcoming-count').textContent.trim()`), '0/1 séries concluídas');
+  assert.equal(await evaluate(`document.querySelector('.live-upcoming button') === null`), true);
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  assert.equal(await evaluate(`document.documentElement.scrollWidth <= window.innerWidth`), true);
+  await capture('mobile-390-upcoming');
   await click('[aria-label="Reabrir Série 1"]');
-  await wait(`document.querySelector('[aria-label="Concluir Série 1"]') !== null`);
-  await fill('[aria-label="Carga de Série 1 em kg"]', '35');
+  await wait(`document.querySelector('.live-exercise.is-current [aria-label="Carga de Série 1 em kg"]')?.value === '32,5'`);
+  await fill('.live-exercise.is-current [aria-label="Carga de Série 1 em kg"]', '35');
   await key('Enter');
   await wait(`!document.body.innerText.includes('Salvando…') && !document.body.innerText.includes('Há edições ainda não salvas.')`);
-  await click('[aria-label="Concluir Série 1"]');
+  await click('.live-exercise.is-current [aria-label="Concluir Série 1"]');
   await wait(`document.querySelectorAll('.live-set.is-completed').length === 3`);
   await clickText('Concluir');
   await clickText('Concluir treino');
-  await wait(`document.querySelector('.live-finished h1')?.textContent === 'Treino concluído'`);
+  await wait(`document.querySelector('.live-completion h1')?.textContent === 'Treino concluído'`);
   const closed = await snapshot();
   assert.equal(closed.status, 'COMPLETED');
   assert.equal(closed.exercises[0].sets[0].weight, 35);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { MoreVertical, Plus, Timer } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { ExerciseThumbnail, MuscleVisual } from '../ExerciseThumbnail';
@@ -8,8 +9,8 @@ import { NumericField, SetRow } from './SetRow';
 import { formatTime, previousSetLabels, type PreviousPerformance, type LiveExercise, type LiveCatalogExercise, type SetType } from './model';
 import type { LiveWorkoutStore } from './state';
 
-export function LiveExerciseCard({ exercise, disabled, isCurrent, store, sessionId, catalog, previous }: {
-  exercise: LiveExercise; disabled: boolean; isCurrent: boolean; store: LiveWorkoutStore; sessionId: string; catalog?: LiveCatalogExercise; previous?: PreviousPerformance | null;
+export function LiveExerciseCard({ exercise, disabled, isCurrent, store, sessionId, catalog, previous, sessionSummary }: {
+  exercise: LiveExercise; disabled: boolean; isCurrent: boolean; store: LiveWorkoutStore; sessionId: string; catalog?: LiveCatalogExercise; previous?: PreviousPerformance | null; sessionSummary?: ReactNode;
 }) {
   const [restOpen, setRestOpen] = useState(false);
   const [defaultRest, setDefaultRest] = useState(exercise.sets.at(-1)?.restTime ?? 0);
@@ -27,10 +28,11 @@ export function LiveExerciseCard({ exercise, disabled, isCurrent, store, session
   const previousLabels = previousSetLabels(exercise.sets, previous);
   let workingNumber = 0;
   const nextSetId = isCurrent && !frozen ? exercise.sets.find(set => !set.completedAt)?.id : undefined;
-  return <section className="live-exercise" aria-label={exercise.exerciseNameSnapshot}>
+  return <section className={`live-exercise${isCurrent ? ' is-current' : ''}`} aria-label={exercise.exerciseNameSnapshot}>
+    <div className="live-exercise-hero">
     <div className="live-exercise-heading">
       <div className="live-thumb">{catalog ? <ExerciseThumbnail exercise={catalog} /> : <div className="exercise-thumbnail"><div className="exercise-placeholder"><MuscleVisual muscle={exercise.primaryMuscleSnapshot} /></div></div>}</div>
-      <div className="min-w-0 flex-1"><h2>{exercise.exerciseNameSnapshot}</h2><p>{muscleLabels[exercise.primaryMuscleSnapshot] ?? exercise.primaryMuscleSnapshot} · {equipmentLabels[exercise.equipmentSnapshot] ?? exercise.equipmentSnapshot}</p></div>
+      <div className="live-exercise-copy min-w-0 flex-1">{isCurrent && <span className="live-current-label">Exercício atual</span>}<h2>{exercise.exerciseNameSnapshot}</h2><p>{muscleLabels[exercise.primaryMuscleSnapshot] ?? exercise.primaryMuscleSnapshot} · {equipmentLabels[exercise.equipmentSnapshot] ?? exercise.equipmentSnapshot}</p></div>
       {!disabled && <details className="live-menu live-exercise-menu" onKeyDown={event => {
         if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); }
       }}><summary aria-label={`Opções de ${exercise.exerciseNameSnapshot}`}><MoreVertical size={20} /></summary>
@@ -44,7 +46,7 @@ export function LiveExerciseCard({ exercise, disabled, isCurrent, store, session
     {unsupported && <p className="live-notice">Execução disponível apenas para exercícios com carga e repetições.</p>}
     <div className="live-rest">
       <button type="button" disabled={frozen || applying} onClick={() => { setRest(exercise.sets[0]?.restTime ?? defaultRest); if (restOpen) store.dirty(restKey, false); setRestOpen(value => !value); }} aria-expanded={restOpen}>
-        <Timer size={15} aria-hidden="true" />Descanso: {shownRest}
+        <Timer size={15} aria-hidden="true" /><span>Descanso planejado <strong>{shownRest}</strong></span>
       </button>
       {restOpen && !frozen && <div className="live-rest-edit">
         <label>Segundos após cada série<NumericField label="Descanso planejado em segundos" value={rest} integer disabled={applying} onChange={value => { setRest(value); store.dirty(restKey, true); }} /></label>
@@ -60,6 +62,10 @@ export function LiveExerciseCard({ exercise, disabled, isCurrent, store, session
         }}>{applying ? 'Salvando…' : 'Aplicar a todas'}</Button>
       </div>}
     </div>
+    </div>
+    {sessionSummary}
+    <div className="live-series">
+    <h3>Séries</h3>
     <div className="live-table-heading live-set-grid" aria-hidden="true"><span>Série</span><span>Anterior</span><span>KG</span><span>Reps</span><span>Feita</span></div>
     <div className="live-set-list">{exercise.sets.map(set => <div key={set.id}><SetRow set={set} isNext={set.id === nextSetId} number={set.type === 'WORKING' ? ++workingNumber : set.setNumber}
       disabled={frozen} store={store} base={base} previous={previousLabels[set.id]} /></div>)}</div>
@@ -73,5 +79,6 @@ export function LiveExerciseCard({ exercise, disabled, isCurrent, store, session
           ...(type === 'DROP_SET' ? {} : { weight: previous?.weight ?? null, reps: previous?.reps ?? null }) });
       }}><Plus size={16} />Adicionar série</Button>
     </div>}
+    </div>
   </section>;
 }

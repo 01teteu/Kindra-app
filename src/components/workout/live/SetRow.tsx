@@ -123,7 +123,7 @@ export function SetRow({ set, number, disabled, isNext, store, base, previous = 
     if (window.confirm('Remover este segmento preenchido?')) void store.mutate(set.id, `${path}/segments/${segment.id}`, 'DELETE');
   };
   return <div className={`live-set${isNext ? ' is-next' : ''}${completed ? ' is-completed' : ''}${achievement ? ' is-pr' : ''}${set.type === 'DROP_SET' ? ' is-drop' : ''}`} data-set-type={set.type} aria-current={isNext ? 'step' : undefined}>
-    {isNext && <span className="sr-only">Próxima série</span>}
+    {isNext && <span className="live-set-next">Próxima série</span>}
     <div className="live-set-grid">
       <div className="live-set-identity">
         <details ref={menuRef} className="live-menu live-set-menu" onToggle={event => setMenuOpen(event.currentTarget.open)} onKeyDown={event => {

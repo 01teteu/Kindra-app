@@ -197,8 +197,8 @@ try {
   await call(extraBase, { weight: 50, reps: 5 }); // unfinished WORKING must not count
   await send('Page.reload');
   await wait(`document.querySelectorAll('.live-set').length === 6`);
-  await evaluate(`document.querySelectorAll('.live-set')[3].querySelector('.live-complete').focus()`); await key('Enter'); await saved();
-  await evaluate(`document.querySelectorAll('.live-set')[4].querySelector('.live-complete').focus()`); await key('Enter'); await saved();
+  await evaluate(`document.querySelector('.live-exercise[aria-label="Remada resumo"] .live-set[data-set-type="WARMUP"] .live-complete').focus()`); await key('Enter'); await saved();
+  await evaluate(`document.querySelector('.live-exercise[aria-label="Remada resumo"] .live-set[data-set-type="DROP_SET"] .live-complete').focus()`); await key('Enter'); await saved();
   assert.equal(completions.at(-1).achievement, null);
   assert.equal(await evaluate(`document.querySelectorAll('.live-set.is-completed').length`), 5);
   // Persisted timestamps, not the local timer. This write is confined to the isolated fixture.

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Timer, ChevronLeft, X } from 'lucide-react';
+import { Plus, Timer, ChevronLeft, X, ListChecks, Trash2 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -9,6 +9,8 @@ import { apiFetch } from '../lib/api';
 import { LiveExerciseCard } from '../components/workout/live/LiveExerciseCard';
 import { ExerciseSelector } from '../components/workout/live/ExerciseSelector';
 import { WorkoutCompletionSummary } from '../components/workout/live/WorkoutCompletionSummary';
+import { ExerciseThumbnail, MuscleVisual } from '../components/workout/ExerciseThumbnail';
+import { muscleLabels, equipmentLabels } from '../shared/activityOptions';
 import { useLiveWorkout } from '../components/workout/live/useLiveWorkout';
 import { catalogSchema, elapsedSeconds, formatTime, summary, type LiveCatalogExercise } from '../components/workout/live/model';
 import './exercise-catalog.css';
@@ -55,11 +57,26 @@ export function WorkoutLive() {
     navigate('/workout');
   };
   const nextExerciseId = session?.exercises.find(exercise => exercise.sets.some(set => !set.completedAt))?.id;
+  const currentIndex = session?.exercises.findIndex(exercise => exercise.id === nextExerciseId) ?? -1;
+  const currentExercise = currentIndex >= 0 ? session?.exercises[currentIndex] : undefined;
+  const orderedExercises = currentExercise
+    ? [currentExercise, ...session!.exercises.filter(exercise => exercise.id !== currentExercise.id)]
+    : session?.exercises ?? [];
+  const upcomingExercises = currentIndex >= 0 ? session!.exercises.slice(currentIndex + 1) : [];
   const endSession = async (action: 'finish' | 'discard') => {
     if (!session) return;
     if (await store.mutate('end', `/${session.id}/${action}`, 'POST', undefined, action === 'finish' ? '' : undefined)) setFinish(false);
   };
   const volume = totals.volume === null ? '—' : totals.volume.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+  const sessionSummary = active && session && <section className="live-summary" aria-label="Resumo da sessão">
+    <h2><ListChecks size={20} aria-hidden="true" />Resumo da sessão</h2>
+    <div className="live-summary-grid">
+      <div><strong>{currentIndex >= 0 ? `${currentIndex + 1} de ${session.exercises.length}` : session.exercises.length}</strong><span>exercícios</span></div>
+      <div><strong data-testid="sets">{totals.sets ?? '—'}</strong><span>séries concluídas</span>{totals.warmups > 0 && <small>+ {totals.warmups} aquecimento{totals.warmups > 1 ? 's' : ''}</small>}</div>
+      <div><strong>{formatTime(elapsed)}</strong><span>tempo de sessão</span></div>
+    </div>
+    <p className="live-summary-volume">Volume <strong data-testid="volume">{volume} kg</strong></p>
+  </section>;
   const closeSummary = () => { store.clearClosed(); navigate('/workout', { replace: true }); };
   // Presentation after finish only. Refresh resumes GET active; no local summary persistence.
   if (session?.status === 'COMPLETED') return <div className="workout-live"><WorkoutCompletionSummary
@@ -75,7 +92,7 @@ export function WorkoutLive() {
         <span className="sr-only">{active ? 'Treino em andamento' : session ? 'Treino encerrado' : 'Novo treino'}</span>
         <Input aria-label="Nome do treino" value={session?.name ?? (routineId ? 'Treino da rotina' : name)} maxLength={100} readOnly={Boolean(session) || Boolean(routineId)} disabled={loading || unavailable || pending.includes('start')}
           onChange={event => setName(event.target.value)} /></div>
-      <span className="live-header-clock"><Timer size={16} aria-hidden="true" /><span>{formatTime(elapsed)}</span></span>
+      <span className="live-header-clock"><Timer size={20} aria-hidden="true" /><span><strong>{formatTime(elapsed)}</strong><small>Tempo de sessão</small></span></span>
       {active && <Button disabled={frozen} onClick={() => setFinish(true)}>Concluir</Button>}
     </div></header>
     <main className="live-main">
@@ -86,23 +103,34 @@ export function WorkoutLive() {
         {previousError && <p role="status" className="live-notice">{previousError}</p>}
         {personalRecordsError && <p role="status" className="live-notice">{personalRecordsError}</p>}
         {totals.error && <p role="alert" className="live-field-error">{totals.error}</p>}
-        <section className="live-summary" aria-label="Resumo do treino">
-          <div><span>Duração</span><strong>{formatTime(elapsed)}</strong></div>
-          <div><span>Volume</span><strong data-testid="volume">{volume}<small> kg</small></strong></div>
-          <div><span>Séries</span><strong data-testid="sets">{totals.sets ?? '—'}</strong>{totals.warmups > 0 && <small>+ {totals.warmups} aquecimento{totals.warmups > 1 ? 's' : ''}</small>}</div>
-        </section>
+        {!currentExercise && sessionSummary}
         {!session && !unavailable && <section className="live-empty"><h1>{routineId ? 'Inicie o treino com sua rotina.' : 'Seu treino ainda não foi iniciado.'}</h1>
           <Button disabled={pending.includes('start') || !name.trim()} onClick={() => {
             void store.mutate('start', '', 'POST', { ...(routineId ? { routineId } : { name: name.trim() }) });
           }}>{pending.includes('start') ? 'Iniciando…' : 'Iniciar treino'}</Button></section>}
         {active && !session.exercises.length && <section className="live-empty"><h1>Seu treino ainda não possui exercícios.</h1>
           <Button onClick={() => setSelector(true)} disabled={frozen}><Plus size={18} />Adicionar exercício</Button></section>}
-        <div className="live-exercises">{session?.exercises.map(exercise => <div key={exercise.id}><LiveExerciseCard previous={previous[exercise.id]} exercise={exercise} disabled={frozen} isCurrent={exercise.id === nextExerciseId}
-          store={store} sessionId={session.id} catalog={catalog.find(item => item.id === exercise.exerciseId)} /></div>)}</div>
+        <div className="live-exercises">{orderedExercises.map((exercise, index) => <Fragment key={exercise.id}>
+          {index === 1 && currentExercise && <h2 className="live-other-heading">Outros exercícios da sessão</h2>}
+          <div><LiveExerciseCard previous={previous[exercise.id]} exercise={exercise} disabled={frozen} isCurrent={exercise.id === nextExerciseId}
+            store={store} sessionId={session!.id} catalog={catalog.find(item => item.id === exercise.exerciseId)}
+            sessionSummary={exercise.id === nextExerciseId ? sessionSummary : undefined} /></div>
+          {index === 0 && currentExercise && upcomingExercises.length > 0 && <section className="live-upcoming" aria-label="Próximos exercícios">
+            <h2><ListChecks size={20} aria-hidden="true" />Próximos exercícios</h2>
+            <ul>{upcomingExercises.map(next => {
+              const item = catalog.find(entry => entry.id === next.exerciseId);
+              return <li key={next.id}>
+                <div className="live-upcoming-thumb">{item ? <ExerciseThumbnail exercise={item} /> : <div className="exercise-thumbnail"><div className="exercise-placeholder"><MuscleVisual muscle={next.primaryMuscleSnapshot} /></div></div>}</div>
+                <div className="live-upcoming-copy"><strong>{next.exerciseNameSnapshot}</strong><span>{muscleLabels[next.primaryMuscleSnapshot] ?? next.primaryMuscleSnapshot} · {equipmentLabels[next.equipmentSnapshot] ?? next.equipmentSnapshot}</span></div>
+                <span className="live-upcoming-count">{next.sets.filter(set => Boolean(set.completedAt)).length}/{next.sets.length}<span className="sr-only"> séries concluídas</span></span>
+              </li>;
+            })}</ul>
+          </section>}
+        </Fragment>)}</div>
         {active && session.exercises.length > 0 && <Button className="live-add-exercise" variant="outline" disabled={frozen} onClick={() => setSelector(true)}><Plus size={18} />Adicionar exercício</Button>}
         {active && <button type="button" className="live-discard" disabled={frozen} onClick={() => {
           if (window.confirm('Descartar este treino? A sessão será encerrada e os dados já salvos serão preservados.')) void endSession('discard');
-        }}>Descartar treino</button>}
+        }}><Trash2 size={16} aria-hidden="true" />Descartar treino</button>}
         {pending.length > 0 && <p role="status" className="live-notice">{ending ? 'Encerrando treino…' : 'Salvando…'}</p>}
         {dirty.length > 0 && <p role="status" className="live-notice">Há edições ainda não salvas.</p>}
       </>}
