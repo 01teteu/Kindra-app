@@ -12,7 +12,7 @@ await app.register(workoutRoutes, { prefix: '/api/workouts' });
 try {
   const owner = await db.user.create({ data: { email: 'previous-owner@example.test' } });
   const other = await db.user.create({ data: { email: 'previous-other@example.test' } });
-  const exercises = await Promise.all([0, 1, 2].map(index => db.exercise.create({ data: {
+  const exercises = await Promise.all([0, 1, 2, 3].map(index => db.exercise.create({ data: {
     origin: 'GLOBAL', slug: `previous-${index}`, name: 'Mesmo nome', primaryMuscle: 'CHEST', equipment: 'BARBELL',
     measurementType: 'WEIGHT_REPS', aliases: [], secondaryMuscles: [], muscleRegion: 'CHEST',
     movementPattern: 'PUSH', laterality: 'BILATERAL', instructions: 'Controle o movimento.',
@@ -83,6 +83,24 @@ try {
   } });
   const emptyPrevious = (await get(next.id)).items[0].previous;
   assert.equal(emptyPrevious.sessionId, empty.id); assert.equal(emptyPrevious.notes, null); assert.deepEqual(emptyPrevious.sets, []);
+  await db.workoutSession.update({ where: { id: next.id }, data: { status: 'COMPLETED', endedAt: new Date('2020-06-05T00:00:00Z') } });
+  // One hour apart on the same civil day: the raw SQL must match Prisma DateTime
+  // values whether the PostgreSQL connection timezone is UTC or not.
+  const nearby = await db.workoutSession.create({ data: {
+    userId: owner.id, name: 'Anterior próximo', status: 'COMPLETED',
+    startedAt: new Date('2020-07-01T12:00:00Z'), endedAt: new Date('2020-07-01T13:00:00Z'),
+    exercises: { create: { exerciseId: exercises[3].id, order: 0, notes: 'Nota do mesmo dia',
+      sets: { create: { setNumber: 1, type: 'WORKING', weight: 24, reps: 8, completedAt: new Date('2020-07-01T12:30:00Z') } } } },
+  } });
+  assert.equal((await get(nearby.id)).items[0].previous, null);
+  const nearbyTarget = await db.workoutSession.create({ data: {
+    userId: owner.id, name: 'Atual próximo', startedAt: new Date('2020-07-01T14:00:00Z'),
+    exercises: { create: { exerciseId: exercises[3].id, order: 0 } },
+  } });
+  const nearbyPrevious = (await get(nearbyTarget.id)).items[0].previous;
+  assert.equal(nearbyPrevious.sessionId, nearby.id);
+  assert.equal(nearbyPrevious.notes, 'Nota do mesmo dia');
+  assert.deepEqual(nearbyPrevious.sets.map((set: { weight: number; reps: number }) => [set.weight, set.reps]), [[24, 8]]);
   assert.ok(!/estimated1RM|personalBest|isPR|achievement|volume|record/.test(JSON.stringify(result)));
-  console.log('PASS batch, temporalidade estrita, desempate, duplicados, ownership, snapshots, notes, ordinais, séries/segmentos concluídos e ausência de métricas.');
+  console.log('PASS batch, temporalidade estrita, histórico no mesmo dia, ausência de histórico, desempate, duplicados, ownership, snapshots, notes, ordinais, séries/segmentos concluídos e ausência de métricas.');
 } finally { await app.close(); await db.$disconnect(); await database.cleanup(); }

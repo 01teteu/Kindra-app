@@ -152,7 +152,7 @@ export async function getPreviousPerformance(userId: string, sessionId: string) 
     FROM workout_exercises we JOIN workout_sessions ws ON ws.id = we."sessionId"
     WHERE we."exerciseId" IN (${Prisma.join([...new Set(target.exercises.map(item => item.exerciseId))])})
       AND ws."userId" = ${userId} AND ws.status = 'COMPLETED'
-      AND ws."endedAt" < ${target.startedAt} AND ws.id <> ${sessionId}
+      AND ws."endedAt" < (${target.startedAt} AT TIME ZONE 'UTC') AND ws.id <> ${sessionId}
     ORDER BY we."exerciseId", ws."endedAt" DESC, ws.id DESC, we."order" ASC`;
   const executions = await prisma.workoutExercise.findMany({
     where: { id: { in: winners.map(item => item.id) }, sessionIdRel: { userId } },
